@@ -8,6 +8,21 @@ export default function ChatSidebar({ teamId = "team-alpha-bits-id", onClose }) 
     const messagesEndRef = useRef(null);
     const currentUser = auth.currentUser;
 
+    const [userData, setUserData] = useState(null);
+
+    useEffect(() => {
+        if (currentUser) {
+            // Fetch current user details to send with messages
+            import('firebase/firestore').then(({ doc, getDoc }) => {
+                import('../firebase/config').then(({ db }) => {
+                    getDoc(doc(db, "users", currentUser.uid)).then(snap => {
+                        if (snap.exists()) setUserData(snap.data());
+                    });
+                });
+            });
+        }
+    }, [currentUser]);
+
     useEffect(() => {
         const unsubscribe = listenToMessages(teamId, (msgs) => {
             setMessages(msgs);
@@ -23,7 +38,9 @@ export default function ChatSidebar({ teamId = "team-alpha-bits-id", onClose }) 
     const handleSendMessage = async () => {
         if (!newMessage.trim() || !currentUser) return;
         try {
-            await sendMessage(teamId, currentUser.uid, newMessage);
+            const name = userData?.username || userData?.name || "User";
+            const avatar = userData?.avatar || "";
+            await sendMessage(teamId, currentUser.uid, newMessage, name, avatar);
             setNewMessage("");
             scrollToBottom();
         } catch (error) {
@@ -39,7 +56,7 @@ export default function ChatSidebar({ teamId = "team-alpha-bits-id", onClose }) 
     };
 
     return (
-        <aside className="w-80 border-l border-emerald-500/20 dark:border-emerald-500/20 bg-white/60 dark:bg-black/70 backdrop-blur-2xl flex flex-col hidden lg:flex">
+        <aside className="w-96 border-l border-emerald-500/20 dark:border-emerald-500/20 bg-white/60 dark:bg-black/70 backdrop-blur-2xl flex flex-col hidden lg:flex">
             <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">chat_bubble</span>
@@ -70,12 +87,19 @@ export default function ChatSidebar({ teamId = "team-alpha-bits-id", onClose }) 
                         <div key={msg.id} className={`flex flex-col gap-1.5 ${isMe ? 'items-end' : 'items-start'}`}>
                             <div className={`flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                                 {!isMe && (
-                                    <div className="size-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                                        {msg.userId.substring(0, 2).toUpperCase()}
+                                    <div
+                                        className="size-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center border border-slate-300 dark:border-slate-600"
+                                        style={msg.userAvatar ? { backgroundImage: `url(${msg.userAvatar})` } : {}}
+                                    >
+                                        {!msg.userAvatar && (
+                                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 flex items-center justify-center h-full w-full">
+                                                {(msg.userName || "U").substring(0, 1).toUpperCase()}
+                                            </span>
+                                        )}
                                     </div>
                                 )}
                                 <span className="text-xs font-bold text-slate-900 dark:text-white">
-                                    {isMe ? 'You' : `User ${msg.userId.substring(0, 4)}`}
+                                    {isMe ? 'You' : (msg.userName || `User ${msg.userId.substring(0, 4)}`)}
                                 </span>
                                 <span className="text-[10px] text-slate-400">
                                     {msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}

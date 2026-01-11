@@ -5,7 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Header({ title = "Team Alpha-Bits", hideSearch = false, showBack = false, backPath = "/dashboard", children }) {
+export default function Header({ title = "Team Alpha-Bits", backPath = "/teams", children }) {
     const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = useTheme();
     const [userData, setUserData] = React.useState(null);
@@ -27,38 +27,21 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
 
     return (
         <header className="flex items-center justify-between whitespace-nowrap border-b border-emerald-500/20 dark:border-emerald-500/20 px-6 lg:px-10 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 z-50">
-            <div className="flex items-center gap-8">
-                {showBack && (
-                    <Link to={backPath} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </Link>
-                )}
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={() => navigate(backPath)}
+                    className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                >
+                    <span className="material-symbols-outlined">arrow_back</span>
+                </button>
                 <Link to="/teams" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
                     <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />
                     <h2 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
                 </Link>
-                {!hideSearch && (
-                    <label className="hidden md:flex flex-col min-w-40 h-10 max-w-64">
-                        <div className="flex w-full flex-1 items-stretch rounded-lg h-full">
-                            <div className="text-slate-400 flex border-none bg-slate-100 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg">
-                                <span className="material-symbols-outlined text-[20px]">search</span>
-                            </div>
-                            <input className="form-input flex w-full min-w-0 flex-1 border-none bg-slate-100 dark:bg-emerald-900/10 focus:outline-0 focus:ring-0 text-slate-900 dark:text-white h-full placeholder:text-slate-600 dark:placeholder:text-emerald-100/40 px-4 rounded-r-lg pl-2 text-sm font-black" placeholder="Search workspace..." />
-                        </div>
-                    </label>
-                )}
             </div>
+
+
             <div className="flex items-center gap-6">
-                <nav className="hidden lg:flex items-center gap-6">
-                    {children || (
-                        <>
-                            <Link className="text-primary text-sm font-black" to="/dashboard">Dashboard</Link>
-                            <Link className="text-slate-700 dark:text-emerald-100/70 hover:text-primary transition-colors text-sm font-black" to="/workspace">Workspace</Link>
-                            <Link className="text-slate-700 dark:text-emerald-100/70 hover:text-primary transition-colors text-sm font-black" to="/teams">Teams</Link>
-                            <Link className="text-slate-700 dark:text-emerald-100/70 hover:text-primary transition-colors text-sm font-black" to="/profile">Profile</Link>
-                        </>
-                    )}
-                </nav >
                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
 
                 <button

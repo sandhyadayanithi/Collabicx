@@ -187,6 +187,25 @@ export const updateHackathonStatus = async (teamId, hackathonId, status) => {
 
 // --- 5. Notes Functions ---
 
+export const updateQuickNote = async (teamId, hackathonId, content) => {
+    const noteRef = doc(db, `teams/${teamId}/hackathons/${hackathonId}/notes`, 'shared');
+    await setDoc(noteRef, {
+        content,
+        updatedAt: serverTimestamp()
+    }, { merge: true });
+};
+
+export const listenToQuickNote = (teamId, hackathonId, callback) => {
+    const noteRef = doc(db, `teams/${teamId}/hackathons/${hackathonId}/notes`, 'shared');
+    return onSnapshot(noteRef, (doc) => {
+        if (doc.exists()) {
+            callback(doc.data().content);
+        } else {
+            callback(""); // Default to empty if no note exists
+        }
+    });
+};
+
 export const addNote = async (teamId, hackathonId, content) => {
     await addDoc(collection(db, `teams/${teamId}/hackathons/${hackathonId}/notes`), {
         content,
@@ -237,10 +256,12 @@ export const getLinks = async (teamId, hackathonId) => {
 
 // --- 8. Chat Functions ---
 
-export const sendMessage = async (teamId, userId, message) => {
+export const sendMessage = async (teamId, userId, message, userName = "Unknown", userAvatar = "") => {
     await addDoc(collection(db, `teams/${teamId}/messages`), {
         userId,
         message,
+        userName,
+        userAvatar,
         createdAt: serverTimestamp()
     });
 };

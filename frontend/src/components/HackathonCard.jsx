@@ -61,16 +61,8 @@ export default function HackathonCard({
 
                 {/* Footer: Participants & Actions */}
                 <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/50 flex items-center justify-between gap-3">
-                    <div className="flex -space-x-2">
-                        {participants.length > 0 ? participants.map((p, i) => (
-                            <div key={i} className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 bg-cover bg-center" style={{ backgroundImage: `url('${p}')` }}></div>
-                        )) : (
-                            <>
-                                <div className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 bg-cover bg-center" style={{ backgroundImage: 'url("https://ui-avatars.com/api/?name=User+1&background=random")' }}></div>
-                                <div className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 bg-cover bg-center" style={{ backgroundImage: 'url("https://ui-avatars.com/api/?name=User+2&background=random")' }}></div>
-                            </>
-                        )}
-                        <div className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">+</div>
+                    <div>
+                        {/* Participants removed as per request */}
                     </div>
 
                     <div className="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">

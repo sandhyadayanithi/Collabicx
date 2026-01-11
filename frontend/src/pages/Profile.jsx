@@ -78,30 +78,22 @@ export default function Profile() {
     }
 
     return (
-        <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen flex">
-            <Sidebar showLogo={true}
-                footer={
-                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors cursor-pointer text-left">
-                        <span className="material-symbols-outlined">logout</span>
-                        <p className="text-sm font-medium">Logout</p>
+        <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen bg-[#f5f5f5] dark:bg-[#0b101a]">
+            <header className="flex items-center justify-between px-6 lg:px-10 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 z-50 border-b border-emerald-500/20 dark:border-emerald-500/20">
+                <div className="flex items-center gap-4">
+                    <button onClick={() => navigate(-1)} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        <span className="material-symbols-outlined">arrow_back</span>
                     </button>
-                }
-            >
-                <div
-                    onClick={() => navigate('/teams')}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-[#9da6b9] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                >
-                    <span className="material-symbols-outlined">groups</span>
-                    <p className="text-sm font-medium">My Teams</p>
+                    <div className="flex items-center gap-3">
+                        <img src="/logo.png" alt="Collabicx" className="size-10 object-contain" />
+                        <h2 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
+                    </div>
                 </div>
-                <div
-                    onClick={() => navigate('/dashboard')}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-[#9da6b9] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                >
-                    <span className="material-symbols-outlined">dashboard</span>
-                    <p className="text-sm font-medium">Dashboard</p>
+
+                <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-full bg-cover bg-center border-2 border-slate-200 dark:border-slate-800" style={{ backgroundImage: `url(${userData?.avatar})` }}></div>
                 </div>
-            </Sidebar>
+            </header>
 
             <main className="flex-1 p-6 md:p-10 lg:p-16 max-w-4xl mx-auto w-full">
                 <div className="bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-[32px] border border-emerald-500/20 dark:border-emerald-500/20 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
