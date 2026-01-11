@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Sidebar({ children, showLogo = false, footer }) {
     return (
-        <aside className="w-16 md:w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white dark:bg-background-dark sticky top-0 h-screen">
+        <aside className="w-16 md:w-64 border-r border-slate-200 dark:border-slate-700 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white dark:bg-background-dark h-full">
             {showLogo && (
                 <div className="flex items-center gap-3 px-6 mb-2">
                     <div className="bg-primary size-10 rounded-lg flex items-center justify-center text-white shrink-0">

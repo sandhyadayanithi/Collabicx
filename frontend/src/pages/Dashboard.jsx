@@ -1,14 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HackathonCard from '../components/HackathonCard';
-import TaskItem from '../components/TaskItem';
 import NewHackathonModal from '../components/NewHackathonModal';
+import { getHackathons } from '../firebase/functions';
 
 export default function Dashboard() {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [hackathons, setHackathons] = useState([]);
+    const [loadingHackathons, setLoadingHackathons] = useState(true);
+    const [copied, setCopied] = useState(false);
+    const teamId = "team-alpha-bits-id"; // Hardcoded for now as per previous context
+    const joinCode = "XJ9-22L";
+
+    const fetchHackathons = useCallback(async () => {
+        setLoadingHackathons(true);
+        try {
+            const data = await getHackathons(teamId);
+            setHackathons(data);
+        } catch (error) {
+            console.error("Failed to fetch hackathons:", error);
+        } finally {
+            setLoadingHackathons(false);
+        }
+    }, [teamId]);
+
+    const handleCopyCode = () => {
+        navigator.clipboard.writeText(joinCode);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    useEffect(() => {
+        fetchHackathons();
+    }, [fetchHackathons]);
+
     return (
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-5xl mx-auto space-y-8 pb-10">
             {/* Profile Header */}
             <div className="flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="flex gap-5 items-center">
@@ -19,18 +47,19 @@ export default function Dashboard() {
                             <span className="material-symbols-outlined text-[16px]">groups</span> Hackathon Workspace
                         </p>
                         <div className="mt-1 flex items-center gap-2">
-                            <span className="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Join Code: XJ9-22L</span>
-                            <button className="text-primary hover:text-primary/80 transition-colors">
-                                <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                            <span className="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Join Code: {joinCode}</span>
+                            <button
+                                onClick={handleCopyCode}
+                                className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                                title="Copy Join Code"
+                            >
+                                <span className="material-symbols-outlined text-[16px]">{copied ? 'check' : 'content_copy'}</span>
+                                {copied && <span className="text-xs font-bold animate-in fade-in">Link copied!</span>}
                             </button>
                         </div>
                     </div>
                 </div>
                 <div className="flex gap-3">
-                    <button className="flex-1 @[480px]:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-white text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-                        <span className="material-symbols-outlined text-[18px]">person_add</span>
-                        Invite
-                    </button>
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="flex-1 @[480px]:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
@@ -47,55 +76,45 @@ export default function Dashboard() {
                     <h2 className="text-slate-900 dark:text-white text-xl font-bold">Active Hackathons</h2>
                     <button className="text-primary text-sm font-semibold hover:underline">View All</button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div onClick={() => navigate('/workspace')} className="cursor-pointer">
-                        <HackathonCard
-                            title="AI Safety Hackathon"
-                            TimeInfo="Started 3 days ago • 4 days remaining"
-                            status="Ongoing"
-                            progress={65}
-                            image="https://lh3.googleusercontent.com/aida-public/AB6AXuB9PAOY0tIhO6AfT2CPKIxambugzwRa53Hrf3QnXFSdGFg-NWOtJ7pNhPOM7HGmtq1RrRWkdaNeq2ntVNuINMsfej13ZfcOWQW67K7DADu5iCo_N5tPXJrjK4f8kkbXOT8Fpk2jJDNlujC-3V8AnjV49G6UgkJZUeeB9CHZOeE4gv3h0oMR9UaoRkQX4uh2WI9UPFvHcq3zAY3z-Kv11Z9nfQ4LBTkS-zxMMQXs5iP0ggXcbS35NVRtltCkIYpyDhHt3pGjzgCoZhOQ"
-                            participants={[
-                                "https://lh3.googleusercontent.com/aida-public/AB6AXuC9hJOAFG2XiMgpjYuLWPxrHwAuaQR9TIKB8Y9GUMVPskB9CMJM7Mzp3OcAwHlj3x019E23GDcKwK-csi07zRz1JA8AU-It0VjKaIAmjX7cXOZSEv3IaovEXzZevdPch7OgY1wiI46rwuTyl3-byww3TcVVgezi5b61eeHIC7ULSz0BY1bX7tmDxoNXfYxEUIGFFhPVR8e-3PdCEw356K3638sFSTrWaIYE7qW6TqWxr6ijcdaNnRzdWcYL7hT2qtnNEkto_s6qjzSj",
-                                "https://lh3.googleusercontent.com/aida-public/AB6AXuBP4owmbzhsBuK-1C6HnKHPp-8pKR-Yf2N7uNbKFB4IW9XAotRmvr5ONCIzW5VfPe7xifY-IDjsy5BI3SPApLH9dpt2QYMf6rOoo0dCx8oVWyH1bvXqLCs5jdub-cM3GtlcESqI1WhPdQP-xnZQ0qS2RVcfNmlr8VPJOFCaxUw3a5o4Dza9qzG9I-3_zgAhEYx437BoAy4DC-pktGlrgJE08RMM43NgyWVFpV412ejQuj5vesJ1PqnKwfB1Kr7lqcCsbGG1EsaElCG2"
-                            ]}
-                        />
+
+                {loadingHackathons ? (
+                    <div className="flex items-center justify-center py-20 text-slate-500">
+                        <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
+                        Loading hackathons...
                     </div>
-                    <div onClick={() => navigate('/workspace')} className="cursor-pointer">
-                        <HackathonCard
-                            title="Fintech Innovation"
-                            TimeInfo="Ended 1 week ago • Winner: Team Alpha"
-                            status="Completed"
-                            finished={true}
-                            image="https://lh3.googleusercontent.com/aida-public/AB6AXuBqlyjqBs7awaDqZHxrHo-mvWqGj6FluRUPiNRGJBfWbY3j5d5KG8c_AauSSXPrGx2tvJeJSZkobQ9jgExvDiRNXFvT7QpNLIT92KKuWef3Mb5tcmlQV70QZb6ex9c7gop6hKoyNE-Js1t8zB3BYPMqtaV6pDZOA7TbTY2xxZJZhVEpXNV_owltDm-AuzOlXdpT5f6E4L14DCydxJmr9hDVImz-GfY92uePHeUCZ69ybOVAhIhe_k46l4vcdkrjr-A_aG6obBwsv8Ga"
-                        />
+                ) : hackathons.length === 0 ? (
+                    <div className="text-center py-12 bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 border-dashed">
+                        <span className="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">event_busy</span>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium">No hackathons found</p>
+                        <button onClick={() => setIsModalOpen(true)} className="text-primary text-sm font-bold hover:underline mt-2">Create one now</button>
                     </div>
-                </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {hackathons.map((hackathon) => (
+                            <div key={hackathon.id} onClick={() => navigate('/workspace')} className="cursor-pointer">
+                                <HackathonCard
+                                    title={hackathon.name}
+                                    TimeInfo={`Starts: ${new Date(hackathon.startDate).toLocaleDateString()}`}
+                                    status={hackathon.status}
+                                    progress={hackathon.status === "Completed" ? 100 : hackathon.status === "Ongoing" ? 50 : 0}
+                                    image="https://lh3.googleusercontent.com/aida-public/AB6AXuB9PAOY0tIhO6AfT2CPKIxambugzwRa53Hrf3QnXFSdGFg-NWOtJ7pNhPOM7HGmtq1RrRWkdaNeq2ntVNuINMsfej13ZfcOWQW67K7DADu5iCo_N5tPXJrjK4f8kkbXOT8Fpk2jJDNlujC-3V8AnjV49G6UgkJZUeeB9CHZOeE4gv3h0oMR9UaoRkQX4uh2WI9UPFvHcq3zAY3z-Kv11Z9nfQ4LBTkS-zxMMQXs5iP0ggXcbS35NVRtltCkIYpyDhHt3pGjzgCoZhOQ"
+                                    participants={[]} // Placeholder for now, real participants would come from DB
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
-            {/* Recent Tasks / Activity */}
-            <div className="space-y-4">
-                <h2 className="text-slate-900 dark:text-white text-xl font-bold px-2">Project Tasks</h2>
-                <div className="bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
-                    <TaskItem
-                        title="Implement OAuth Login"
-                        assignee="Assigned to Sarah M."
-                        priority="High"
-                        done={true}
-                    />
-                    <TaskItem
-                        title="Design Landing Page Hero"
-                        assignee="Unassigned"
-                        priority="Medium"
-                        done={false}
-                    />
-                </div>
-            </div>
             {/* New Hackathon Modal */}
             <NewHackathonModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                teamId="team-alpha-bits-id"
+                onSuccess={() => {
+                    setIsModalOpen(false);
+                    fetchHackathons();
+                }}
+                teamId={teamId}
             />
         </div>
     );
