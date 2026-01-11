@@ -3,7 +3,8 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    getAdditionalUserInfo
 } from "firebase/auth";
 import {
     doc,
@@ -44,8 +45,9 @@ export const googleSignIn = async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
+        const { isNewUser } = getAdditionalUserInfo(result);
         await createUserProfile(user);
-        return user;
+        return { user, isNewUser };
     } catch (error) {
         throw error;
     }
