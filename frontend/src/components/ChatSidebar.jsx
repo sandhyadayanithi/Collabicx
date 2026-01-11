@@ -2,11 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { auth } from '../firebase/config';
 import { sendMessage, listenToMessages } from '../firebase/functions';
 
-export default function ChatSidebar() {
+export default function ChatSidebar({ teamId = "team-alpha-bits-id", onClose }) {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const messagesEndRef = useRef(null);
-    const teamId = "team-alpha-bits-id"; // consistent with Dashboard
     const currentUser = auth.currentUser;
 
     useEffect(() => {
@@ -47,6 +46,11 @@ export default function ChatSidebar() {
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white">Team Chat</h3>
                 </div>
                 <div className="flex gap-2">
+                    {onClose && (
+                        <button onClick={onClose} className="size-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400">
+                            <span className="material-symbols-outlined text-[20px]">close_fullscreen</span>
+                        </button>
+                    )}
                     <button className="size-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400">
                         <span className="material-symbols-outlined text-[20px]">more_vert</span>
                     </button>

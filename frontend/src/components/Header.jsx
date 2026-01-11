@@ -4,7 +4,7 @@ import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
-export default function Header({ title = "Team Alpha-Bits", hideSearch = false, children }) {
+export default function Header({ title = "Team Alpha-Bits", hideSearch = false, showBack = false, backPath = "/dashboard", children }) {
     const navigate = useNavigate();
     const [userData, setUserData] = React.useState(null);
 
@@ -25,7 +25,12 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
 
     return (
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 lg:px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4">
+                {showBack && (
+                    <Link to={backPath} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        <span className="material-symbols-outlined">arrow_back</span>
+                    </Link>
+                )}
                 <Link to="/teams" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
                     <div className="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
                         <span className="material-symbols-outlined">hub</span>

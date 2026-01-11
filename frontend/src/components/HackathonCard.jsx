@@ -1,71 +1,87 @@
 import React from 'react';
 
-export default function HackathonCard({ title, status, TimeInfo, progress, participants, image, finished }) {
+export default function HackathonCard({
+    title,
+    status,
+    TimeInfo,
+    progress = 0,
+    participants = [],
+    image,
+    daysLeft,
+    nextDeadline
+}) {
     const isCompleted = status === 'Completed';
 
     return (
-        <div className="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary/50 transition-all">
+        <div className="group flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all h-full">
+            {/* Image Header with Overlay Info */}
             <div
                 className="w-full bg-center bg-no-repeat aspect-video bg-cover relative"
                 style={{ backgroundImage: `url("${image}")` }}
             >
-                <div className={`absolute top-3 right-3 px-3 py-1 ${isCompleted ? 'bg-slate-500' : 'bg-green-500'} text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg`}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+                <div className={`absolute top-3 right-3 px-3 py-1 ${isCompleted ? 'bg-slate-500/90' : 'bg-green-500/90'} backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm`}>
                     {status}
                 </div>
+
+                <div className="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+                    <div>
+                        <h3 className="text-white text-lg font-bold leading-tight mb-1">{title}</h3>
+                        <p className="text-white/80 text-xs font-medium flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">calendar_today</span>
+                            {TimeInfo}
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div className="p-5 space-y-4">
-                <div>
-                    <p className="text-slate-900 dark:text-white text-lg font-bold">{title}</p>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">{TimeInfo}</p>
+
+            <div className="p-5 flex-1 flex flex-col gap-5">
+                {/* Stats Row */}
+                <div className="flex items-center gap-4 text-xs">
+                    <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/50 flex flex-col gap-1">
+                        <span className="text-slate-500 font-semibold uppercase text-[10px] tracking-wider">Days Left</span>
+                        <span className="font-bold text-slate-900 dark:text-white text-base">{daysLeft || '--'}</span>
+                    </div>
+                    <div className="flex-[1.5] bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/50 flex flex-col gap-1">
+                        <span className="text-slate-500 font-semibold uppercase text-[10px] tracking-wider">Next Deadline</span>
+                        <span className="font-bold text-slate-900 dark:text-white truncate">{nextDeadline || 'No deadlines'}</span>
+                    </div>
                 </div>
 
-                {progress !== undefined && (
-                    <div className="flex flex-col gap-2">
-                        <div className="flex gap-6 justify-between items-center">
-                            <p className="text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase">Project Progress</p>
-                            <p className="text-primary text-sm font-bold">{progress}%</p>
-                        </div>
-                        <div className="rounded-full bg-slate-100 dark:bg-slate-800 h-2.5 w-full overflow-hidden">
-                            <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }}></div>
-                        </div>
+                {/* Progress */}
+                <div className="flex flex-col gap-2">
+                    <div className="flex gap-6 justify-between items-center">
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Completion</p>
+                        <p className="text-slate-700 dark:text-white text-xs font-bold">{progress}%</p>
                     </div>
-                )}
-
-                {finished && (
-                    <div className="flex flex-col gap-2 opacity-60">
-                        <div className="flex gap-6 justify-between items-center">
-                            <p className="text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase">Final Score</p>
-                            <p className="text-slate-900 dark:text-white text-sm font-bold">100%</p>
-                        </div>
-                        <div className="rounded-full bg-slate-100 dark:bg-slate-800 h-2.5 w-full overflow-hidden">
-                            <div className="h-full rounded-full bg-slate-400" style={{ width: "100%" }}></div>
-                        </div>
+                    <div className="rounded-full bg-slate-100 dark:bg-slate-800 h-1.5 w-full overflow-hidden">
+                        <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }}></div>
                     </div>
-                )}
+                </div>
 
-                <div className="flex items-center justify-between pt-2">
-                    {participants ? (
-                        <div className="flex -space-x-2">
-                            {participants.map((p, i) => (
-                                <div key={i} className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-cover" style={{ backgroundImage: `url('${p}')` }}></div>
-                            ))}
-                            <div className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold">+3</div>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-yellow-500 text-[20px]">emoji_events</span>
-                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Top 3 Finish</span>
-                        </div>
-                    )}
-                    <button className="text-slate-400 hover:text-primary transition-colors flex items-center">
-                        {finished ? (
-                            <span className="material-symbols-outlined">visibility</span>
-                        ) : (
-                            <svg height="20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                {/* Footer: Participants & Actions */}
+                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/50 flex items-center justify-between gap-3">
+                    <div className="flex -space-x-2">
+                        {participants.length > 0 ? participants.map((p, i) => (
+                            <div key={i} className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 bg-cover bg-center" style={{ backgroundImage: `url('${p}')` }}></div>
+                        )) : (
+                            <>
+                                <div className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 bg-cover bg-center" style={{ backgroundImage: 'url("https://ui-avatars.com/api/?name=User+1&background=random")' }}></div>
+                                <div className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 bg-cover bg-center" style={{ backgroundImage: 'url("https://ui-avatars.com/api/?name=User+2&background=random")' }}></div>
+                            </>
                         )}
-                    </button>
+                        <div className="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">+</div>
+                    </div>
+
+                    <div className="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors" title="Edit">
+                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm">
+                            Open
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
