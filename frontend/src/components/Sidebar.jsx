@@ -5,10 +5,10 @@ export default function Sidebar({ children, showLogo = false, footer }) {
         <aside className="w-16 md:w-64 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white/60 dark:bg-black/70 backdrop-blur-2xl sticky top-0 h-screen">
             {showLogo && (
                 <div className="flex items-center gap-3 px-6 mb-2">
-                    <img src="/logo.png" alt="Collabicx" className="size-12 object-contain" />
+                    <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />
                     <div className="hidden md:flex flex-col text-white-forced">
-                        <h1 className="text-slate-900 dark:text-black text-lg font-black leading-tight">Collabicx</h1>
-                        <p className="text-slate-700 dark:text-black/60 text-[10px] font-black uppercase tracking-wider">Management</p>
+                        <h1 className="text-emerald-900 dark:text-emerald-400 text-lg font-black leading-tight">Collabicx</h1>
+                        <p className="text-slate-700 dark:text-emerald-400/60 text-[10px] font-black uppercase tracking-wider">Management</p>
                     </div>
                 </div>
             )}

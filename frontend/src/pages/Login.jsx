@@ -68,8 +68,8 @@ export default function Login() {
 
             <div className="w-full max-w-[440px] relative z-10 animate-in fade-in zoom-in-95 duration-700">
                 <div className="flex flex-col items-center mb-10">
-                    <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
-                        <span className="material-symbols-outlined text-white text-[28px]">hub</span>
+                    <div className="w-16 h-16 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
+                        <span className="material-symbols-outlined text-white text-[32px]">hub</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-2">{isSignUp ? 'Join Collabicx' : 'Welcome Back'}</h2>
                     <p className="text-slate-500 font-medium text-center">

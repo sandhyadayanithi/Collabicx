@@ -34,8 +34,8 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
                     </Link>
                 )}
                 <Link to="/teams" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
-                    <img src="/logo.png" alt="Collabicx" className="size-10 object-contain" />
-                    <h2 className="text-slate-900 dark:text-emerald-950 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
+                    <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />
+                    <h2 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
                 </Link>
                 {!hideSearch && (
                     <label className="hidden md:flex flex-col min-w-40 h-10 max-w-64">

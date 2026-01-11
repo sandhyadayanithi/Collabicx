@@ -9,10 +9,10 @@ export default function LandingPage() {
             {/* Top Navigation */}
             <nav className="relative z-20 flex items-center justify-between px-8 md:px-16 lg:px-24 py-8">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <span className="material-symbols-outlined text-white text-[24px]">hub</span>
+                    <div className="w-16 h-16 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                        <span className="material-symbols-outlined text-white text-[32px]">hub</span>
                     </div>
-                    <span className="text-2xl font-bold tracking-tight text-white">Collabicx</span>
+                    <span className="text-2xl font-bold tracking-tight text-emerald-500">Collabicx</span>
                 </div>
 
                 <button
