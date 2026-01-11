@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Sidebar({ children, showLogo = false }) {
+export default function Sidebar({ children, showLogo = false, footer }) {
     return (
         <aside className="w-16 md:w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white dark:bg-background-dark sticky top-0 h-screen">
             {showLogo && (
@@ -40,10 +40,12 @@ export default function Sidebar({ children, showLogo = false }) {
             </div>
 
             <div className="mt-auto px-4 flex flex-col gap-2">
-                <div className="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors flex items-center gap-3">
-                    <span className="material-symbols-outlined text-[24px]">help</span>
-                    <span className="hidden md:block text-sm font-medium">Help Center</span>
-                </div>
+                {footer || (
+                    <div className="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors flex items-center gap-3">
+                        <span className="material-symbols-outlined text-[24px]">help</span>
+                        <span className="hidden md:block text-sm font-medium">Help Center</span>
+                    </div>
+                )}
             </div>
         </aside>
     );

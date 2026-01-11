@@ -21,7 +21,7 @@ export default function Login() {
                 navigate('/profile-setup');
             } else {
                 await loginWithEmail(email, password);
-                navigate('/dashboard');
+                navigate('/teams');
             }
         } catch (err) {
             setError(err.message);
@@ -35,7 +35,7 @@ export default function Login() {
         setLoading(true);
         try {
             await googleSignIn();
-            navigate('/dashboard');
+            navigate('/teams');
         } catch (err) {
             setError(err.message);
         } finally {
