@@ -58,7 +58,7 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
                             <Link className="text-slate-700 dark:text-emerald-100/70 hover:text-primary transition-colors text-sm font-black" to="/profile">Profile</Link>
                         </>
                     )}
-                </nav>
+                </nav >
                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
 
                 <button
@@ -87,7 +87,7 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
                         style={{ backgroundImage: `url(${userData?.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_'})` }}
                     ></div>
                 </div>
-            </div>
-        </header>
+            </div >
+        </header >
     );
 }
