@@ -1,10 +1,11 @@
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Header({ title = "Team Alpha-Bits", hideSearch = false, children }) {
+export default function Header({ title = "Team Alpha-Bits", hideSearch = false, showBack = false, backPath = "/dashboard", children }) {
     const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = useTheme();
     const [userData, setUserData] = React.useState(null);
@@ -27,11 +28,14 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
     return (
         <header className="flex items-center justify-between whitespace-nowrap border-b border-emerald-500/20 dark:border-emerald-500/20 px-6 lg:px-10 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 z-50">
             <div className="flex items-center gap-8">
+                {showBack && (
+                    <Link to={backPath} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        <span className="material-symbols-outlined">arrow_back</span>
+                    </Link>
+                )}
                 <Link to="/teams" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
-                    <div className="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <span className="material-symbols-outlined">hub</span>
-                    </div>
-                    <h2 className="text-slate-900 dark:text-emerald-950 text-lg font-black leading-tight tracking-tight">Collabicx</h2>
+                    <img src="/logo.png" alt="Collabicx" className="size-10 object-contain" />
+                    <h2 className="text-slate-900 dark:text-emerald-950 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
                 </Link>
                 {!hideSearch && (
                     <label className="hidden md:flex flex-col min-w-40 h-10 max-w-64">

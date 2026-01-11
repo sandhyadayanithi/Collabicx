@@ -2,15 +2,13 @@ import React from 'react';
 
 export default function Sidebar({ children, showLogo = false, footer }) {
     return (
-        <aside className="w-16 md:w-64 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 h-screen">
+        <aside className="w-16 md:w-64 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white/60 dark:bg-black/70 backdrop-blur-2xl sticky top-0 h-screen">
             {showLogo && (
                 <div className="flex items-center gap-3 px-6 mb-2">
-                    <div className="bg-primary size-10 rounded-lg flex items-center justify-center text-white shrink-0">
-                        <span className="material-symbols-outlined">hub</span>
-                    </div>
-                    <div className="hidden md:flex flex-col">
-                        <h1 className="text-slate-900 dark:text-black text-base font-black leading-tight">Collabicx</h1>
-                        <p className="text-slate-700 dark:text-black/60 text-xs font-black uppercase tracking-wider">Management</p>
+                    <img src="/logo.png" alt="Collabicx" className="size-12 object-contain" />
+                    <div className="hidden md:flex flex-col text-white-forced">
+                        <h1 className="text-slate-900 dark:text-black text-lg font-black leading-tight">Collabicx</h1>
+                        <p className="text-slate-700 dark:text-black/60 text-[10px] font-black uppercase tracking-wider">Management</p>
                     </div>
                 </div>
             )}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { createHackathon } from '../firebase/functions';
 
-export default function NewHackathonModal({ isOpen, onClose, teamId = "default-team" }) {
+export default function NewHackathonModal(props) {
+  const { isOpen, onClose, teamId = "default-team", onSuccess } = props;
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -25,8 +26,11 @@ export default function NewHackathonModal({ isOpen, onClose, teamId = "default-t
     setLoading(true);
     try {
       await createHackathon(teamId, formData);
-      onClose();
-      // Optionally trigger a refresh or callback here
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        onClose();
+      }
     } catch (error) {
       console.error("Error creating hackathon:", error);
     } finally {
