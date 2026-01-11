@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 
 export default function HackathonWorkspace() {
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
+        <div className="text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
             {/* Global Header */}
             <Header title="Global AI Hack 2024" hideSearch={true}>
                 <a className="text-primary text-sm font-semibold leading-normal border-b-2 border-primary pb-1" href="#">Workspace</a>
@@ -44,7 +44,7 @@ export default function HackathonWorkspace() {
             {/* Main Workspace Grid */}
             <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden">
                 {/* Left Column: Shared Editor */}
-                <section className="lg:col-span-4 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-white dark:bg-background-dark/50">
+                <section className="lg:col-span-4 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col bg-white/60 dark:bg-black/40 backdrop-blur-2xl">
                     <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                         <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Notes</h3>
                         <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export default function HackathonWorkspace() {
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {/* Composer Component Style */}
                         <div className="flex flex-col h-full">
-                            <div className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                            <div className="flex-1 rounded-lg border border-emerald-500/20 dark:border-emerald-500/20 bg-white/40 dark:bg-black/20 p-4">
                                 <textarea className="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 font-mono text-sm leading-relaxed" placeholder="Start typing ideas, snippets, or reminders..."></textarea>
                             </div>
                             <div className="mt-4 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
@@ -87,7 +87,7 @@ export default function HackathonWorkspace() {
                 </section>
 
                 {/* Center Column: Task Checklist */}
-                <section className="lg:col-span-5 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-white dark:bg-background-dark">
+                <section className="lg:col-span-5 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col bg-white/40 dark:bg-black/20 backdrop-blur-2xl">
                     <div className="p-4 border-b border-slate-200 dark:border-slate-800">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Sprint Tasks</h3>
@@ -154,7 +154,7 @@ export default function HackathonWorkspace() {
                 </section>
 
                 {/* Right Column: Submission Hub */}
-                <section className="lg:col-span-3 flex flex-col bg-slate-50 dark:bg-background-dark/80">
+                <section className="lg:col-span-3 flex flex-col bg-white/40 dark:bg-black/20 backdrop-blur-2xl">
                     <div className="p-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Submission Assets</h3>
                     </div>

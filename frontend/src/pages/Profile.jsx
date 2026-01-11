@@ -78,7 +78,7 @@ export default function Profile() {
     }
 
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex">
+        <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen flex">
             <Sidebar showLogo={true}
                 footer={
                     <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors cursor-pointer text-left">
@@ -107,12 +107,12 @@ export default function Profile() {
                 <Header title="Your Profile" hideSearch={true} />
 
                 <main className="flex-1 p-6 md:p-10 lg:p-16 max-w-4xl mx-auto w-full">
-                    <div className="bg-white dark:bg-[#131b2b] rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <div className="bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-[32px] border border-emerald-500/20 dark:border-emerald-500/20 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
                         {/* Profile Header Background */}
-                        <div className="h-32 bg-gradient-to-r from-primary/20 via-blue-600/10 to-transparent relative">
-                            <div className="absolute -bottom-16 left-10 p-1.5 bg-white dark:bg-[#0b101a] rounded-full">
+                        <div className="h-32 bg-gradient-to-r from-emerald-500/30 via-green-600/20 to-transparent relative">
+                            <div className="absolute -bottom-16 left-10 p-1.5 bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-full">
                                 <div
-                                    className="size-32 rounded-full border-4 border-white dark:border-[#0b101a] shadow-xl bg-slate-100 dark:bg-slate-800 bg-cover bg-center"
+                                    className="size-32 rounded-full border-4 border-white dark:border-emerald-900/50 shadow-xl bg-slate-100 dark:bg-emerald-900/20 bg-cover bg-center"
                                     style={{ backgroundImage: `url(${userData?.avatar})` }}
                                 ></div>
                             </div>
@@ -121,7 +121,7 @@ export default function Profile() {
                         <div className="pt-20 px-10 pb-10">
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                                 <div>
-                                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-1">
+                                    <h1 className="text-3xl font-black text-slate-900 dark:text-emerald-950 mb-1">
                                         {userData?.name || 'User'}
                                     </h1>
                                     <p className="text-primary font-bold tracking-wide">
@@ -132,7 +132,7 @@ export default function Profile() {
                                     <button
                                         onClick={handleSave}
                                         disabled={isSaving}
-                                        className="h-11 px-8 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
+                                        className="h-11 px-8 bg-primary hover:bg-primary/90 text-emerald-950 rounded-xl font-black transition-all shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
                                     >
                                         {isSaving ? 'Saving...' : 'Save Changes'}
                                     </button>

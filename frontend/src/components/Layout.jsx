@@ -6,7 +6,7 @@ import ChatSidebar from './ChatSidebar';
 
 export default function Layout() {
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col font-display">
+        <div className="text-slate-900 dark:text-white min-h-screen flex flex-col font-display">
             <Header />
             <div className="flex-1 flex overflow-hidden">
                 <Sidebar />

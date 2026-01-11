@@ -2,9 +2,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #2b6cee;
-  --color-background-light: #f6f6f8;
-  --color-background-dark: #101622;
+  --color-primary: #10b981;
+  --color-background-light: transparent;
+  --color-background-dark: transparent;
   --font-display: Inter, sans-serif;
   --radius: 0.25rem;
   --radius-lg: 0.5rem;
@@ -12,21 +12,53 @@
   --radius-full: 9999px;
 }
 
+:root {
+  --gradient-bg: radial-gradient(circle, rgba(215, 238, 174, 1) 0%, rgba(215, 238, 174, 1) 100%);
+  --text-main: #0f172a;
+}
+
+.dark {
+  --gradient-bg: radial-gradient(circle, rgba(20, 54, 20, 1) 0%, rgba(20, 54, 20, 1) 100%);
+  --text-main: #ecfdf5;
+}
+
 body {
   font-family: var(--font-display);
-  @apply bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col;
+  background: var(--gradient-bg) no-repeat center center fixed;
+  background-size: cover;
+  color: #0f172a;
+  /* Default light */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dark body {
+  color: #000000;
+}
+
+/* Specific override for headers or text that MUST stay white */
+.dark .text-white-forced {
+  color: #ffffff !important;
+}
+
+/* Secondary forced white for subtext */
+.dark .text-white-forced-dim {
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Custom Scrollbar from design */
 .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+  width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #282e39;
-    border-radius: 10px;
+  background: #282e39;
+  border-radius: 10px;
 }
 
 .material-symbols-outlined {

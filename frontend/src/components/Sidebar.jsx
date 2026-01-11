@@ -2,15 +2,15 @@ import React from 'react';
 
 export default function Sidebar({ children, showLogo = false, footer }) {
     return (
-        <aside className="w-16 md:w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white dark:bg-background-dark sticky top-0 h-screen">
+        <aside className="w-16 md:w-64 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 h-screen">
             {showLogo && (
                 <div className="flex items-center gap-3 px-6 mb-2">
                     <div className="bg-primary size-10 rounded-lg flex items-center justify-center text-white shrink-0">
                         <span className="material-symbols-outlined">hub</span>
                     </div>
                     <div className="hidden md:flex flex-col">
-                        <h1 className="text-slate-900 dark:text-white text-base font-bold leading-tight">Collabicx</h1>
-                        <p className="text-slate-500 dark:text-[#9da6b9] text-xs font-medium">Management</p>
+                        <h1 className="text-slate-900 dark:text-black text-base font-black leading-tight">Collabicx</h1>
+                        <p className="text-slate-700 dark:text-black/60 text-xs font-black uppercase tracking-wider">Management</p>
                     </div>
                 </div>
             )}
@@ -20,7 +20,7 @@ export default function Sidebar({ children, showLogo = false, footer }) {
                     <>
                         <div className="p-2 text-primary bg-primary/10 rounded-xl cursor-pointer flex items-center gap-3">
                             <span className="material-symbols-outlined">grid_view</span>
-                            <span className="hidden md:block text-sm font-semibold">Dashboard</span>
+                            <span className="hidden md:block text-sm font-black">Dashboard</span>
                         </div>
                         <div className="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors flex items-center gap-3">
                             <span className="material-symbols-outlined text-[24px]">folder</span>

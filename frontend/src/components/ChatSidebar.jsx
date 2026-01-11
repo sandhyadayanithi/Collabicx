@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function ChatSidebar() {
     return (
-        <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col hidden lg:flex">
+        <aside className="w-80 border-l border-emerald-500/20 dark:border-emerald-500/20 bg-white/60 dark:bg-black/40 backdrop-blur-2xl flex flex-col hidden lg:flex">
             <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">chat_bubble</span>

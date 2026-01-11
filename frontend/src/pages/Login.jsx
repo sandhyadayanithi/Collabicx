@@ -62,13 +62,13 @@ export default function Login() {
     };
 
     return (
-        <div className="bg-[#0b101a] font-display text-white min-h-screen flex items-center justify-center p-6 selection:bg-primary/30 relative overflow-hidden">
+        <div className="bg-black font-display text-white min-h-screen flex items-center justify-center p-6 selection:bg-emerald-500/30 relative overflow-hidden">
             {/* Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 
             <div className="w-full max-w-[440px] relative z-10 animate-in fade-in zoom-in-95 duration-700">
                 <div className="flex flex-col items-center mb-10">
-                    <div className="w-12 h-12 bg-[#3b82f6] rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
+                    <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
                         <span className="material-symbols-outlined text-white text-[28px]">hub</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-2">{isSignUp ? 'Join Collabicx' : 'Welcome Back'}</h2>
@@ -77,7 +77,7 @@ export default function Login() {
                     </p>
                 </div>
 
-                <div className="bg-[#131b2b]/50 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 md:p-10 shadow-2xl">
+                <div className="bg-white/10 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 rounded-3xl p-8 md:p-10 shadow-2xl">
                     {error && (
                         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl flex items-center gap-2">
                             <svg height="18" width="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -126,7 +126,7 @@ export default function Login() {
                         <div className="space-y-2">
                             <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500 ml-1">Email Address</label>
                             <input
-                                className="w-full h-13 px-5 bg-[#0b101a] border border-slate-800 rounded-xl text-white placeholder:text-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                className="w-full h-13 px-5 bg-white/10 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all"
                                 placeholder="name@company.com"
                                 type="email"
                                 value={email}
@@ -137,11 +137,11 @@ export default function Login() {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between ml-1">
                                 <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500">Password</label>
-                                {!isSignUp && <a className="text-xs font-bold text-[#3b82f6] hover:underline" href="#">Forgot?</a>}
+                                {!isSignUp && <a className="text-xs font-bold text-emerald-500 hover:underline" href="#">Forgot?</a>}
                             </div>
                             <div className="relative">
                                 <input
-                                    className="w-full h-13 px-5 bg-[#0b101a] border border-slate-800 rounded-xl text-white placeholder:text-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all pr-12"
+                                    className="w-full h-13 px-5 bg-white/10 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all pr-12"
                                     placeholder="••••••••"
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
@@ -169,7 +169,7 @@ export default function Login() {
                             </div>
                         </div>
                         <button
-                            className="w-full h-14 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:translate-y-0.5 disabled:opacity-50 pt-1"
+                            className="w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-emerald-950 rounded-xl font-black text-base flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:translate-y-0.5 disabled:opacity-50 pt-1"
                             type="submit"
                             disabled={loading}
                         >
@@ -184,7 +184,7 @@ export default function Login() {
 
                     <p className="text-center text-slate-500 font-bold text-sm">
                         {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-                        <button onClick={() => setIsSignUp(!isSignUp)} className="text-[#3b82f6] hover:underline ml-1">
+                        <button onClick={() => setIsSignUp(!isSignUp)} className="text-emerald-500 hover:underline ml-1">
                             {isSignUp ? 'Sign In' : 'Create an account'}
                         </button>
                     </p>

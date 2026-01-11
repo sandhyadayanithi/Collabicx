@@ -156,7 +156,7 @@ export default function ProfileSetup() {
                             <div className="relative">
                                 <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 font-bold">@</span>
                                 <input
-                                    className="w-full h-13 pl-10 pr-32 bg-[#0b101a] border border-slate-800 rounded-xl text-white placeholder:text-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                    className="w-full h-13 pl-10 pr-32 bg-white/60 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl text-white placeholder:text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all"
                                     placeholder="username"
                                     type="text"
                                     value={username}
@@ -178,7 +178,7 @@ export default function ProfileSetup() {
                                         key={r}
                                         type="button"
                                         onClick={() => setRole(r)}
-                                        className={`h-11 rounded-xl border-2 font-bold text-xs transition-all uppercase tracking-wider ${role === r ? 'border-[#3b82f6] bg-[#3b82f6]/10 text-[#3b82f6]' : 'border-slate-800/80 text-slate-600 hover:border-slate-700'}`}
+                                        className={`h-11 rounded-xl border-2 font-bold text-xs transition-all uppercase tracking-wider ${role === r ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-emerald-500/10 text-slate-600 hover:border-emerald-500/30'}`}
                                     >
                                         {r}
                                     </button>
@@ -190,7 +190,7 @@ export default function ProfileSetup() {
                             type="button"
                             onClick={handleCompleteSetup}
                             disabled={loading}
-                            className="w-full h-14 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-2xl font-bold text-base transition-all shadow-lg shadow-blue-500/30 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-emerald-950 rounded-2xl font-black text-base transition-all shadow-lg shadow-emerald-500/30 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             {loading ? 'Processing...' : 'Complete Profile Setup'}
                             {!loading && (

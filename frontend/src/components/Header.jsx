@@ -1,11 +1,12 @@
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Header({ title = "Team Alpha-Bits", hideSearch = false, children }) {
     const navigate = useNavigate();
+    const { isDarkMode, toggleTheme } = useTheme();
     const [userData, setUserData] = React.useState(null);
 
     React.useEffect(() => {
@@ -24,13 +25,13 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
     }, []);
 
     return (
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 lg:px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-emerald-500/20 dark:border-emerald-500/20 px-6 lg:px-10 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 z-50">
             <div className="flex items-center gap-8">
                 <Link to="/teams" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
                     <div className="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
                         <span className="material-symbols-outlined">hub</span>
                     </div>
-                    <h2 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Collabicx</h2>
+                    <h2 className="text-slate-900 dark:text-emerald-950 text-lg font-black leading-tight tracking-tight">Collabicx</h2>
                 </Link>
                 {!hideSearch && (
                     <label className="hidden md:flex flex-col min-w-40 h-10 max-w-64">
@@ -38,7 +39,7 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
                             <div className="text-slate-400 flex border-none bg-slate-100 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg">
                                 <span className="material-symbols-outlined text-[20px]">search</span>
                             </div>
-                            <input className="form-input flex w-full min-w-0 flex-1 border-none bg-slate-100 dark:bg-slate-800 focus:outline-0 focus:ring-0 text-slate-900 dark:text-white h-full placeholder:text-slate-400 px-4 rounded-r-lg pl-2 text-sm font-normal" placeholder="Search workspace..." />
+                            <input className="form-input flex w-full min-w-0 flex-1 border-none bg-slate-100 dark:bg-emerald-900/10 focus:outline-0 focus:ring-0 text-slate-900 dark:text-white h-full placeholder:text-slate-600 dark:placeholder:text-emerald-100/40 px-4 rounded-r-lg pl-2 text-sm font-black" placeholder="Search workspace..." />
                         </div>
                     </label>
                 )}
@@ -47,24 +48,33 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
                 <nav className="hidden lg:flex items-center gap-6">
                     {children || (
                         <>
-                            <Link className="text-primary text-sm font-semibold" to="/dashboard">Dashboard</Link>
-                            <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" to="/workspace">Workspace</Link>
-                            <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" to="/teams">Teams</Link>
-                            <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" to="/profile">Profile</Link>
+                            <Link className="text-primary text-sm font-black" to="/dashboard">Dashboard</Link>
+                            <Link className="text-slate-700 dark:text-emerald-100/70 hover:text-primary transition-colors text-sm font-black" to="/workspace">Workspace</Link>
+                            <Link className="text-slate-700 dark:text-emerald-100/70 hover:text-primary transition-colors text-sm font-black" to="/teams">Teams</Link>
+                            <Link className="text-slate-700 dark:text-emerald-100/70 hover:text-primary transition-colors text-sm font-black" to="/profile">Profile</Link>
                         </>
                     )}
                 </nav>
-                <div className="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
+                <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+                <button
+                    onClick={toggleTheme}
+                    className="size-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-all active:scale-95"
+                >
+                    <span className="material-symbols-outlined text-[20px]">
+                        {isDarkMode ? 'light_mode' : 'dark_mode'}
+                    </span>
+                </button>
 
                 <div
                     onClick={() => navigate('/profile')}
                     className="flex items-center gap-3 px-2 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group"
                 >
                     <div className="hidden md:flex flex-col items-end">
-                        <p className="text-xs font-black text-slate-900 dark:text-white leading-none mb-1">
+                        <p className="text-xs font-black text-slate-900 text-white-forced leading-none mb-1">
                             {userData?.username ? `@${userData.username}` : (userData?.name || 'User')}
                         </p>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none">
+                        <p className="text-[10px] font-bold text-slate-500 text-white-forced-dim uppercase tracking-wider leading-none">
                             {userData?.role || 'Member'}
                         </p>
                     </div>

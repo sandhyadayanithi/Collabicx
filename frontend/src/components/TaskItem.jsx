@@ -7,7 +7,7 @@ export default function TaskItem({ title, assignee, priority, done }) {
     };
 
     return (
-        <div className="p-4 flex items-center gap-4 group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+        <div className="p-4 flex items-center gap-4 group cursor-pointer hover:bg-emerald-500/5 dark:hover:bg-emerald-500/10">
             <div className={`${done ? 'text-primary' : 'text-slate-400'}`}>
                 {done ? (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

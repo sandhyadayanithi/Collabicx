@@ -10,12 +10,12 @@ export default function Dashboard() {
     return (
         <div className="max-w-5xl mx-auto space-y-8">
             {/* Profile Header */}
-            <div className="flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 bg-white/60 dark:bg-black/40 backdrop-blur-2xl p-6 rounded-xl border border-emerald-500/20 dark:border-emerald-500/20">
                 <div className="flex gap-5 items-center">
                     <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-20 shadow-lg border-2 border-primary/20" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqKVE-Fbz3DwX1MnQJDpDIqR6p5m0lOIH-zp5X8kkzZgXoTl4c64rAZgNVdEF49u0cXw3QrP2tbgu6yhpsYVi2JTDo8Zn-ntzG6W0-JA9rxNoDAsyjbZZgo_EPnhgppLkpbu6lmE8AF5naq7qR3F_G4E3TjbyryMKlyCH10U52PDC4euYvmZdkJVM4ojFAiQMVbJzs8YM2hH4ArN3JGnTV2MeOT0FYd-Y8MH2tqvhueBgAPCQfHi2aR-cz8monZIWrzZ0a4PJur4wE")' }}></div>
                     <div className="flex flex-col">
-                        <h1 className="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">Team Alpha-Bits</h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center gap-1">
+                        <h1 className="text-slate-900 dark:text-black text-2xl font-black tracking-tight">Team Alpha-Bits</h1>
+                        <p className="text-slate-700 dark:text-black/70 text-sm font-black flex items-center gap-1">
                             <span className="material-symbols-outlined text-[16px]">groups</span> Hackathon Workspace
                         </p>
                         <div className="mt-1 flex items-center gap-2">
@@ -76,7 +76,7 @@ export default function Dashboard() {
             {/* Recent Tasks / Activity */}
             <div className="space-y-4">
                 <h2 className="text-slate-900 dark:text-white text-xl font-bold px-2">Project Tasks</h2>
-                <div className="bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 divide-y divide-emerald-500/10 dark:divide-emerald-500/10">
                     <TaskItem
                         title="Implement OAuth Login"
                         assignee="Assigned to Sarah M."
