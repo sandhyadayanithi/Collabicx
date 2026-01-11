@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Team Workspace and Chat | Alpha-Bits</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #282e39;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">rocket_launch</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Team Alpha-Bits</h2>
+</div>
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-slate-400 flex border-none bg-slate-100 dark:bg-slate-800 items-center justify-center pl-4 rounded-l-lg" data-icon="search">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-slate-100 dark:bg-slate-800 focus:outline-0 focus:ring-0 text-slate-900 dark:text-white h-full placeholder:text-slate-400 px-4 rounded-r-lg pl-2 text-sm font-normal" placeholder="Search workspace..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-primary text-sm font-semibold" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Files</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Calendar</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Settings</a>
+</nav>
+<div class="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold transition-all hover:bg-primary/90">
+<span class="truncate">New Project</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border border-slate-200 dark:border-slate-800" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_");'></div>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<!-- Sidebar Navigation (Rail) -->
+<aside class="w-16 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-6 gap-8 bg-white dark:bg-background-dark">
+<div class="p-2 text-primary bg-primary/10 rounded-xl">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<div class="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[24px]">folder</span>
+</div>
+<div class="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[24px]">task_alt</span>
+</div>
+<div class="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors relative">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+<span class="absolute top-1 right-1 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</div>
+<div class="mt-auto p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[24px]">help</span>
+</div>
+</aside>
+<!-- Main Dashboard Content -->
+<main class="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10">
+<div class="max-w-5xl mx-auto space-y-8">
+<!-- Profile Header -->
+<div class="flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 bg-white dark:bg-slate-900/40 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex gap-5 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-20 shadow-lg border-2 border-primary/20" data-alt="Team Alpha-Bits logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqKVE-Fbz3DwX1MnQJDpDIqR6p5m0lOIH-zp5X8kkzZgXoTl4c64rAZgNVdEF49u0cXw3QrP2tbgu6yhpsYVi2JTDo8Zn-ntzG6W0-JA9rxNoDAsyjbZZgo_EPnhgppLkpbu6lmE8AF5naq7qR3F_G4E3TjbyryMKlyCH10U52PDC4euYvmZdkJVM4ojFAiQMVbJzs8YM2hH4ArN3JGnTV2MeOT0FYd-Y8MH2tqvhueBgAPCQfHi2aR-cz8monZIWrzZ0a4PJur4wE");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">Team Alpha-Bits</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">groups</span> Hackathon Workspace
+                            </p>
+<div class="mt-1 flex items-center gap-2">
+<span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Join Code: XJ9-22L</span>
+<button class="text-primary hover:text-primary/80 transition-colors">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 @[480px]:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-white text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                            Invite
+                        </button>
+<button class="flex-1 @[480px]:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                            New Project
+                        </button>
+</div>
+</div>
+<!-- Active Hackathons Section -->
+<div>
+<div class="flex items-center justify-between px-2 mb-4">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold">Active Hackathons</h2>
+<button class="text-primary text-sm font-semibold hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Hackathon Card 1 -->
+<div class="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary/50 transition-all">
+<div class="w-full bg-center bg-no-repeat aspect-video bg-cover relative" data-alt="AI Safety Hackathon hero image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB9PAOY0tIhO6AfT2CPKIxambugzwRa53Hrf3QnXFSdGFg-NWOtJ7pNhPOM7HGmtq1RrRWkdaNeq2ntVNuINMsfej13ZfcOWQW67K7DADu5iCo_N5tPXJrjK4f8kkbXOT8Fpk2jJDNlujC-3V8AnjV49G6UgkJZUeeB9CHZOeE4gv3h0oMR9UaoRkQX4uh2WI9UPFvHcq3zAY3z-Kv11Z9nfQ4LBTkS-zxMMQXs5iP0ggXcbS35NVRtltCkIYpyDhHt3pGjzgCoZhOQ");'>
+<div class="absolute top-3 right-3 px-3 py-1 bg-green-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg">
+                                    Ongoing
+                                </div>
+</div>
+<div class="p-5 space-y-4">
+<div>
+<p class="text-slate-900 dark:text-white text-lg font-bold">AI Safety Hackathon</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Started 3 days ago • 4 days remaining</p>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex gap-6 justify-between items-center">
+<p class="text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase">Project Progress</p>
+<p class="text-primary text-sm font-bold">65%</p>
+</div>
+<div class="rounded-full bg-slate-100 dark:bg-slate-800 h-2.5 w-full overflow-hidden">
+<div class="h-full rounded-full bg-primary" style="width: 65%;"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex -space-x-2">
+<div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC9hJOAFG2XiMgpjYuLWPxrHwAuaQR9TIKB8Y9GUMVPskB9CMJM7Mzp3OcAwHlj3x019E23GDcKwK-csi07zRz1JA8AU-It0VjKaIAmjX7cXOZSEv3IaovEXzZevdPch7OgY1wiI46rwuTyl3-byww3TcVVgezi5b61eeHIC7ULSz0BY1bX7tmDxoNXfYxEUIGFFhPVR8e-3PdCEw356K3638sFSTrWaIYE7qW6TqWxr6ijcdaNnRzdWcYL7hT2qtnNEkto_s6qjzSj')"></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBP4owmbzhsBuK-1C6HnKHPp-8pKR-Yf2N7uNbKFB4IW9XAotRmvr5ONCIzW5VfPe7xifY-IDjsy5BI3SPApLH9dpt2QYMf6rOoo0dCx8oVWyH1bvXqLCs5jdub-cM3GtlcESqI1WhPdQP-xnZQ0qS2RVcfNmlr8VPJOFCaxUw3a5o4Dza9qzG9I-3_zgAhEYx437BoAy4DC-pktGlrgJE08RMM43NgyWVFpV412ejQuj5vesJ1PqnKwfB1Kr7lqcCsbGG1EsaElCG2')"></div>
+<div class="size-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold">+3</div>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Hackathon Card 2 -->
+<div class="flex flex-col bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary/50 transition-all">
+<div class="w-full bg-center bg-no-repeat aspect-video bg-cover relative" data-alt="Fintech Innovation hackathon image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqlyjqBs7awaDqZHxrHo-mvWqGj6FluRUPiNRGJBfWbY3j5d5KG8c_AauSSXPrGx2tvJeJSZkobQ9jgExvDiRNXFvT7QpNLIT92KKuWef3Mb5tcmlQV70QZb6ex9c7gop6hKoyNE-Js1t8zB3BYPMqtaV6pDZOA7TbTY2xxZJZhVEpXNV_owltDm-AuzOlXdpT5f6E4L14DCydxJmr9hDVImz-GfY92uePHeUCZ69ybOVAhIhe_k46l4vcdkrjr-A_aG6obBwsv8Ga");'>
+<div class="absolute top-3 right-3 px-3 py-1 bg-slate-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg">
+                                    Completed
+                                </div>
+</div>
+<div class="p-5 space-y-4">
+<div>
+<p class="text-slate-900 dark:text-white text-lg font-bold">Fintech Innovation</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Ended 1 week ago • Winner: Team Alpha</p>
+</div>
+<div class="flex flex-col gap-2 opacity-60">
+<div class="flex gap-6 justify-between items-center">
+<p class="text-slate-700 dark:text-slate-300 text-xs font-semibold uppercase">Final Score</p>
+<p class="text-slate-900 dark:text-white text-sm font-bold">100%</p>
+</div>
+<div class="rounded-full bg-slate-100 dark:bg-slate-800 h-2.5 w-full overflow-hidden">
+<div class="h-full rounded-full bg-slate-400" style="width: 100%;"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500 text-[20px]">emoji_events</span>
+<span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Top 3 Finish</span>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Tasks / Activity -->
+<div class="space-y-4">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold px-2">Project Tasks</h2>
+<div class="bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+<div class="p-4 flex items-center gap-4 group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+<span class="material-symbols-outlined text-primary">check_circle</span>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Implement OAuth Login</p>
+<p class="text-xs text-slate-500">Assigned to Sarah M.</p>
+</div>
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase">High</span>
+</div>
+<div class="p-4 flex items-center gap-4 group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+<span class="material-symbols-outlined text-slate-400">radio_button_unchecked</span>
+<div class="flex-1">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Design Landing Page Hero</p>
+<p class="text-xs text-slate-500">Unassigned</p>
+</div>
+<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase">Medium</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Persistent Chat Sidebar -->
+<aside class="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col hidden lg:flex">
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">chat_bubble</span>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white">Team Chat</h3>
+</div>
+<div class="flex gap-2">
+<button class="size-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Chat Messages -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
+<!-- Date Separator -->
+<div class="flex items-center gap-4">
+<div class="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
+<span class="text-[10px] text-slate-400 font-bold uppercase">Today</span>
+<div class="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
+</div>
+<!-- Message 1 -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAo-IiXDUHfaQV-jwkfih4w7h_zppZAXeJkk036cGpFZgdwxyiyxuZtQQES2PyP3nrupwV0v_-5RuQvv10qzy-1ftqRtzq7vgy-U9PjeCJ1Zt46bfpFGT0zAx6koTTUy-dmLNoLVK-0FP1eC-e7xS8AtJaqLe0XnLOhr-A-jHlDlAClSJNDKQ8fhgqguaSFg1HT0pWXDKEI1LsTSpiWmzYd5_XaRZOIE3j6RlZ9HHGAoq_-WLpmKRyErxbYyErfi440XNaR56zTDx08')"></div>
+<span class="text-xs font-bold text-slate-900 dark:text-white">Marcus Dev</span>
+<span class="text-[10px] text-slate-400">10:42 AM</span>
+</div>
+<div class="ml-8 p-3 rounded-lg rounded-tl-none bg-slate-100 dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-300">
+                        Just pushed the initial API scaffolding to the repo. Check it out guys! 🚀
+                    </div>
+</div>
+<!-- Message 2 -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-2">
+<div class="size-6 rounded-full bg-cover" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmHn8rP5J9f7ihBq3LICaf8oSwJu-nvF4mmnSpDpuSeFWmcgQFLVclBeJPUZRCz0A761H938QiHOGfwbMT2o4tAXpdDQ3LxqtnFFpoVGf5W76GLV32GmWIXzFMU5oZXqHA2aAURHMdj1q-MU82lJ0yZYBfMxDI9OEm-2aJ3pmSE6HEZ3C3Dcx8Qv2vcfiYwa8xMnCEsG6oV3n0cxKIvhR4AxGTwFNXD58jNWVHg5Cn9BabBBgluc4XtXyHJkGX40I9bZHNsV2L2s_h')"></div>
+<span class="text-xs font-bold text-slate-900 dark:text-white">Sarah Chen</span>
+<span class="text-[10px] text-slate-400">10:45 AM</span>
+</div>
+<div class="ml-8 p-3 rounded-lg rounded-tl-none bg-primary/10 border border-primary/20 text-sm text-slate-700 dark:text-slate-300">
+                        On it! I'll start working on the frontend integration now. 
+                        <div class="mt-2 p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<div class="flex-1 overflow-hidden">
+<p class="text-[11px] font-bold truncate">api-docs.md</p>
+<p class="text-[10px] text-slate-400">2.4 MB</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Message 3 (System) -->
+<div class="flex items-center gap-2 justify-center text-[10px] font-medium text-slate-400 py-2">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+<span>Github: 3 commits merged to main</span>
+</div>
+<!-- Message 4 (Me) -->
+<div class="flex flex-col items-end gap-1.5">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-slate-400">11:05 AM</span>
+<span class="text-xs font-bold text-primary">You</span>
+</div>
+<div class="mr-0 p-3 rounded-lg rounded-tr-none bg-primary text-white text-sm shadow-sm">
+                        Great progress. I'll handle the UI design tweaks this afternoon.
+                    </div>
+</div>
+</div>
+<!-- Chat Input Area -->
+<div class="p-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800">
+<div class="relative">
+<textarea class="form-textarea w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-primary focus:border-primary text-sm min-h-[80px] pb-10 custom-scrollbar resize-none dark:text-white dark:placeholder-slate-500" placeholder="Type a message..."></textarea>
+<div class="absolute bottom-3 left-3 flex gap-2">
+<button class="size-7 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+<button class="size-7 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined text-[18px]">mood</span>
+</button>
+</div>
+<button class="absolute bottom-3 right-3 size-7 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+</body></html>
