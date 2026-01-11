@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HackathonCard from '../components/HackathonCard';
 import TaskItem from '../components/TaskItem';
+import NewHackathonModal from '../components/NewHackathonModal';
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const [isModalOpen, setIsModalOpen] = useState(false);
     return (
         <div className="max-w-5xl mx-auto space-y-8">
             {/* Profile Header */}
@@ -29,9 +31,12 @@ export default function Dashboard() {
                         <span className="material-symbols-outlined text-[18px]">person_add</span>
                         Invite
                     </button>
-                    <button className="flex-1 @[480px]:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex-1 @[480px]:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
+                    >
                         <span className="material-symbols-outlined text-[18px]">add_circle</span>
-                        New Project
+                        New Hackathon
                     </button>
                 </div>
             </div>
@@ -86,6 +91,12 @@ export default function Dashboard() {
                     />
                 </div>
             </div>
+            {/* New Hackathon Modal */}
+            <NewHackathonModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                teamId="team-alpha-bits-id"
+            />
         </div>
     );
 }

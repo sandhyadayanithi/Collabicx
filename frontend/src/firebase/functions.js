@@ -166,8 +166,8 @@ export const getTeamMembers = async (teamId) => {
 
 export const createHackathon = async (teamId, data) => {
     const hackathonRef = await addDoc(collection(db, `teams/${teamId}/hackathons`), {
+        status: "Yet to register",
         ...data,
-        status: "Planned",
         createdAt: serverTimestamp()
     });
     return hackathonRef.id;
