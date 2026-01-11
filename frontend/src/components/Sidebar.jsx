@@ -9,7 +9,7 @@ export default function Sidebar({ children, showLogo = false }) {
                         <span className="material-symbols-outlined">hub</span>
                     </div>
                     <div className="hidden md:flex flex-col">
-                        <h1 className="text-slate-900 dark:text-white text-base font-bold leading-tight">Hackathon Hub</h1>
+                        <h1 className="text-slate-900 dark:text-white text-base font-bold leading-tight">Collabicx</h1>
                         <p className="text-slate-500 dark:text-[#9da6b9] text-xs font-medium">Management</p>
                     </div>
                 </div>

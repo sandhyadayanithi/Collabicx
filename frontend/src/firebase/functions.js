@@ -21,6 +21,23 @@ import {
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "./config";
 
+// --- 0. Helper Functions ---
+export const checkUsernameAvailability = async (username) => {
+    if (!username) return false;
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("username", "==", username.toLowerCase()));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty;
+};
+
+export const updateUserProfile = async (userId, data) => {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+        ...data,
+        updatedAt: serverTimestamp()
+    });
+};
+
 // --- 1. Authentication Functions ---
 
 export const googleSignIn = async () => {

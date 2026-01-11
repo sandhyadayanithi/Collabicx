@@ -57,8 +57,14 @@ export default function HackathonCard({ title, status, TimeInfo, progress, parti
                             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Top 3 Finish</span>
                         </div>
                     )}
-                    <button className="text-slate-400 hover:text-primary transition-colors">
-                        <span className="material-symbols-outlined">{finished ? 'visibility' : 'arrow_forward'}</span>
+                    <button className="text-slate-400 hover:text-primary transition-colors flex items-center">
+                        {finished ? (
+                            <span className="material-symbols-outlined">visibility</span>
+                        ) : (
+                            <svg height="20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        )}
                     </button>
                 </div>
             </div>

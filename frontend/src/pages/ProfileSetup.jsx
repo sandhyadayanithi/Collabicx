@@ -75,7 +75,7 @@ export default function ProfileSetup() {
                         <a className="hover:text-primary" href="#">Privacy Policy</a>
                         <a className="hover:text-primary" href="#">Terms of Service</a>
                     </div>
-                    <span>© 2024 DevSprint Inc.</span>
+                    <span>© 2024 Collabicx Inc.</span>
                 </div>
             </div>
         </div>

@@ -7,9 +7,9 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
             <div className="flex items-center gap-8">
                 <Link to="/" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
                     <div className="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <span className="material-symbols-outlined">rocket_launch</span>
+                        <span className="material-symbols-outlined">hub</span>
                     </div>
-                    <h2 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">{title}</h2>
+                    <h2 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Collabicx</h2>
                 </Link>
                 {!hideSearch && (
                     <label className="hidden md:flex flex-col min-w-40 h-10 max-w-64">

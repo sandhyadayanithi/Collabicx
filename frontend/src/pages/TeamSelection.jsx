@@ -8,7 +8,7 @@ export default function TeamSelection() {
     return (
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
             {/* Top Navigation */}
-            <Header title="HackathonOS" hideSearch={true}>
+            <Header title="Collabicx" hideSearch={true}>
                 <a className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
                 <a className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Projects</a>
                 <a className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors" href="#">Support</a>
