@@ -16,27 +16,7 @@ export default function Sidebar({ children, showLogo = false, footer }) {
             )}
 
             <div className="flex flex-col gap-2 px-4 flex-1">
-                {children || (
-                    <>
-                        <div className="p-2 text-primary bg-primary/10 rounded-xl cursor-pointer flex items-center gap-3">
-                            <span className="material-symbols-outlined">grid_view</span>
-                            <span className="hidden md:block text-sm font-semibold">Dashboard</span>
-                        </div>
-                        <div className="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors flex items-center gap-3">
-                            <span className="material-symbols-outlined text-[24px]">folder</span>
-                            <span className="hidden md:block text-sm font-medium">Files</span>
-                        </div>
-                        <div className="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors flex items-center gap-3">
-                            <span className="material-symbols-outlined text-[24px]">task_alt</span>
-                            <span className="hidden md:block text-sm font-medium">Tasks</span>
-                        </div>
-                        <div className="p-2 text-slate-400 hover:text-primary cursor-pointer transition-colors relative flex items-center gap-3">
-                            <span className="material-symbols-outlined text-[24px]">notifications</span>
-                            <span className="absolute top-1 left-5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark md:static md:hidden"></span>
-                            <span className="hidden md:block text-sm font-medium">Notifications</span>
-                        </div>
-                    </>
-                )}
+                {children}
             </div>
 
             <div className="mt-auto px-4 flex flex-col gap-2">

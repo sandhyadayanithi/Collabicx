@@ -26,11 +26,9 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
     return (
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 px-6 lg:px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
             <div className="flex items-center gap-4">
-                {showBack && (
-                    <Link to={backPath} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </Link>
-                )}
+                <Link to="/teams" className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                    <span className="material-symbols-outlined">arrow_back</span>
+                </Link>
                 <Link to="/teams" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
                     <div className="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
                         <span className="material-symbols-outlined">hub</span>
@@ -40,14 +38,7 @@ export default function Header({ title = "Team Alpha-Bits", hideSearch = false, 
             </div>
             <div className="flex items-center gap-6">
                 <nav className="hidden lg:flex items-center gap-6">
-                    {children || (
-                        <>
-                            <Link className="text-primary text-sm font-semibold" to="/dashboard">Dashboard</Link>
-                            <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" to="/workspace">Workspace</Link>
-                            <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" to="/teams">Teams</Link>
-                            <Link className="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm font-medium" to="/profile">Profile</Link>
-                        </>
-                    )}
+                    {children}
                 </nav>
                 <div className="h-6 w-px bg-slate-200 dark:border-slate-800"></div>
 
