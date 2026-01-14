@@ -206,18 +206,19 @@ export default function HackathonWorkspace() {
     };
 
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen flex flex-col font-display overflow-hidden">
+        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
             {/* Global Header */}
             <Header title="Global AI Hack 2024" backPath="/dashboard">
 
             </Header>
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* Main Workspace Grid */}
-                <main className="flex-1 grid grid-cols-1 lg:grid-cols-10 gap-6 p-6 overflow-hidden bg-slate-50 dark:bg-slate-900/50">
+            <div className="flex-1 w-full max-w-[1600px] mx-auto p-6">
+                {/* Main Workspace Stack */}
+                <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full h-[calc(100vh-110px)]">
 
-                    {/* Left Column: Quick Notes */}
-                    <section className="lg:col-span-3 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50">
+                    {/* Quick Notes */}
+                    {/* Quick Notes */}
+                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Notes</h3>
                             <div className="flex items-center gap-2">
@@ -251,8 +252,9 @@ export default function HackathonWorkspace() {
                         </div>
                     </section>
 
-                    {/* Center Column: Team Chat */}
-                    <section className="lg:col-span-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50">
+                    {/* Team Chat */}
+                    {/* Team Chat */}
+                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">chat_bubble</span>
@@ -323,88 +325,90 @@ export default function HackathonWorkspace() {
                         </div>
                     </section>
 
-                    {/* Right Column: Tasks & Assets */}
-                    <div className="lg:col-span-2 flex flex-col gap-6 overflow-hidden">
-                        {/* Top: Sprint Tasks */}
-                        <section className="flex-1 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark">
-                            <div className="p-4 border-b border-slate-200 dark:border-slate-800">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Sprint Tasks</h3>
-                                    <button onClick={addTask} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
-                                        <span className="material-symbols-outlined text-sm">add</span> Add
-                                    </button>
-                                </div>
-                                <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                                    <div className="flex justify-between items-end mb-2">
-                                        <div>
-                                            <p className="text-2xl font-bold text-slate-900 dark:text-white">{progress}%</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${progress >= 50 ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
-                                                {progress >= 50 ? 'On Track' : 'In Progress'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
-                                        <div className="bg-primary h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                                <div className="space-y-2">
-                                    {tasks.map(task => (
-                                        <div key={task.id} className={`flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={task.completed}
-                                                onChange={() => toggleTask(task.id)}
-                                                className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer"
-                                            />
-                                            <div className="flex-1">
-                                                <p className={`text-sm text-slate-900 dark:text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
-                                                    {task.title}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {tasks.length === 0 && (
-                                        <p className="text-center text-slate-400 text-sm py-8 italic">No tasks.</p>
-                                    )}
-                                </div>
-                            </div>
-                        </section>
+                    {/* Tasks & Assets */}
 
-                        {/* Bottom: Submission Assets */}
-                        <section className="flex-1 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark">
-                            <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Assets</h3>
-                                <button onClick={addAsset} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
-                                    <span className="material-symbols-outlined text-sm">add</span> New
+                    {/* Top: Sprint Tasks */}
+                    {/* Top: Sprint Tasks */}
+                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Sprint Tasks</h3>
+                                <button onClick={addTask} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
+                                    <span className="material-symbols-outlined text-sm">add</span> Add
                                 </button>
                             </div>
-                            <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                                {assets.map(asset => (
-                                    <div key={asset.id} className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
-                                        <div className={`size-8 ${asset.color || 'bg-slate-500'} text-white rounded-lg flex items-center justify-center shrink-0`}>
-                                            <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
+                            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div className="flex justify-between items-end mb-2">
+                                    <div>
+                                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{progress}%</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${progress >= 50 ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                                            {progress >= 50 ? 'On Track' : 'In Progress'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                                    <div className="bg-primary h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                            <div className="space-y-2">
+                                {tasks.map(task => (
+                                    <div key={task.id} className={`flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={task.completed}
+                                            onChange={() => toggleTask(task.id)}
+                                            className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer"
+                                        />
+                                        <div className="flex-1">
+                                            <p className={`text-sm text-slate-900 dark:text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                                                {task.title}
+                                            </p>
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                            <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.title}</h5>
-                                            <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:text-primary truncate block">{asset.url}</a>
-                                        </div>
-                                        <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
-                                            <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                        </a>
                                     </div>
                                 ))}
-                                {assets.length === 0 && (
-                                    <button onClick={addAsset} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
-                                        Add Asset
-                                    </button>
+                                {tasks.length === 0 && (
+                                    <p className="text-center text-slate-400 text-sm py-8 italic">No tasks.</p>
                                 )}
                             </div>
-                        </section>
-                    </div>
+                        </div>
+                    </section>
+
+                    {/* Bottom: Submission Assets */}
+                    {/* Bottom: Submission Assets */}
+                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                            <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Assets</h3>
+                            <button onClick={addAsset} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
+                                <span className="material-symbols-outlined text-sm">add</span> New
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                            {assets.map(asset => (
+                                <div key={asset.id} className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
+                                    <div className={`size-8 ${asset.color || 'bg-slate-500'} text-white rounded-lg flex items-center justify-center shrink-0`}>
+                                        <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.title}</h5>
+                                        <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:text-primary truncate block">{asset.url}</a>
+                                    </div>
+                                    <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
+                                        <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                    </a>
+                                </div>
+                            ))}
+                            {assets.length === 0 && (
+                                <button onClick={addAsset} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                                    Add Asset
+                                </button>
+                            )}
+                        </div>
+                    </section>
+
                 </main>
             </div>
 
