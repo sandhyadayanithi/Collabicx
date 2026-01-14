@@ -206,19 +206,18 @@ export default function HackathonWorkspace() {
     };
 
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
+        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col font-display">
             {/* Global Header */}
             <Header title="Global AI Hack 2024" backPath="/dashboard">
 
             </Header>
 
-            <div className="flex-1 w-full max-w-[1600px] mx-auto p-6">
+            <div className="flex flex-1 w-full max-w-[1600px] mx-auto p-6 overflow-hidden">
                 {/* Main Workspace Stack */}
-                <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full h-[calc(100vh-110px)]">
+                <main className="flex gap-6 w-full h-full overflow-x-auto pb-2 custom-scrollbar">
 
                     {/* Quick Notes */}
-                    {/* Quick Notes */}
-                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
+                    <section className="flex-1 min-w-[280px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Notes</h3>
                             <div className="flex items-center gap-2">
@@ -253,8 +252,7 @@ export default function HackathonWorkspace() {
                     </section>
 
                     {/* Team Chat */}
-                    {/* Team Chat */}
-                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
+                    <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">chat_bubble</span>
@@ -325,11 +323,8 @@ export default function HackathonWorkspace() {
                         </div>
                     </section>
 
-                    {/* Tasks & Assets */}
-
-                    {/* Top: Sprint Tasks */}
-                    {/* Top: Sprint Tasks */}
-                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
+                    {/* Sprint Tasks */}
+                    <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Sprint Tasks</h3>
@@ -377,9 +372,8 @@ export default function HackathonWorkspace() {
                         </div>
                     </section>
 
-                    {/* Bottom: Submission Assets */}
-                    {/* Bottom: Submission Assets */}
-                    <section className="w-full h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
+                    {/* Submission Assets */}
+                    <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Assets</h3>
                             <button onClick={addAsset} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
