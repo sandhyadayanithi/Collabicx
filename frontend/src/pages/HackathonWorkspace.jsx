@@ -274,7 +274,7 @@ export default function HackathonWorkspace() {
                     </section>
 
                     {/* Team Chat */}
-                    <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
+                    <section className="flex-1 min-w-[480px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('teamChat')}>
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">chat_bubble</span>
@@ -311,7 +311,7 @@ export default function HackathonWorkspace() {
                                                         </div>
                                                     )}
                                                     <span className="text-xs font-bold text-slate-900 dark:text-white">
-                                                        {isMe ? 'You' : (msg.userName || `User ${msg.userId.substring(0, 4)}`)}
+                                                        {isMe ? (userData?.username ? `@${userData.username}` : 'You') : (msg.userName ? (msg.userName.startsWith('@') ? msg.userName : `@${msg.userName}`) : `User ${msg.userId.substring(0, 4)}`)}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400">
                                                         {msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
