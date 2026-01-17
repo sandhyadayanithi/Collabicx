@@ -151,6 +151,21 @@ export default function HackathonWorkspace() {
     const completedCount = tasks.filter(t => t.completed).length;
     const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
 
+    // -- State: Expandable Sections --
+    const [expandedSections, setExpandedSections] = useState({
+        quickNotes: true,
+        teamChat: true,
+        sprintTasks: true,
+        assets: true
+    });
+
+    const toggleSection = (section) => {
+        setExpandedSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
+
     // -- State: Submission Assets --
     const [assets, setAssets] = useState([
         { id: 1, type: 'github', title: 'GitHub Repository', url: 'github.com/team-alpha/ai-hack', icon: 'code', color: 'bg-slate-900' },
@@ -218,119 +233,138 @@ export default function HackathonWorkspace() {
 
                     {/* Quick Notes */}
                     <section className="flex-1 min-w-[280px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('quickNotes')}>
                             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Notes</h3>
-                            <div className="flex items-center gap-2">
-                                <span className={`flex h-2 w-2 rounded-full ${lastSaved ? 'bg-green-500' : 'bg-orange-500'}`}></span>
-                                <span className="text-[10px] font-medium text-slate-400">{lastSaved ? 'SAVED' : 'UNSAVED'}</span>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <span className={`flex h-2 w-2 rounded-full ${lastSaved ? 'bg-green-500' : 'bg-orange-500'}`}></span>
+                                    <span className="text-[10px] font-medium text-slate-400">{lastSaved ? 'SAVED' : 'UNSAVED'}</span>
+                                </div>
+                                <span className={`material-symbols-outlined text-slate-400 transition-transform ${expandedSections.quickNotes ? 'rotate-180' : ''}`}>
+                                    expand_more
+                                </span>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                            <div className="flex flex-col h-full">
-                                <div className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-                                    <textarea
-                                        value={noteContent}
-                                        onChange={handleNoteChange}
-                                        className="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 font-mono text-sm leading-relaxed"
-                                        placeholder="Start typing ideas..."
-                                    ></textarea>
-                                </div>
-                                <div className="mt-2 flex justify-end">
-                                    <button
-                                        onClick={saveNote}
-                                        disabled={lastSaved}
-                                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${lastSaved
-                                            ? 'bg-green-500/10 text-green-500 cursor-default'
-                                            : 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20'
-                                            }`}
-                                    >
-                                        {lastSaved ? 'SAVED' : 'SAVE NOTE'}
-                                    </button>
+                        {expandedSections.quickNotes && (
+                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                <div className="flex flex-col h-full">
+                                    <div className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                                        <textarea
+                                            value={noteContent}
+                                            onChange={handleNoteChange}
+                                            className="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 font-mono text-sm leading-relaxed"
+                                            placeholder="Start typing ideas..."
+                                        ></textarea>
+                                    </div>
+                                    <div className="mt-2 flex justify-end">
+                                        <button
+                                            onClick={saveNote}
+                                            disabled={lastSaved}
+                                            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${lastSaved
+                                                ? 'bg-green-500/10 text-green-500 cursor-default'
+                                                : 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20'
+                                                }`}
+                                        >
+                                            {lastSaved ? 'SAVED' : 'SAVE NOTE'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </section>
 
                     {/* Team Chat */}
                     <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('teamChat')}>
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">chat_bubble</span>
                                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Team Chat</h3>
                             </div>
+                            <span className={`material-symbols-outlined text-slate-400 transition-transform ${expandedSections.teamChat ? 'rotate-180' : ''}`}>
+                                expand_more
+                            </span>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-                            <div className="flex items-center gap-4">
-                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
-                                <span className="text-[10px] text-slate-400 font-bold uppercase">Today</span>
-                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
-                            </div>
-                            {messages.map((msg) => {
-                                const isMe = msg.userId === currentUser?.uid;
-                                return (
-                                    <div key={msg.id} className={`flex flex-col gap-1.5 ${isMe ? 'items-end' : 'items-start'}`}>
-                                        <div className={`flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                                            {!isMe && (
-                                                <div
-                                                    className="size-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center border border-slate-300 dark:border-slate-600"
-                                                    style={msg.userAvatar ? { backgroundImage: `url(${msg.userAvatar})` } : {}}
-                                                >
-                                                    {!msg.userAvatar && (
-                                                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 flex items-center justify-center h-full w-full">
-                                                            {(msg.userName || "U").substring(0, 1).toUpperCase()}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            )}
-                                            <span className="text-xs font-bold text-slate-900 dark:text-white">
-                                                {isMe ? 'You' : (msg.userName || `User ${msg.userId.substring(0, 4)}`)}
-                                            </span>
-                                            <span className="text-[10px] text-slate-400">
-                                                {msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                                            </span>
-                                        </div>
-                                        <div className={`p-3 rounded-xl max-w-[85%] break-words text-sm ${isMe
-                                            ? 'bg-primary text-white rounded-tr-none'
-                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none'
-                                            }`}>
-                                            {msg.message}
-                                        </div>
+                        {expandedSections.teamChat && (
+                            <>
+                                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
+                                        <span className="text-[10px] text-slate-400 font-bold uppercase">Today</span>
+                                        <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
                                     </div>
-                                );
-                            })}
-                            <div ref={messagesEndRef} />
-                        </div>
+                                    {messages.map((msg) => {
+                                        const isMe = msg.userId === currentUser?.uid;
+                                        return (
+                                            <div key={msg.id} className={`flex flex-col gap-1.5 ${isMe ? 'items-end' : 'items-start'}`}>
+                                                <div className={`flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                                                    {!isMe && (
+                                                        <div
+                                                            className="size-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center border border-slate-300 dark:border-slate-600"
+                                                            style={msg.userAvatar ? { backgroundImage: `url(${msg.userAvatar})` } : {}}
+                                                        >
+                                                            {!msg.userAvatar && (
+                                                                <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 flex items-center justify-center h-full w-full">
+                                                                    {(msg.userName || "U").substring(0, 1).toUpperCase()}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                                        {isMe ? 'You' : (msg.userName || `User ${msg.userId.substring(0, 4)}`)}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-400">
+                                                        {msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                                    </span>
+                                                </div>
+                                                <div className={`p-3 rounded-xl max-w-[85%] break-words text-sm ${isMe
+                                                    ? 'bg-primary text-white rounded-tr-none'
+                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none'
+                                                    }`}>
+                                                    {msg.message}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                    <div ref={messagesEndRef} />
+                                </div>
 
-                        <div className="p-4 bg-white/0 dark:bg-black/0 border-t border-slate-200 dark:border-slate-800 shrink-0">
-                            <div className="relative">
-                                <textarea
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    onKeyDown={handleChatKeyDown}
-                                    className="form-textarea w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-primary focus:border-primary text-sm min-h-[50px] max-h-[120px] py-3 pr-12 pl-4 custom-scrollbar resize-none dark:text-white dark:placeholder-slate-500"
-                                    placeholder="Type a message..."
-                                    rows={1}
-                                    style={{ height: 'auto', minHeight: '50px' }}
-                                ></textarea>
-                                <button
-                                    onClick={handleSendMessage}
-                                    className="absolute bottom-2.5 right-2 size-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-                                >
-                                    <span className="material-symbols-outlined text-[18px]">send</span>
-                                </button>
-                            </div>
-                        </div>
+                                <div className="p-4 bg-white/0 dark:bg-black/0 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                                    <div className="relative">
+                                        <textarea
+                                            value={newMessage}
+                                            onChange={(e) => setNewMessage(e.target.value)}
+                                            onKeyDown={handleChatKeyDown}
+                                            className="form-textarea w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-primary focus:border-primary text-sm min-h-[50px] max-h-[120px] py-3 pr-12 pl-4 custom-scrollbar resize-none dark:text-white dark:placeholder-slate-500"
+                                            placeholder="Type a message..."
+                                            rows={1}
+                                            style={{ height: 'auto', minHeight: '50px' }}
+                                        ></textarea>
+                                        <button
+                                            onClick={handleSendMessage}
+                                            className="absolute bottom-2.5 right-2 size-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
+                                        >
+                                            <span className="material-symbols-outlined text-[18px]">send</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </section>
 
                     {/* Sprint Tasks */}
                     <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('sprintTasks')}>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Sprint Tasks</h3>
-                                <button onClick={addTask} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
-                                    <span className="material-symbols-outlined text-sm">add</span> Add
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={(e) => { e.stopPropagation(); addTask(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
+                                        <span className="material-symbols-outlined text-sm">add</span> Add
+                                    </button>
+                                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${expandedSections.sprintTasks ? 'rotate-180' : ''}`}>
+                                        expand_more
+                                    </span>
+                                </div>
                             </div>
                             <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                                 <div className="flex justify-between items-end mb-2">
@@ -348,60 +382,71 @@ export default function HackathonWorkspace() {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                            <div className="space-y-2">
-                                {tasks.map(task => (
-                                    <div key={task.id} className={`flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            checked={task.completed}
-                                            onChange={() => toggleTask(task.id)}
-                                            className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer"
-                                        />
-                                        <div className="flex-1">
-                                            <p className={`text-sm text-slate-900 dark:text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
-                                                {task.title}
-                                            </p>
+                        {expandedSections.sprintTasks && (
+                            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
+                                <div className="space-y-2">
+                                    {tasks.map(task => (
+                                        <div key={task.id} className={`flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
+                                            <input
+                                                type="checkbox"
+                                                checked={task.completed}
+                                                onChange={() => toggleTask(task.id)}
+                                                className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer"
+                                            />
+                                            <div className="flex-1">
+                                                <p className={`text-sm text-slate-900 dark:text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                                                    {task.title}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {tasks.length === 0 && (
+                                        <p className="text-center text-slate-400 text-sm py-8 italic">No tasks.</p>
+                                    )}
+                                </div>
+
+                                {/* Nested Assets Section */}
+                                <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
+                                    <div className="flex justify-between items-center mb-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-2 rounded-lg transition-colors" onClick={() => toggleSection('assets')}>
+                                        <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Submission Assets</h4>
+                                        <div className="flex items-center gap-2">
+                                            <button onClick={(e) => { e.stopPropagation(); addAsset(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-xs font-bold">
+                                                <span className="material-symbols-outlined text-xs">add</span> New
+                                            </button>
+                                            <span className={`material-symbols-outlined text-slate-400 text-sm transition-transform ${expandedSections.assets ? 'rotate-180' : ''}`}>
+                                                expand_more
+                                            </span>
                                         </div>
                                     </div>
-                                ))}
-                                {tasks.length === 0 && (
-                                    <p className="text-center text-slate-400 text-sm py-8 italic">No tasks.</p>
-                                )}
+                                    {expandedSections.assets && (
+                                        <div className="space-y-3">
+                                            {assets.map(asset => (
+                                                <div key={asset.id} className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
+                                                    <div className={`size-8 ${asset.color || 'bg-slate-500'} text-white rounded-lg flex items-center justify-center shrink-0`}>
+                                                        <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.title}</h5>
+                                                        <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:text-primary truncate block">{asset.url}</a>
+                                                    </div>
+                                                    <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
+                                                        <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                                    </a>
+                                                </div>
+                                            ))}
+                                            {assets.length === 0 && (
+                                                <button onClick={addAsset} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                                                    Add Asset
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </section>
 
-                    {/* Submission Assets */}
-                    <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                            <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Assets</h3>
-                            <button onClick={addAsset} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
-                                <span className="material-symbols-outlined text-sm">add</span> New
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                            {assets.map(asset => (
-                                <div key={asset.id} className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
-                                    <div className={`size-8 ${asset.color || 'bg-slate-500'} text-white rounded-lg flex items-center justify-center shrink-0`}>
-                                        <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.title}</h5>
-                                        <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:text-primary truncate block">{asset.url}</a>
-                                    </div>
-                                    <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
-                                        <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                    </a>
-                                </div>
-                            ))}
-                            {assets.length === 0 && (
-                                <button onClick={addAsset} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
-                                    Add Asset
-                                </button>
-                            )}
-                        </div>
-                    </section>
+
 
                 </main>
             </div>
