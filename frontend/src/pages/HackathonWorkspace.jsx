@@ -1,21 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { updateQuickNote, listenToQuickNote, sendMessage, listenToMessages } from '../firebase/functions';
-import { auth } from '../firebase/config';
-import { doc, getDoc } from 'firebase/firestore'; // For user fetching if needed, or stick to simple
-import { db } from '../firebase/config';
+import {
+    updateQuickNote,
+    listenToQuickNote,
+    sendMessage,
+    listenToMessages,
+    listenToTasks,
+    listenToLinks,
+    toggleTaskComplete,
+    addTask as firebaseAddTask,
+    addLink as firebaseAddLink,
+    getHackathonDetails
+} from '../firebase/functions';
+import { auth, db } from '../firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
-const TEAM_ID = "team-alpha-bits-id";
-const HACKATHON_ID = "hackathon-1";
 
 export default function HackathonWorkspace() {
+    const { teamId, hackathonId } = useParams();
+    const navigate = useNavigate();
     const [showChat, setShowChat] = useState(true);
-    const currentUser = auth.currentUser;
+    const [currentUser, setCurrentUser] = useState(auth.currentUser);
+    const [hackathon, setHackathon] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // -- State: Chat --
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState("");
-    const messagesEndRef = useRef(null);
+    // Auth listener
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setCurrentUser(user);
+            } else {
+                navigate('/login');
+            }
+        });
+        return () => unsubscribe();
+    }, [navigate]);
+
+    // Fetch user data for chat
     const [userData, setUserData] = useState(null);
 
     // Fetch user data for chat
@@ -27,15 +50,38 @@ export default function HackathonWorkspace() {
         }
     }, [currentUser]);
 
+    // Fetch hackathon details
+    useEffect(() => {
+        if (teamId && hackathonId) {
+            setLoading(true);
+            getHackathonDetails(teamId, hackathonId).then(data => {
+                if (data) {
+                    setHackathon(data);
+                } else {
+                    // Hackathon not found, maybe redirect
+                    console.error("Hackathon not found");
+                }
+                setLoading(false);
+            }).catch(err => {
+                console.error("Error fetching hackathon:", err);
+                setLoading(false);
+            });
+        }
+    }, [teamId, hackathonId]);
+
+    // -- State: Chat --
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
+    const messagesEndRef = useRef(null);
+
     // Chat Listeners
     useEffect(() => {
-        const unsubscribe = listenToMessages(TEAM_ID, (msgs) => {
+        if (!teamId || !hackathonId) return;
+        const unsubscribe = listenToMessages(teamId, hackathonId, (msgs) => {
             setMessages(msgs);
-            // Scroll to bottom on new messages?
-            // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         });
         return () => unsubscribe();
-    }, []);
+    }, [teamId, hackathonId]);
 
     // Scroll effect when messages change
     useEffect(() => {
@@ -43,11 +89,11 @@ export default function HackathonWorkspace() {
     }, [messages]);
 
     const handleSendMessage = async () => {
-        if (!newMessage.trim() || !currentUser) return;
+        if (!newMessage.trim() || !currentUser || !teamId || !hackathonId) return;
         try {
             const name = userData?.username || userData?.name || "User";
             const avatar = userData?.avatar || "";
-            await sendMessage(TEAM_ID, currentUser.uid, newMessage, name, avatar);
+            await sendMessage(teamId, hackathonId, currentUser.uid, newMessage, name, avatar);
             setNewMessage("");
         } catch (error) {
             console.error("Error sending message:", error);
@@ -69,18 +115,15 @@ export default function HackathonWorkspace() {
 
     // Load initial note and listen for changes
     useEffect(() => {
-        const unsubscribe = listenToQuickNote(TEAM_ID, HACKATHON_ID, (content) => {
-            // Only update from DB if we aren't currently typing to avoid overwriting ourselves immediately
-            // or better, just always update and let React handle diffs? 
-            // If we are typing, we might have local changes that are newer.
-            // For now, let's sync. If user says "real time", we should show updates.
+        if (!teamId || !hackathonId) return;
+        const unsubscribe = listenToQuickNote(teamId, hackathonId, (content) => {
             if (!isTypingRef.current) {
                 setNoteContent(content || "");
                 noteContentRef.current = content || "";
             }
         });
         return () => unsubscribe();
-    }, []);
+    }, [teamId, hackathonId]);
 
     const handleNoteChange = (e) => {
         setNoteContent(e.target.value);
@@ -98,16 +141,17 @@ export default function HackathonWorkspace() {
     // Autosave on unmount
     useEffect(() => {
         return () => {
-            if (noteContentRef.current) {
+            if (noteContentRef.current && teamId && hackathonId) {
                 console.log("Autosaving note on navigation:", noteContentRef.current);
-                updateQuickNote(TEAM_ID, HACKATHON_ID, noteContentRef.current);
+                updateQuickNote(teamId, hackathonId, noteContentRef.current);
             }
         };
-    }, []);
+    }, [teamId, hackathonId]);
 
     const saveNote = async () => {
+        if (!teamId || !hackathonId) return;
         try {
-            await updateQuickNote(TEAM_ID, HACKATHON_ID, noteContent);
+            await updateQuickNote(teamId, hackathonId, noteContent);
             setLastSaved(new Date());
         } catch (error) {
             console.error("Failed to save note:", error);
@@ -115,18 +159,28 @@ export default function HackathonWorkspace() {
     };
 
     // -- State: Sprint Tasks --
-    const [tasks, setTasks] = useState([
-        { id: 1, title: 'Finalize Figma Prototyping', category: 'Design', completed: true },
-        { id: 2, title: 'Integrate OpenAI API endpoints', category: 'Development', completed: false, tag: 'BLOCKER' },
-    ]);
+    const [tasks, setTasks] = useState([]);
     const [newTaskTitle, setNewTaskTitle] = useState("");
+
+    // Tasks Listener
+    useEffect(() => {
+        if (!teamId || !hackathonId) return;
+        const unsubscribe = listenToTasks(teamId, hackathonId, (fetchedTasks) => {
+            setTasks(fetchedTasks);
+        });
+        return () => unsubscribe();
+    }, [teamId, hackathonId]);
 
     // -- State: Task Modal --
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [newTaskCategory, setNewTaskCategory] = useState("General");
 
-    const toggleTask = (id) => {
-        setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+    const toggleTask = async (id) => {
+        try {
+            await toggleTaskComplete(teamId, hackathonId, id);
+        } catch (error) {
+            console.error("Error toggling task:", error);
+        }
     };
 
     const addTask = () => {
@@ -135,16 +189,16 @@ export default function HackathonWorkspace() {
         setIsTaskModalOpen(true);
     };
 
-    const handleAddTaskSubmit = (e) => {
+    const handleAddTaskSubmit = async (e) => {
         e.preventDefault();
-        if (newTaskTitle.trim()) {
-            setTasks(prev => [...prev, {
-                id: Date.now(),
-                title: newTaskTitle,
-                category: newTaskCategory,
-                completed: false
-            }]);
-            setIsTaskModalOpen(false);
+        if (newTaskTitle.trim() && teamId && hackathonId) {
+            try {
+                await firebaseAddTask(teamId, hackathonId, newTaskTitle, newTaskCategory);
+                setIsTaskModalOpen(false);
+                setNewTaskTitle("");
+            } catch (error) {
+                console.error("Error adding task:", error);
+            }
         }
     };
 
@@ -167,9 +221,16 @@ export default function HackathonWorkspace() {
     };
 
     // -- State: Submission Assets --
-    const [assets, setAssets] = useState([
-        { id: 1, type: 'github', title: 'GitHub Repository', url: 'github.com/team-alpha/ai-hack', icon: 'code', color: 'bg-slate-900' },
-    ]);
+    const [assets, setAssets] = useState([]);
+
+    // Assets Listener
+    useEffect(() => {
+        if (!teamId || !hackathonId) return;
+        const unsubscribe = listenToLinks(teamId, hackathonId, (fetchedLinks) => {
+            setAssets(fetchedLinks);
+        });
+        return () => unsubscribe();
+    }, [teamId, hackathonId]);
 
     const [isAssetModalOpen, setIsAssetModalOpen] = useState(false);
     const [newAssetTitle, setNewAssetTitle] = useState("");
@@ -181,9 +242,9 @@ export default function HackathonWorkspace() {
         setIsAssetModalOpen(true);
     };
 
-    const handleAddAssetSubmit = (e) => {
+    const handleAddAssetSubmit = async (e) => {
         e.preventDefault();
-        if (newAssetUrl.trim()) {
+        if (newAssetUrl.trim() && teamId && hackathonId) {
             let type = 'link';
             let icon = 'link';
             let color = 'bg-slate-500';
@@ -193,15 +254,22 @@ export default function HackathonWorkspace() {
             else if (url.includes('figma')) { type = 'figma'; icon = 'design_services'; color = 'bg-pink-500'; }
             else if (url.includes('youtube') || url.includes('loom')) { type = 'video'; icon = 'video_library'; color = 'bg-red-500'; }
 
-            setAssets(prev => [...prev, {
-                id: Date.now(),
-                type,
-                title: newAssetTitle.trim() || 'New Asset',
-                url: newAssetUrl,
-                icon,
-                color
-            }]);
-            setIsAssetModalOpen(false);
+            try {
+                await firebaseAddLink(
+                    teamId,
+                    hackathonId,
+                    newAssetTitle.trim() || 'New Asset',
+                    newAssetUrl,
+                    type,
+                    icon,
+                    color
+                );
+                setIsAssetModalOpen(false);
+                setNewAssetTitle("");
+                setNewAssetUrl("");
+            } catch (error) {
+                console.error("Error adding asset:", error);
+            }
         }
     };
 
@@ -220,10 +288,29 @@ export default function HackathonWorkspace() {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-slate-900 text-slate-500">
+                <span className="material-symbols-outlined animate-spin text-4xl mb-4 text-primary">progress_activity</span>
+                <p className="font-bold text-lg">Loading Workspace...</p>
+            </div>
+        );
+    }
+
+    if (!hackathon) {
+        return (
+            <div className="h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-slate-900 text-slate-500">
+                <span className="material-symbols-outlined text-4xl mb-4 text-red-500">error</span>
+                <p className="font-bold text-lg mb-4">Hackathon not found</p>
+                <button onClick={() => navigate('/dashboard')} className="px-6 py-2 bg-primary text-white rounded-lg font-bold">Go to Dashboard</button>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col font-display">
             {/* Global Header */}
-            <Header title="Global AI Hack 2024" backPath="/dashboard">
+            <Header title={hackathon?.name || "Loading Workspace..."} backPath="/dashboard">
 
             </Header>
 
@@ -426,10 +513,10 @@ export default function HackathonWorkspace() {
                                                         <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
                                                     </div>
                                                     <div className="min-w-0 flex-1">
-                                                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.title}</h5>
-                                                        <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:text-primary truncate block">{asset.url}</a>
+                                                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.label || asset.title}</h5>
+                                                        <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:text-primary truncate block">{asset.url}</a>
                                                     </div>
-                                                    <a href={`https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
+                                                    <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
                                                         <span className="material-symbols-outlined text-sm">open_in_new</span>
                                                     </a>
                                                 </div>

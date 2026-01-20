@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import HackathonCard from '../components/HackathonCard';
 import NewHackathonModal from '../components/NewHackathonModal';
 import TaskItem from '../components/TaskItem';
@@ -10,6 +10,7 @@ import { doc, getDoc } from 'firebase/firestore';
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const { teamId: urlTeamId } = useParams();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [hackathons, setHackathons] = useState([]);
     const [loadingHackathons, setLoadingHackathons] = useState(true);
@@ -42,8 +43,9 @@ export default function Dashboard() {
                         // No teams, redirect to team selection
                         navigate('/teams/select');
                     } else {
-                        // Set first team as current
-                        setCurrentTeam(teams[0]);
+                        // Set team from URL if exists, otherwise first team
+                        const selectedTeam = urlTeamId ? teams.find(t => t.id === urlTeamId) : teams[0];
+                        setCurrentTeam(selectedTeam || teams[0]);
                     }
                 } catch (error) {
                     console.error("Error fetching teams:", error);
@@ -225,18 +227,19 @@ export default function Dashboard() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {filteredHackathons.map((hackathon) => (
-                                    <div key={hackathon.id} onClick={() => navigate('/workspace')} className="cursor-pointer h-full">
-                                        <HackathonCard
-                                            title={hackathon.name}
-                                            TimeInfo={`${new Date(hackathon.startDate).toLocaleDateString()} - ${new Date(hackathon.endDate).toLocaleDateString()}`}
-                                            status={hackathon.status}
-                                            progress={hackathon.status === "Completed" ? 100 : hackathon.status === "Ongoing" ? 45 : 0}
-                                            daysLeft={Math.max(0, Math.ceil((new Date(hackathon.endDate) - new Date()) / (1000 * 60 * 60 * 24)))}
-                                            nextDeadline="Submission: Friday"
-                                            image="https://lh3.googleusercontent.com/aida-public/AB6AXuB9PAOY0tIhO6AfT2CPKIxambugzwRa53Hrf3QnXFSdGFg-NWOtJ7pNhPOM7HGmtq1RrRWkdaNeq2ntVNuINMsfej13ZfcOWQW67K7DADu5iCo_N5tPXJrjK4f8kkbXOT8Fpk2jJDNlujC-3V8AnjV49G6UgkJZUeeB9CHZOeE4gv3h0oMR9UaoRkQX4uh2WI9UPFvHcq3zAY3z-Kv11Z9nfQ4LBTkS-zxMMQXs5iP0ggXcbS35NVRtltCkIYpyDhHt3pGjzgCoZhOQ"
-                                            participants={['https://i.pravatar.cc/150?u=a', 'https://i.pravatar.cc/150?u=b']}
-                                        />
-                                    </div>
+                                    <HackathonCard
+                                        key={hackathon.id}
+                                        id={hackathon.id}
+                                        teamId={currentTeam?.id}
+                                        title={hackathon.name}
+                                        TimeInfo={`${new Date(hackathon.startDate).toLocaleDateString()} - ${new Date(hackathon.endDate).toLocaleDateString()}`}
+                                        status={hackathon.status}
+                                        progress={hackathon.status === "Completed" ? 100 : hackathon.status === "Ongoing" ? 45 : 0}
+                                        daysLeft={Math.max(0, Math.ceil((new Date(hackathon.endDate) - new Date()) / (1000 * 60 * 60 * 24)))}
+                                        nextDeadline="Submission: Friday"
+                                        image="https://lh3.googleusercontent.com/aida-public/AB6AXuB9PAOY0tIhO6AfT2CPKIxambugzwRa53Hrf3QnXFSdGFg-NWOtJ7pNhPOM7HGmtq1RrRWkdaNeq2ntVNuINMsfej13ZfcOWQW67K7DADu5iCo_N5tPXJrjK4f8kkbXOT8Fpk2jJDNlujC-3V8AnjV49G6UgkJZUeeB9CHZOeE4gv3h0oMR9UaoRkQX4uh2WI9UPFvHcq3zAY3z-Kv11Z9nfQ4LBTkS-zxMMQXs5iP0ggXcbS35NVRtltCkIYpyDhHt3pGjzgCoZhOQ"
+                                        participants={['https://i.pravatar.cc/150?u=a', 'https://i.pravatar.cc/150?u=b']}
+                                    />
                                 ))}
                             </div>
                         )}
@@ -291,15 +294,18 @@ export default function Dashboard() {
                                 <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">Resume Work</span>
                             </div>
 
-                            <h3 className="text-xl font-bold mb-2">Global AI Hack 2024</h3>
-                            <p className="text-slate-400 text-sm mb-8 max-w-[200px] mx-auto">Jump right back into your hackathon project.</p>
+                            <h3 className="text-xl font-bold mb-2">{filteredHackathons[0]?.name || "No Active Hackathon"}</h3>
+                            <p className="text-slate-400 text-sm mb-8 max-w-[200px] mx-auto">
+                                {filteredHackathons[0] ? "Jump right back into your hackathon project." : "You haven't joined any hackathons yet."}
+                            </p>
 
                             <button
-                                onClick={() => navigate('/workspace')}
-                                className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-black text-lg transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] flex items-center justify-center gap-3 group/btn"
+                                onClick={() => filteredHackathons[0] && currentTeam?.id && navigate(`/workspace/${currentTeam.id}/${filteredHackathons[0].id}`)}
+                                disabled={!filteredHackathons[0]}
+                                className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-black text-lg transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] flex items-center justify-center gap-3 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <span className="material-symbols-outlined text-2xl group-hover/btn:translate-x-1 transition-transform">play_circle</span>
-                                Continue where you left off
+                                {filteredHackathons[0] ? "Continue where you left off" : "Create a Hackathon first"}
                             </button>
                         </div>
                     </div>

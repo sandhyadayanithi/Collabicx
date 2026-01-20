@@ -180,6 +180,15 @@ export const getHackathons = async (teamId) => {
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+export const getHackathonDetails = async (teamId, hackathonId) => {
+    const docRef = doc(db, `teams/${teamId}/hackathons`, hackathonId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() };
+    }
+    return null;
+};
+
 export const updateHackathonStatus = async (teamId, hackathonId, status) => {
     const ref = doc(db, `teams/${teamId}/hackathons`, hackathonId);
     await updateDoc(ref, { status });
@@ -220,11 +229,23 @@ export const getNotes = async (teamId, hackathonId) => {
 
 // --- 6. Tasks Functions ---
 
-export const addTask = async (teamId, hackathonId, title) => {
+export const addTask = async (teamId, hackathonId, title, category = "General") => {
     await addDoc(collection(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`), {
         title,
+        category,
         completed: false,
         createdAt: serverTimestamp()
+    });
+};
+
+export const listenToTasks = (teamId, hackathonId, callback) => {
+    const q = query(
+        collection(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`),
+        orderBy("createdAt", "asc")
+    );
+    return onSnapshot(q, (snapshot) => {
+        const tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(tasks);
     });
 };
 
@@ -241,11 +262,25 @@ export const getTasks = async (teamId, hackathonId) => {
 
 // --- 7. Submission Links Functions ---
 
-export const addLink = async (teamId, hackathonId, label, url) => {
+export const addLink = async (teamId, hackathonId, label, url, type = "link", icon = "link", color = "bg-slate-500") => {
     await addDoc(collection(db, `teams/${teamId}/hackathons/${hackathonId}/links`), {
         label,
         url,
+        type,
+        icon,
+        color,
         createdAt: serverTimestamp()
+    });
+};
+
+export const listenToLinks = (teamId, hackathonId, callback) => {
+    const q = query(
+        collection(db, `teams/${teamId}/hackathons/${hackathonId}/links`),
+        orderBy("createdAt", "asc")
+    );
+    return onSnapshot(q, (snapshot) => {
+        const links = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(links);
     });
 };
 
@@ -256,8 +291,8 @@ export const getLinks = async (teamId, hackathonId) => {
 
 // --- 8. Chat Functions ---
 
-export const sendMessage = async (teamId, userId, message, userName = "Unknown", userAvatar = "") => {
-    await addDoc(collection(db, `teams/${teamId}/messages`), {
+export const sendMessage = async (teamId, hackathonId, userId, message, userName = "Unknown", userAvatar = "") => {
+    await addDoc(collection(db, `teams/${teamId}/hackathons/${hackathonId}/messages`), {
         userId,
         message,
         userName,
@@ -266,9 +301,9 @@ export const sendMessage = async (teamId, userId, message, userName = "Unknown",
     });
 };
 
-export const listenToMessages = (teamId, callback) => {
+export const listenToMessages = (teamId, hackathonId, callback) => {
     const q = query(
-        collection(db, `teams/${teamId}/messages`),
+        collection(db, `teams/${teamId}/hackathons/${hackathonId}/messages`),
         orderBy("createdAt", "asc")
     );
     return onSnapshot(q, (snapshot) => {

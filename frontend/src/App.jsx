@@ -20,10 +20,13 @@ function App() {
       <Route path="/dashboard" element={<Layout />}>
         <Route index element={<Dashboard />} />
       </Route>
+      <Route path="/dashboard/:teamId" element={<Layout />}>
+        <Route index element={<Dashboard />} />
+      </Route>
 
       <Route path="/teams/select" element={<TeamSelection />} />
       <Route path="/teams" element={<TeamsDashboard />} />
-      <Route path="/workspace" element={<HackathonWorkspace />} />
+      <Route path="/workspace/:teamId/:hackathonId" element={<HackathonWorkspace />} />
     </Routes>
   )
 }

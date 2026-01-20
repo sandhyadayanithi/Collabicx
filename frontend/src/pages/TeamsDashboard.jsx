@@ -153,7 +153,7 @@ export default function TeamsDashboard() {
                             {userTeams.map((team) => (
                                 <div
                                     key={team.id}
-                                    onClick={() => navigate('/dashboard')}
+                                    onClick={() => navigate(`/dashboard/${team.id}`)}
                                     className="group bg-white backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl p-6 transition-all hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
                                 >
                                     <div className="mb-4 relative">

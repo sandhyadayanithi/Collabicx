@@ -26,7 +26,7 @@ export default function Header({ title = "Team Alpha-Bits", backPath = "/teams",
     }, []);
 
     return (
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-emerald-500/20 dark:border-emerald-500/20 px-6 lg:px-10 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 z-50">
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-emerald-500/20 dark:border-emerald-500/20 px-6 lg:px-10 py-3 bg-white backdrop-blur-2xl sticky top-0 z-50">
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate(backPath)}

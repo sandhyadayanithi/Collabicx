@@ -1,6 +1,8 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function HackathonCard({
+    id,
+    teamId,
     title,
     status,
     TimeInfo,
@@ -10,10 +12,14 @@ export default function HackathonCard({
     daysLeft,
     nextDeadline
 }) {
+    const navigate = useNavigate();
     const isCompleted = status === 'Completed';
 
     return (
-        <div className="flex flex-col bg-white backdrop-blur-2xl rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 overflow-hidden hover:border-primary/50 transition-all">
+        <div
+            onClick={() => navigate(`/workspace/${teamId}/${id}`)}
+            className="flex flex-col bg-white backdrop-blur-2xl rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 overflow-hidden hover:border-primary/50 transition-all cursor-pointer group"
+        >
             <div
                 className="w-full bg-center bg-no-repeat aspect-video bg-cover relative"
                 style={{ backgroundImage: `url("${image}")` }}
@@ -69,7 +75,10 @@ export default function HackathonCard({
                         <button className="p-2 text-slate-400 dark:text-white hover:text-primary hover:bg-primary/5 rounded-lg transition-colors" title="Edit">
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                         </button>
-                        <button className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm">
+                        <button
+                            onClick={() => navigate(`/workspace/${teamId}/${id}`)}
+                            className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+                        >
                             Open
                         </button>
                     </div>
