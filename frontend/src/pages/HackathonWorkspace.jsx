@@ -26,6 +26,11 @@ export default function HackathonWorkspace() {
     const [hackathon, setHackathon] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // -- State: Resizing Chat --
+    const [chatWidth, setChatWidth] = useState(480);
+    const [isResizing, setIsResizing] = useState(false);
+    const resizeStartRef = useRef(null);
+
     // Auth listener
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -106,6 +111,50 @@ export default function HackathonWorkspace() {
             handleSendMessage();
         }
     };
+
+    // -- Resize Handlers --
+    const startResizing = (e) => {
+        e.preventDefault();
+        setIsResizing(true);
+        resizeStartRef.current = {
+            x: e.clientX,
+            width: chatWidth
+        };
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (!isResizing || !resizeStartRef.current) return;
+
+            const dx = e.clientX - resizeStartRef.current.x;
+            const newWidth = Math.min(Math.max(resizeStartRef.current.width + dx, 320), 800);
+            setChatWidth(newWidth);
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+            resizeStartRef.current = null;
+        };
+
+        if (isResizing) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        } else {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+    }, [isResizing, chatWidth]);
 
     // -- State: Quick Notes --
     const [noteContent, setNoteContent] = useState("");
@@ -361,7 +410,18 @@ export default function HackathonWorkspace() {
                     </section>
 
                     {/* Team Chat */}
-                    <section className="flex-1 min-w-[480px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
+                    <section
+                        className={`h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0 relative transition-[flex-basis] duration-75 ${isResizing ? 'border-primary shadow-primary/10' : ''}`}
+                        style={{ flexBasis: `${chatWidth}px` }}
+                    >
+                        {/* Resize Handle (Right) */}
+                        <div
+                            onMouseDown={startResizing}
+                            className={`absolute right-0 top-0 w-2 h-full cursor-col-resize z-50 group hover:bg-primary/10 transition-colors ${isResizing ? 'bg-primary/20' : ''}`}
+                        >
+                            <div className="absolute right-0.5 top-1/2 -translate-y-1/2 w-0.5 h-12 bg-slate-200 dark:bg-slate-700 group-hover:bg-primary rounded-full transition-colors opacity-40 group-hover:opacity-100"></div>
+                        </div>
+
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('teamChat')}>
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">chat_bubble</span>
