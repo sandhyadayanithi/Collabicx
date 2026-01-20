@@ -124,7 +124,7 @@ export default function TeamsDashboard() {
                             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                                 <span className="material-symbols-outlined">search</span>
                             </span>
-                            <input className="block w-full bg-white/60 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl py-3 pl-11 pr-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm placeholder:text-slate-500 dark:placeholder:text-emerald-100/40 dark:text-white font-black" name="search" placeholder="Search teams by name or project..." type="text" />
+                            <input className="block w-full bg-white border border-emerald-500/20 rounded-xl py-3 pl-11 pr-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm placeholder:text-slate-500 text-black-forced font-black" name="search" placeholder="Search teams by name or project..." type="text" />
                         </label>
                     </div>
                 </header>
