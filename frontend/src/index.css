@@ -34,7 +34,7 @@ body {
 }
 
 .dark body {
-  color: #000000;
+  color: var(--text-main);
 }
 
 /* Specific override for headers or text that MUST stay white */

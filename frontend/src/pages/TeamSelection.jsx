@@ -76,7 +76,7 @@ export default function TeamSelection() {
                 <div className="w-full max-w-[1100px] flex flex-col gap-12">
                     {/* Page Heading */}
                     <div className="text-center max-w-2xl mx-auto flex flex-col gap-4">
-                        <h1 className="text-slate-900 dark:text-white text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">Join the Innovation</h1>
+                        <h1 className="text-slate-900 text-white-forced text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">Join the Innovation</h1>
                         <p className="text-slate-500 dark:text-[#9da6b9] text-lg font-normal leading-normal">Start your journey by forming a new squad or joining an existing one.</p>
                     </div>
 
@@ -175,18 +175,7 @@ export default function TeamSelection() {
             {/* Footer Stats */}
             <footer className="mt-auto py-8 border-t border-slate-200 dark:border-slate-800">
                 <div className="max-w-[1100px] mx-auto px-4 flex flex-wrap justify-center gap-8 md:gap-20 opacity-60">
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-slate-900 dark:text-white">124</span>
-                        <span className="text-xs uppercase font-bold tracking-widest text-slate-500">Teams Formed</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-slate-900 dark:text-white">540</span>
-                        <span className="text-xs uppercase font-bold tracking-widest text-slate-500">Hackers Active</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-slate-900 dark:text-white">12</span>
-                        <span className="text-xs uppercase font-bold tracking-widest text-slate-500">Days Left</span>
-                    </div>
+
                 </div>
             </footer>
         </div>
