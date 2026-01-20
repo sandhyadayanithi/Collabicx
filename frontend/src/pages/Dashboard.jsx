@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import HackathonCard from '../components/HackathonCard';
 import NewHackathonModal from '../components/NewHackathonModal';
 import TaskItem from '../components/TaskItem';
-import { getHackathons } from '../firebase/functions';
+import { getHackathons, getUserTeams, getTeamMembers } from '../firebase/functions';
+import { auth, db } from '../firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -12,29 +15,89 @@ export default function Dashboard() {
     const [loadingHackathons, setLoadingHackathons] = useState(true);
     const [filter, setFilter] = useState('All');
     const [copied, setCopied] = useState(false);
-    const teamId = "team-alpha-bits-id";
 
-    const handleCopyCode = () => {
-        navigator.clipboard.writeText("XJ9-22L");
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
+    // Real user data states
+    const [currentUser, setCurrentUser] = useState(null);
+    const [userTeams, setUserTeams] = useState([]);
+    const [currentTeam, setCurrentTeam] = useState(null);
+    const [teamMembers, setTeamMembers] = useState([]);
+    const [loadingTeams, setLoadingTeams] = useState(true);
 
-    const fetchHackathons = useCallback(async () => {
+    // Fetch user and their teams on mount
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                setCurrentUser(user);
+                // Fetch user data
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                // Fetch user's teams
+                setLoadingTeams(true);
+                try {
+                    const teams = await getUserTeams(user.uid);
+                    setUserTeams(teams);
+
+                    if (teams.length === 0) {
+                        // No teams, redirect to team selection
+                        navigate('/teams/select');
+                    } else {
+                        // Set first team as current
+                        setCurrentTeam(teams[0]);
+                    }
+                } catch (error) {
+                    console.error("Error fetching teams:", error);
+                } finally {
+                    setLoadingTeams(false);
+                }
+            } else {
+                navigate('/login');
+            }
+        });
+
+        return () => unsubscribe();
+    }, [navigate]);
+
+    // Fetch hackathons and team members when current team changes
+    useEffect(() => {
+        if (currentTeam) {
+            fetchHackathons();
+            fetchTeamMembers();
+        }
+    }, [currentTeam]);
+
+    const fetchHackathons = async () => {
+        if (!currentTeam) return;
+
         setLoadingHackathons(true);
         try {
-            const data = await getHackathons(teamId);
+            const data = await getHackathons(currentTeam.id);
             setHackathons(data);
         } catch (error) {
             console.error("Failed to fetch hackathons:", error);
         } finally {
             setLoadingHackathons(false);
         }
-    }, [teamId]);
+    };
 
-    useEffect(() => {
-        fetchHackathons();
-    }, [fetchHackathons]);
+    const fetchTeamMembers = async () => {
+        if (!currentTeam) return;
+
+        try {
+            const members = await getTeamMembers(currentTeam.id);
+            setTeamMembers(members);
+        } catch (error) {
+            console.error("Failed to fetch team members:", error);
+        }
+    };
+
+    const handleCopyCode = () => {
+        if (currentTeam?.joinCode) {
+            navigator.clipboard.writeText(currentTeam.joinCode);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
 
     // Filtering logic
     const filteredHackathons = hackathons.filter(h => {
@@ -46,22 +109,24 @@ export default function Dashboard() {
         <div className="max-w-[1600px] mx-auto space-y-8 pb-10">
             {/* Top Section: Profile Header & Search */}
             <div className="flex flex-col gap-6">
-                <div className="relative z-30 flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 bg-white/60 dark:bg-black/40 backdrop-blur-2xl p-6 rounded-2xl border border-emerald-500/20 dark:border-emerald-500/20 shadow-xl">
+                <div className="relative z-30 flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 bg-white backdrop-blur-2xl p-6 rounded-2xl border border-emerald-500/20 dark:border-emerald-500/20 shadow-xl">
                     <div className="flex gap-5 items-center">
                         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-20 shadow-lg border-2 border-primary/20" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqKVE-Fbz3DwX1MnQJDpDIqR6p5m0lOIH-zp5X8kkzZgXoTl4c64rAZgNVdEF49u0cXw3QrP2tbgu6yhpsYVi2JTDo8Zn-ntzG6W0-JA9rxNoDAsyjbZZgo_EPnhgppLkpbu6lmE8AF5naq7qR3F_G4E3TjbyryMKlyCH10U52PDC4euYvmZdkJVM4ojFAiQMVbJzs8YM2hH4ArN3JGnTV2MeOT0FYd-Y8MH2tqvhueBgAPCQfHi2aR-cz8monZIWrzZ0a4PJur4wE")' }}></div>
                         <div className="flex flex-col gap-2 justify-center">
                             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-                                <h1 className="text-slate-900 dark:text-white text-2xl font-black tracking-tight">Team Alpha-Bits</h1>
+                                <h1 className="text-slate-900 dark:text-white text-2xl font-black tracking-tight">{currentTeam?.name || 'Loading...'}</h1>
                                 <div className="flex items-center gap-3">
                                     {/* Team Members Dropdown */}
                                     <div className="relative group z-40">
                                         <div className="flex items-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                                            <span className="text-xs font-bold text-slate-500 dark:text-white">4 Members</span>
+                                            <span className="text-xs font-bold text-slate-500 dark:text-white">{teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}</span>
                                             <div className="flex -space-x-2">
-                                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_" className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
-                                                <img src="https://i.pravatar.cc/150?u=alice" className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
-                                                <img src="https://i.pravatar.cc/150?u=bob" className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
-                                                <div className="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[8px] font-bold text-slate-600 dark:text-slate-300">+1</div>
+                                                {teamMembers.slice(0, 3).map((member, idx) => (
+                                                    <img key={idx} src={member.user?.avatar || 'https://i.pravatar.cc/150'} className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
+                                                ))}
+                                                {teamMembers.length > 3 && (
+                                                    <div className="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[8px] font-bold text-slate-600 dark:text-slate-300">+{teamMembers.length - 3}</div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -69,34 +134,17 @@ export default function Dashboard() {
                                         <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                                             <h4 className="text-xs font-bold text-slate-500 dark:text-white uppercase px-2 py-1 mb-1">Team Members</h4>
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
-                                                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_" className="size-8 rounded-full" />
-                                                    <div>
-                                                        <p className="text-sm font-bold text-slate-900 dark:text-white">You</p>
-                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Team Lead</p>
+                                                {teamMembers.length > 0 ? teamMembers.map((member) => (
+                                                    <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
+                                                        <img src={member.user?.avatar || 'https://i.pravatar.cc/150'} className="size-8 rounded-full" />
+                                                        <div>
+                                                            <p className="text-sm font-bold text-slate-900 dark:text-white">{member.user?.name || 'Unknown'}</p>
+                                                            <p className="text-[10px] text-slate-500 dark:text-white font-medium">{member.role === 'owner' ? 'Team Lead' : 'Member'}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
-                                                    <img src="https://i.pravatar.cc/150?u=alice" className="size-8 rounded-full" />
-                                                    <div>
-                                                        <p className="text-sm font-bold text-slate-900 dark:text-white">Alice Smith</p>
-                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Developer</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
-                                                    <img src="https://i.pravatar.cc/150?u=bob" className="size-8 rounded-full" />
-                                                    <div>
-                                                        <p className="text-sm font-bold text-slate-900 dark:text-white">Bob Jones</p>
-                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Designer</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
-                                                    <img src="https://i.pravatar.cc/150?u=charlie" className="size-8 rounded-full" />
-                                                    <div>
-                                                        <p className="text-sm font-bold text-slate-900 dark:text-white">Charlie Day</p>
-                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Developer</p>
-                                                    </div>
-                                                </div>
+                                                )) : (
+                                                    <p className="text-sm text-slate-500 dark:text-white px-2 py-4 text-center">No members yet</p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -105,7 +153,7 @@ export default function Dashboard() {
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Join Code: XJ9-22L</span>
+                                <span className="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Join Code: {currentTeam?.joinCode || 'N/A'}</span>
                                 <button
                                     onClick={handleCopyCode}
                                     className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
@@ -199,7 +247,7 @@ export default function Dashboard() {
                 {/* Right Column: Context Panel */}
                 <div className="xl:col-span-4 space-y-6">
                     {/* Upcoming Deadlines Card */}
-                    <div className="bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-2xl border border-emerald-500/20 dark:border-emerald-500/20 p-6 shadow-sm">
+                    <div className="bg-white backdrop-blur-2xl rounded-2xl border border-emerald-500/20 dark:border-emerald-500/20 p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 <span className="material-symbols-outlined text-orange-500">warning</span>
@@ -265,7 +313,7 @@ export default function Dashboard() {
                     setIsModalOpen(false);
                     fetchHackathons();
                 }}
-                teamId={teamId}
+                teamId={currentTeam?.id}
             />
         </div>
     );

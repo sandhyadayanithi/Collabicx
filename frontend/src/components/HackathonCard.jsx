@@ -13,7 +13,7 @@ export default function HackathonCard({
     const isCompleted = status === 'Completed';
 
     return (
-        <div className="flex flex-col bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 overflow-hidden hover:border-primary/50 transition-all">
+        <div className="flex flex-col bg-white backdrop-blur-2xl rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 overflow-hidden hover:border-primary/50 transition-all">
             <div
                 className="w-full bg-center bg-no-repeat aspect-video bg-cover relative"
                 style={{ backgroundImage: `url("${image}")` }}

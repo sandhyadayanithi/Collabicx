@@ -154,7 +154,7 @@ export default function TeamsDashboard() {
                                 <div
                                     key={team.id}
                                     onClick={() => navigate('/dashboard')}
-                                    className="group bg-white backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl p-6 transition-all hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
+                                    className="group bg-white/60 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl p-6 transition-all hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
                                 >
                                     <div className="mb-4 relative">
                                         <div className="size-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full border-4 border-slate-100 dark:border-slate-700 shadow-inner flex items-center justify-center">
@@ -162,11 +162,11 @@ export default function TeamsDashboard() {
                                         </div>
                                         <div className="absolute bottom-0 right-0 size-6 bg-green-500 rounded-full border-4 border-white dark:border-[#1e293b]"></div>
                                     </div>
-                                    <h3 className="text-slate-900 text-lg font-black mb-1 group-hover:text-primary transition-colors">
+                                    <h3 className="text-slate-900 dark:text-white text-lg font-black mb-1 group-hover:text-primary transition-colors">
                                         {team.name}
                                     </h3>
                                     {team.description && (
-                                        <p className="text-slate-500 text-xs mb-3 line-clamp-2">{team.description}</p>
+                                        <p className="text-slate-500 dark:text-slate-400 text-xs mb-3 line-clamp-2">{team.description}</p>
                                     )}
                                     <div className="flex flex-col gap-2 mt-2 w-full">
                                         <div className="inline-flex items-center justify-center px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 text-xs font-black rounded-full shadow-sm">
@@ -178,7 +178,3 @@ export default function TeamsDashboard() {
                         </div>
                     )}
                 </section>
-            </main>
-        </div>
-    );
-}
