@@ -46,7 +46,7 @@ export default function TeamsDashboard() {
                     <>
                         <div
                             onClick={() => navigate('/profile')}
-                            className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-black hover:text-primary transition-colors cursor-pointer"
+                            className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-emerald-300/80 hover:text-primary dark:hover:text-emerald-400 transition-colors cursor-pointer"
                         >
                             <div
                                 className="size-6 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-800"
@@ -61,16 +61,16 @@ export default function TeamsDashboard() {
                     </>
                 }
             >
-                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 border-l-[3px] border-primary text-primary transition-colors cursor-pointer" href="#">
-                    <span className="material-symbols-outlined dark:text-black">groups</span>
+                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 dark:bg-emerald-500/20 border-l-[3px] border-primary dark:border-emerald-400 text-primary dark:text-emerald-400 transition-colors cursor-pointer" href="#">
+                    <span className="material-symbols-outlined dark:text-emerald-400">groups</span>
                     <p className="text-sm font-black">My Teams</p>
                 </a>
-                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-800 dark:text-black hover:bg-slate-100 dark:hover:bg-emerald-500/10 transition-colors cursor-pointer" href="#">
-                    <span className="material-symbols-outlined dark:text-black">explore</span>
+                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-800 dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer" href="#">
+                    <span className="material-symbols-outlined dark:text-emerald-300/80">explore</span>
                     <p className="text-sm font-black">Discover</p>
                 </a>
-                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-800 dark:text-black hover:bg-slate-100 dark:hover:bg-emerald-500/10 transition-colors cursor-pointer" href="#">
-                    <span className="material-symbols-outlined dark:text-black">settings</span>
+                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-800 dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer" href="#">
+                    <span className="material-symbols-outlined dark:text-emerald-300/80">settings</span>
                     <p className="text-sm font-black">Account Settings</p>
                 </a>
             </Sidebar>

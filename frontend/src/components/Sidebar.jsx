@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Sidebar({ children, showLogo = false, footer }) {
     return (
-        <aside className="w-16 md:w-64 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white/60 dark:bg-black/70 backdrop-blur-2xl sticky top-0 h-screen">
+        <aside className="w-16 md:w-64 border-r border-emerald-500/20 dark:border-emerald-500/20 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white/60 dark:bg-black/90 backdrop-blur-2xl sticky top-0 h-screen">
             {showLogo && (
                 <div className="flex items-center gap-3 px-6 mb-2">
                     <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />

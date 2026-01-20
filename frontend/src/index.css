@@ -18,7 +18,7 @@
 }
 
 .dark {
-  --gradient-bg: radial-gradient(circle, rgba(20, 54, 20, 1) 0%, rgba(20, 54, 20, 1) 100%);
+  --gradient-bg: radial-gradient(circle, #013220 0%, #013220 100%);
   --text-main: #ecfdf5;
 }
 

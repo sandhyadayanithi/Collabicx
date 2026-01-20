@@ -71,14 +71,14 @@ export default function Profile() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0b101a] flex items-center justify-center">
+            <div className="min-h-screen bg-background-light dark:bg-background-dark flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
         );
     }
 
     return (
-        <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen bg-[#f5f5f5] dark:bg-[#0b101a]">
+        <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen bg-background-light dark:bg-background-dark">
             <header className="flex items-center justify-between px-6 lg:px-10 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 z-50 border-b border-emerald-500/20 dark:border-emerald-500/20">
                 <div className="flex items-center gap-4">
                     <button onClick={() => navigate(-1)} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">

@@ -62,7 +62,7 @@ export default function Login() {
     };
 
     return (
-        <div className="bg-black font-display text-white min-h-screen flex items-center justify-center p-6 selection:bg-emerald-500/30 relative overflow-hidden">
+        <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex items-center justify-center p-6 selection:bg-emerald-500/30 relative overflow-hidden">
             {/* Background Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 

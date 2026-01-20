@@ -5,7 +5,7 @@ export default function LandingPage() {
     const navigate = useNavigate();
 
     return (
-        <div className="bg-black font-display text-white min-h-screen flex flex-col relative overflow-hidden">
+        <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col relative overflow-hidden">
             {/* Top Navigation */}
             <nav className="relative z-20 flex items-center justify-between px-8 md:px-16 lg:px-24 py-8">
                 <div className="flex items-center gap-3">
