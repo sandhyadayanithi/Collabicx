@@ -8,7 +8,6 @@ export default function Sidebar({ children, showLogo = false, footer }) {
                     <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />
                     <div className="hidden md:flex flex-col text-white-forced">
                         <h1 className="text-emerald-900 dark:text-emerald-400 text-lg font-black leading-tight">Collabicx</h1>
-                        <p className="text-slate-700 dark:text-emerald-400/60 text-[10px] font-black uppercase tracking-wider">Management</p>
                     </div>
                 </div>
             )}

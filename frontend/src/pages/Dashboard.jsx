@@ -192,11 +192,11 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="relative">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white text-[20px]">search</span>
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                             <input
                                 type="text"
                                 placeholder="Search projects..."
-                                className="pl-10 pr-4 h-11 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary w-64 transition-all"
+                                className="pl-10 pr-4 h-11 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary w-64 transition-all text-black-forced"
                             />
                         </div>
                         <button
@@ -284,13 +284,13 @@ export default function Dashboard() {
                                 <div
                                     key={deadline.id}
                                     className={`flex gap-4 items-start p-3 rounded-xl transition-all ${index === 0
-                                            ? 'bg-orange-50 dark:bg-orange-500/20 border border-orange-100 dark:border-orange-500/30'
-                                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
+                                        ? 'bg-orange-50 dark:bg-orange-500/20 border border-orange-100 dark:border-orange-500/30'
+                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
                                         }`}
                                 >
                                     <div className={`${index === 0
-                                            ? 'bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800'
-                                            : 'bg-slate-100 dark:bg-slate-800'
+                                        ? 'bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800'
+                                        : 'bg-slate-100 dark:bg-slate-800'
                                         } rounded-lg p-2 text-center min-w-[50px]`}>
                                         <span className={`block text-xs font-bold uppercase ${index === 0 ? 'text-orange-500' : 'text-slate-500 dark:text-white'}`}>
                                             {deadline.month}
