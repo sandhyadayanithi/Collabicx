@@ -51,12 +51,12 @@ export default function Dashboard() {
                         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-20 shadow-lg border-2 border-primary/20" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqKVE-Fbz3DwX1MnQJDpDIqR6p5m0lOIH-zp5X8kkzZgXoTl4c64rAZgNVdEF49u0cXw3QrP2tbgu6yhpsYVi2JTDo8Zn-ntzG6W0-JA9rxNoDAsyjbZZgo_EPnhgppLkpbu6lmE8AF5naq7qR3F_G4E3TjbyryMKlyCH10U52PDC4euYvmZdkJVM4ojFAiQMVbJzs8YM2hH4ArN3JGnTV2MeOT0FYd-Y8MH2tqvhueBgAPCQfHi2aR-cz8monZIWrzZ0a4PJur4wE")' }}></div>
                         <div className="flex flex-col gap-2 justify-center">
                             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-                                <h1 className="text-slate-900 dark:text-black text-2xl font-black tracking-tight">Team Alpha-Bits</h1>
+                                <h1 className="text-slate-900 dark:text-white text-2xl font-black tracking-tight">Team Alpha-Bits</h1>
                                 <div className="flex items-center gap-3">
                                     {/* Team Members Dropdown */}
                                     <div className="relative group z-40">
                                         <div className="flex items-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">4 Members</span>
+                                            <span className="text-xs font-bold text-slate-500 dark:text-white">4 Members</span>
                                             <div className="flex -space-x-2">
                                                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_" className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
                                                 <img src="https://i.pravatar.cc/150?u=alice" className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
@@ -67,40 +67,40 @@ export default function Dashboard() {
 
                                         {/* Dropdown Menu */}
                                         <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                                            <h4 className="text-xs font-bold text-slate-500 uppercase px-2 py-1 mb-1">Team Members</h4>
+                                            <h4 className="text-xs font-bold text-slate-500 dark:text-white uppercase px-2 py-1 mb-1">Team Members</h4>
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
                                                     <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_" className="size-8 rounded-full" />
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-900 dark:text-white">You</p>
-                                                        <p className="text-[10px] text-slate-500 font-medium">Team Lead</p>
+                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Team Lead</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
                                                     <img src="https://i.pravatar.cc/150?u=alice" className="size-8 rounded-full" />
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-900 dark:text-white">Alice Smith</p>
-                                                        <p className="text-[10px] text-slate-500 font-medium">Developer</p>
+                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Developer</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
                                                     <img src="https://i.pravatar.cc/150?u=bob" className="size-8 rounded-full" />
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-900 dark:text-white">Bob Jones</p>
-                                                        <p className="text-[10px] text-slate-500 font-medium">Designer</p>
+                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Designer</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
                                                     <img src="https://i.pravatar.cc/150?u=charlie" className="size-8 rounded-full" />
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-900 dark:text-white">Charlie Day</p>
-                                                        <p className="text-[10px] text-slate-500 font-medium">Developer</p>
+                                                        <p className="text-[10px] text-slate-500 dark:text-white font-medium">Developer</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1 rounded-full">{hackathons.length} Projects</span>
+                                    <span className="text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-3 py-1 rounded-full">{hackathons.length} Projects</span>
                                 </div>
                             </div>
 
@@ -126,7 +126,7 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="relative">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white text-[20px]">search</span>
                             <input
                                 type="text"
                                 placeholder="Search projects..."
@@ -149,7 +149,7 @@ export default function Dashboard() {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`pb-3 text-sm font-bold border-b-2 transition-colors ${filter === f ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                            className={`pb-3 text-sm font-bold border-b-2 transition-colors ${filter === f ? 'border-primary text-primary' : 'border-transparent text-slate-500 dark:text-white hover:text-slate-700 dark:hover:text-slate-300'}`}
                         >
                             {f}
                         </button>
@@ -164,12 +164,12 @@ export default function Dashboard() {
                     {/* Hackathon Cards Grid */}
                     <div className="space-y-6">
                         {loadingHackathons ? (
-                            <div className="flex items-center justify-center py-20 text-slate-500">
+                            <div className="flex items-center justify-center py-20 text-slate-500 dark:text-white">
                                 <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
                                 Loading...
                             </div>
                         ) : filteredHackathons.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50">
+                            <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-white border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50">
                                 <span className="material-symbols-outlined text-4xl mb-4">folder_open</span>
                                 <p className="font-bold">No hackathons found</p>
                                 <p className="text-sm">Try changing filters or create a new one.</p>
@@ -201,7 +201,7 @@ export default function Dashboard() {
                     {/* Upcoming Deadlines Card */}
                     <div className="bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-2xl border border-emerald-500/20 dark:border-emerald-500/20 p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-bold text-slate-900 dark:text-black flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 <span className="material-symbols-outlined text-orange-500">warning</span>
                                 Upcoming Deadlines
                             </h3>
@@ -214,21 +214,21 @@ export default function Dashboard() {
                                     <span className="block text-xl font-black text-slate-900 dark:text-white">24</span>
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-bold text-slate-900 dark:text-black text-sm">Global AI Submission</p>
-                                    <p className="text-xs text-slate-500 dark:text-black/50 font-medium">11:59 PM EST</p>
+                                    <p className="font-bold text-slate-900 dark:text-white text-sm">Global AI Submission</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">11:59 PM EST</p>
                                     <div className="mt-2 flex items-center gap-2">
-                                        <span className="text-[10px] font-bold bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">High Priority</span>
+                                        <span className="text-[10px] font-bold bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-white border border-slate-200 dark:border-slate-700">High Priority</span>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex gap-4 items-start p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
                                 <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-2 text-center min-w-[50px]">
-                                    <span className="block text-xs font-bold text-slate-500 uppercase">Feb</span>
+                                    <span className="block text-xs font-bold text-slate-500 dark:text-white uppercase">Feb</span>
                                     <span className="block text-xl font-black text-slate-900 dark:text-white">02</span>
                                 </div>
                                 <div>
-                                    <p className="font-bold text-slate-900 dark:text-black text-sm">Design Freeze</p>
-                                    <p className="text-xs text-slate-500 dark:text-black/50 font-medium">5:00 PM PST</p>
+                                    <p className="font-bold text-slate-900 dark:text-white text-sm">Design Freeze</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">5:00 PM PST</p>
                                 </div>
                             </div>
                         </div>

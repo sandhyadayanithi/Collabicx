@@ -39,11 +39,11 @@ export default function HackathonCard({
                 {/* Stats Row */}
                 <div className="flex items-center gap-4 text-xs">
                     <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/50 flex flex-col gap-1">
-                        <span className="text-slate-500 font-semibold uppercase text-[10px] tracking-wider">Days Left</span>
+                        <span className="text-slate-500 dark:text-white font-semibold uppercase text-[10px] tracking-wider">Days Left</span>
                         <span className="font-bold text-slate-900 dark:text-white text-base">{daysLeft || '--'}</span>
                     </div>
                     <div className="flex-[1.5] bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/50 flex flex-col gap-1">
-                        <span className="text-slate-500 font-semibold uppercase text-[10px] tracking-wider">Next Deadline</span>
+                        <span className="text-slate-500 dark:text-white font-semibold uppercase text-[10px] tracking-wider">Next Deadline</span>
                         <span className="font-bold text-slate-900 dark:text-white truncate">{nextDeadline || 'No deadlines'}</span>
                     </div>
                 </div>
@@ -51,7 +51,7 @@ export default function HackathonCard({
                 {/* Progress */}
                 <div className="flex flex-col gap-2">
                     <div className="flex gap-6 justify-between items-center">
-                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Completion</p>
+                        <p className="text-slate-400 dark:text-white text-[10px] font-bold uppercase tracking-wider">Completion</p>
                         <p className="text-slate-700 dark:text-white text-xs font-bold">{progress}%</p>
                     </div>
                     <div className="rounded-full bg-slate-100 dark:bg-slate-800 h-1.5 w-full overflow-hidden">
@@ -66,7 +66,7 @@ export default function HackathonCard({
                     </div>
 
                     <div className="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors" title="Edit">
+                        <button className="p-2 text-slate-400 dark:text-white hover:text-primary hover:bg-primary/5 rounded-lg transition-colors" title="Edit">
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                         </button>
                         <button className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm">
