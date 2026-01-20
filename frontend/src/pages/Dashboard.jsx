@@ -107,6 +107,22 @@ export default function Dashboard() {
         return h.status === filter;
     });
 
+    // Calculate deadlines from hackathons
+    const upcomingDeadlines = hackathons
+        .filter(h => h.status !== 'Completed' && new Date(h.endDate) > new Date())
+        .map(h => {
+            const date = new Date(h.endDate);
+            return {
+                id: h.id,
+                title: `${h.name} Submission`,
+                date: date,
+                month: date.toLocaleString('default', { month: 'short' }),
+                day: date.getDate(),
+                time: "11:59 PM" // Default time since we only have date
+            };
+        })
+        .sort((a, b) => a.date - b.date);
+
     return (
         <div className="max-w-[1600px] mx-auto space-y-8 pb-10">
             {/* Top Section: Profile Header & Search */}
@@ -259,29 +275,44 @@ export default function Dashboard() {
                             <button className="text-xs font-bold text-primary hover:underline">View Calendar</button>
                         </div>
                         <div className="space-y-4">
-                            <div className="flex gap-4 items-start p-3 rounded-xl bg-orange-50 dark:bg-orange-500/20 border border-orange-100 dark:border-orange-500/30">
-                                <div className="bg-white dark:bg-slate-900 rounded-lg p-2 text-center min-w-[50px] shadow-sm border border-slate-100 dark:border-slate-800">
-                                    <span className="block text-xs font-bold text-orange-500 uppercase">Jan</span>
-                                    <span className="block text-xl font-black text-slate-900 dark:text-white">24</span>
+                            {upcomingDeadlines.length === 0 ? (
+                                <div className="text-center py-8 text-slate-400">
+                                    <span className="material-symbols-outlined text-3xl mb-2 opacity-20">event_busy</span>
+                                    <p className="text-xs font-medium">No upcoming deadlines</p>
                                 </div>
-                                <div className="flex-1">
-                                    <p className="font-bold text-slate-900 dark:text-white text-sm">Global AI Submission</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">11:59 PM EST</p>
-                                    <div className="mt-2 flex items-center gap-2">
-                                        <span className="text-[10px] font-bold bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-white border border-slate-200 dark:border-slate-700">High Priority</span>
+                            ) : upcomingDeadlines.map((deadline, index) => (
+                                <div
+                                    key={deadline.id}
+                                    className={`flex gap-4 items-start p-3 rounded-xl transition-all ${index === 0
+                                            ? 'bg-orange-50 dark:bg-orange-500/20 border border-orange-100 dark:border-orange-500/30'
+                                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
+                                        }`}
+                                >
+                                    <div className={`${index === 0
+                                            ? 'bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800'
+                                            : 'bg-slate-100 dark:bg-slate-800'
+                                        } rounded-lg p-2 text-center min-w-[50px]`}>
+                                        <span className={`block text-xs font-bold uppercase ${index === 0 ? 'text-orange-500' : 'text-slate-500 dark:text-white'}`}>
+                                            {deadline.month}
+                                        </span>
+                                        <span className="block text-xl font-black text-slate-900 dark:text-white">
+                                            {deadline.day}
+                                        </span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-bold text-slate-900 dark:text-white text-sm truncate">{deadline.title}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">{deadline.time}</p>
+                                        {index === 0 && (
+                                            <div className="mt-2 flex items-center gap-2">
+                                                <span className="text-[10px] font-bold bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-white border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                                                    <span className="material-symbols-outlined text-[12px] text-orange-500">warning</span>
+                                                    High Priority
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-                            <div className="flex gap-4 items-start p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-2 text-center min-w-[50px]">
-                                    <span className="block text-xs font-bold text-slate-500 dark:text-white uppercase">Feb</span>
-                                    <span className="block text-xl font-black text-slate-900 dark:text-white">02</span>
-                                </div>
-                                <div>
-                                    <p className="font-bold text-slate-900 dark:text-white text-sm">Design Freeze</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">5:00 PM PST</p>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
 
