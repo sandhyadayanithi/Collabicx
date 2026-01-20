@@ -47,6 +47,11 @@ body {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 
+/* Specific override for text that MUST stay black in both modes */
+.text-black-forced {
+  color: #000000 !important;
+}
+
 /* Custom Scrollbar from design */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

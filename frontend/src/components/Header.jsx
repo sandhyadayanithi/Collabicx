@@ -58,10 +58,10 @@ export default function Header({ title = "Team Alpha-Bits", backPath = "/teams",
                     className="flex items-center gap-3 px-2 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group"
                 >
                     <div className="hidden md:flex flex-col items-end">
-                        <p className="text-xs font-black text-slate-900 text-white-forced leading-none mb-1">
+                        <p className="text-xs font-black text-black-forced leading-none mb-1">
                             {userData?.username ? `@${userData.username}` : (userData?.name || 'User')}
                         </p>
-                        <p className="text-[10px] font-bold text-slate-500 text-white-forced-dim uppercase tracking-wider leading-none">
+                        <p className="text-[10px] font-bold text-black-forced leading-none opacity-60 uppercase tracking-wider">
                             {userData?.role || 'Member'}
                         </p>
                     </div>

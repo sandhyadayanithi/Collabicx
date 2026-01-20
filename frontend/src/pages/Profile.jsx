@@ -110,10 +110,10 @@ export default function Profile() {
                     <div className="pt-20 px-10 pb-10">
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                             <div>
-                                <h1 className="text-3xl font-black text-slate-900 dark:text-emerald-950 mb-1">
+                                <h1 className="text-3xl font-black text-black-forced mb-1">
                                     {userData?.name || 'User'}
                                 </h1>
-                                <p className="text-primary font-bold tracking-wide">
+                                <p className="text-primary font-bold tracking-wide text-black-forced">
                                     @{userData?.username || 'username'}
                                 </p>
                             </div>
