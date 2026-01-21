@@ -93,8 +93,24 @@ export default function HackathonWorkspace() {
     }, [teamId, hackathonId]);
 
     // Scroll effect when messages change
+    const isFirstScroll = useRef(true);
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messages.length > 0) {
+            const scroll = () => {
+                messagesEndRef.current?.scrollIntoView({
+                    behavior: isFirstScroll.current ? "auto" : "smooth",
+                    block: "nearest"
+                });
+                if (isFirstScroll.current) isFirstScroll.current = false;
+            };
+
+            // Immediate scroll
+            scroll();
+
+            // Backup scroll for slower renders
+            const timer = setTimeout(scroll, 100);
+            return () => clearTimeout(timer);
+        }
     }, [messages]);
 
     const handleSendMessage = async () => {
@@ -403,44 +419,39 @@ export default function HackathonWorkspace() {
 
                     {/* Quick Notes */}
                     <section className="flex-1 min-w-[280px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('quickNotes')}>
+                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center transition-colors">
                             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Notes</h3>
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
                                     <span className={`flex h-2 w-2 rounded-full ${lastSaved ? 'bg-green-500' : 'bg-orange-500'}`}></span>
                                     <span className="text-[10px] font-medium text-slate-400">{lastSaved ? 'SAVED' : 'UNSAVED'}</span>
                                 </div>
-                                <span className={`material-symbols-outlined text-slate-400 transition-transform ${expandedSections.quickNotes ? 'rotate-180' : ''}`}>
-                                    expand_more
-                                </span>
                             </div>
                         </div>
-                        {expandedSections.quickNotes && (
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                <div className="flex flex-col h-full">
-                                    <div className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
-                                        <textarea
-                                            value={noteContent}
-                                            onChange={handleNoteChange}
-                                            className="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 font-mono text-sm leading-relaxed"
-                                            placeholder="Start typing ideas..."
-                                        ></textarea>
-                                    </div>
-                                    <div className="mt-2 flex justify-end">
-                                        <button
-                                            onClick={saveNote}
-                                            disabled={lastSaved}
-                                            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${lastSaved
-                                                ? 'bg-green-500/10 text-green-500 cursor-default'
-                                                : 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20'
-                                                }`}
-                                        >
-                                            {lastSaved ? 'SAVED' : 'SAVE NOTE'}
-                                        </button>
-                                    </div>
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                            <div className="flex flex-col h-full">
+                                <div className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                                    <textarea
+                                        value={noteContent}
+                                        onChange={handleNoteChange}
+                                        className="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 font-mono text-sm leading-relaxed"
+                                        placeholder="Start typing ideas..."
+                                    ></textarea>
+                                </div>
+                                <div className="mt-2 flex justify-end">
+                                    <button
+                                        onClick={saveNote}
+                                        disabled={lastSaved}
+                                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${lastSaved
+                                            ? 'bg-green-500/10 text-green-500 cursor-default'
+                                            : 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20'
+                                            }`}
+                                    >
+                                        {lastSaved ? 'SAVED' : 'SAVE NOTE'}
+                                    </button>
                                 </div>
                             </div>
-                        )}
+                        </div>
                     </section>
 
                     {/* Team Chat */}

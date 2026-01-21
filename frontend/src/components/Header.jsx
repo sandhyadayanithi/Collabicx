@@ -5,7 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Header({ title = "Team Alpha-Bits", backPath = "/teams", children }) {
+export default function Header({ title = "Team Dashboard", backPath = "/teams", children }) {
     const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = useTheme();
     const [userData, setUserData] = React.useState(null);

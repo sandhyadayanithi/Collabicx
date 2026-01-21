@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useTheme } from '../context/ThemeContext';
 
-export default function TeamsDashboard() {
+export default function TeamsDashboard() { 
     const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = useTheme();
     const [userData, setUserData] = useState(null);
@@ -178,3 +178,7 @@ export default function TeamsDashboard() {
                         </div>
                     )}
                 </section>
+            </main>
+        </div>
+    );
+}

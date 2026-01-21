@@ -79,27 +79,13 @@ export default function Profile() {
 
     return (
         <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen bg-background-light dark:bg-background-dark">
-            <header className="flex items-center justify-between px-6 lg:px-10 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-2xl sticky top-0 z-50 border-b border-emerald-500/20 dark:border-emerald-500/20">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => navigate(-1)} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <div className="flex items-center gap-3">
-                        <img src="/logo.png" alt="Collabicx" className="size-10 object-contain" />
-                        <h2 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-full bg-cover bg-center border-2 border-slate-200 dark:border-slate-800" style={{ backgroundImage: `url(${userData?.avatar})` }}></div>
-                </div>
-            </header>
+            <Header title="My Profile" backPath="/dashboard" />
 
             <main className="flex-1 p-6 md:p-10 lg:p-16 max-w-4xl mx-auto w-full">
-                <div className="bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-[32px] border border-emerald-500/20 dark:border-emerald-500/20 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="bg-white dark:bg-black/40 backdrop-blur-2xl rounded-[32px] border border-emerald-500/20 dark:border-emerald-500/20 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
                     {/* Profile Header Background */}
                     <div className="h-32 bg-gradient-to-r from-emerald-500/30 via-green-600/20 to-transparent relative">
-                        <div className="absolute -bottom-16 left-10 p-1.5 bg-white/60 dark:bg-black/40 backdrop-blur-2xl rounded-full">
+                        <div className="absolute -bottom-16 left-10 p-1.5 bg-white dark:bg-black/40 backdrop-blur-2xl rounded-full">
                             <div
                                 className="size-32 rounded-full border-4 border-white dark:border-emerald-900/50 shadow-xl bg-slate-100 dark:bg-emerald-900/20 bg-cover bg-center"
                                 style={{ backgroundImage: `url(${userData?.avatar})` }}
@@ -140,7 +126,7 @@ export default function Profile() {
                                 <div className="space-y-2">
                                     <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 ml-1">Full Name</label>
                                     <input
-                                        className="w-full h-13 px-5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-emerald-500/20 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                                        className="w-full h-13 px-5 bg-white dark:bg-black/20 border border-slate-200 dark:border-emerald-500/20 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         placeholder="Your Name"
@@ -166,7 +152,7 @@ export default function Profile() {
                             <div className="space-y-2">
                                 <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 ml-1">Bio</label>
                                 <textarea
-                                    className="w-full h-[164px] p-5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-emerald-500/20 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all resize-none"
+                                    className="w-full h-[164px] p-5 bg-white dark:bg-black/20 border border-slate-200 dark:border-emerald-500/20 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all resize-none"
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
                                     placeholder="Tell your team about yourself..."

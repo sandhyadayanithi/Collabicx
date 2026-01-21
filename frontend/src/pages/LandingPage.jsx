@@ -1,11 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Aurora from '../components/Aurora';
 
 export default function LandingPage() {
     const navigate = useNavigate();
 
     return (
         <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col relative overflow-hidden">
+            {/* Aurora Background */}
+            <div className="absolute inset-0 z-0 opacity-50 pointer-events-none">
+                <Aurora
+                    colorStops={["#7cff67", "#a3f0e1", "#5227FF"]}
+                    blend={0.5}
+                    amplitude={1.0}
+                    speed={1}
+                />
+            </div>
+
             {/* Top Navigation */}
             <nav className="relative z-20 flex items-center justify-between px-8 md:px-16 lg:px-24 py-8">
                 <div className="flex items-center gap-3">

@@ -156,7 +156,7 @@ export default function ProfileSetup() {
                             <div className="relative">
                                 <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 font-bold">@</span>
                                 <input
-                                    className="w-full h-13 pl-10 pr-32 bg-white/60 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl text-white placeholder:text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all"
+                                    className="w-full h-13 pl-10 pr-32 bg-white dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl text-white placeholder:text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all"
                                     placeholder="username"
                                     type="text"
                                     value={username}
