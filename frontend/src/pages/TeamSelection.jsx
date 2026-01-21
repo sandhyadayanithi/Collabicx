@@ -150,7 +150,13 @@ export default function TeamSelection() {
                                     </div>
                                     <label className="flex flex-col gap-2">
                                         <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold">Unique Invite Code</p>
-                                        <input className="w-full rounded-lg border border-slate-200 dark:border-[#3b4354] bg-slate-50 dark:bg-[#111318] text-slate-900 dark:text-white focus:ring-primary focus:border-primary h-14 px-4 text-center text-xl font-mono tracking-widest placeholder:text-slate-400 dark:placeholder:text-[#9da6b9] placeholder:font-sans placeholder:tracking-normal placeholder:text-base" placeholder="XXXX-XXXX-XXXX" type="text" />
+                                        <input
+                                            value={joinCode}
+                                            onChange={(e) => setJoinCode(e.target.value)}
+                                            className="w-full rounded-lg border border-slate-200 dark:border-[#3b4354] bg-slate-50 dark:bg-[#111318] text-slate-900 dark:text-white focus:ring-primary focus:border-primary h-14 px-4 text-center text-xl font-mono tracking-widest placeholder:text-slate-400 dark:placeholder:text-[#9da6b9] placeholder:font-sans placeholder:tracking-normal placeholder:text-base"
+                                            placeholder="XXXX-XXXX-XXXX"
+                                            type="text"
+                                        />
                                     </label>
                                 </div>
                                 <div className="flex flex-col gap-4">
