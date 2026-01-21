@@ -10,7 +10,8 @@ export default function HackathonCard({
     participants = [],
     image,
     daysLeft,
-    nextDeadline
+    nextDeadline,
+    onEdit
 }) {
     const navigate = useNavigate();
     const isCompleted = status === 'Completed';
@@ -72,7 +73,14 @@ export default function HackathonCard({
                     </div>
 
                     <div className="flex items-center gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 text-slate-400 dark:text-white hover:text-primary hover:bg-primary/5 rounded-lg transition-colors" title="Edit">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (onEdit) onEdit();
+                            }}
+                            className="p-2 text-slate-400 dark:text-white hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                            title="Edit"
+                        >
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                         </button>
                         <button

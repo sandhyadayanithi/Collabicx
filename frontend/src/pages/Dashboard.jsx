@@ -16,6 +16,8 @@ export default function Dashboard() {
     const [loadingHackathons, setLoadingHackathons] = useState(true);
     const [filter, setFilter] = useState('All');
     const [copied, setCopied] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingHackathon, setEditingHackathon] = useState(null);
 
     // Real user data states
     const [currentUser, setCurrentUser] = useState(null);
@@ -104,6 +106,8 @@ export default function Dashboard() {
     // Filtering logic
     const filteredHackathons = hackathons.filter(h => {
         if (filter === 'All') return true;
+        if (filter === 'Ongoing') return h.status === 'Ongoing' || h.status === 'Registered';
+        if (filter === 'Upcoming') return h.status === 'Upcoming' || h.status === 'Yet to register';
         return h.status === filter;
     });
 
@@ -255,6 +259,10 @@ export default function Dashboard() {
                                         nextDeadline="Submission: Friday"
                                         image="https://lh3.googleusercontent.com/aida-public/AB6AXuB9PAOY0tIhO6AfT2CPKIxambugzwRa53Hrf3QnXFSdGFg-NWOtJ7pNhPOM7HGmtq1RrRWkdaNeq2ntVNuINMsfej13ZfcOWQW67K7DADu5iCo_N5tPXJrjK4f8kkbXOT8Fpk2jJDNlujC-3V8AnjV49G6UgkJZUeeB9CHZOeE4gv3h0oMR9UaoRkQX4uh2WI9UPFvHcq3zAY3z-Kv11Z9nfQ4LBTkS-zxMMQXs5iP0ggXcbS35NVRtltCkIYpyDhHt3pGjzgCoZhOQ"
                                         participants={['https://i.pravatar.cc/150?u=a', 'https://i.pravatar.cc/150?u=b']}
+                                        onEdit={() => {
+                                            setEditingHackathon(hackathon);
+                                            setIsEditModalOpen(true);
+                                        }}
                                     />
                                 ))}
                             </div>
@@ -325,19 +333,30 @@ export default function Dashboard() {
                                 <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">Resume Work</span>
                             </div>
 
-                            <h3 className="text-xl font-bold mb-2">{filteredHackathons[0]?.name || "No Active Hackathon"}</h3>
-                            <p className="text-slate-400 text-sm mb-8 max-w-[200px] mx-auto">
-                                {filteredHackathons[0] ? "Jump right back into your hackathon project." : "You haven't joined any hackathons yet."}
-                            </p>
+                            {(() => {
+                                const lastViewed = JSON.parse(localStorage.getItem('lastViewedHackathon') || 'null');
+                                const resumable = (lastViewed && currentTeam && lastViewed.teamId === currentTeam.id)
+                                    ? hackathons.find(h => h.id === lastViewed.hackathonId) || hackathons[0]
+                                    : hackathons[0];
 
-                            <button
-                                onClick={() => filteredHackathons[0] && currentTeam?.id && navigate(`/workspace/${currentTeam.id}/${filteredHackathons[0].id}`)}
-                                disabled={!filteredHackathons[0]}
-                                className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-black text-lg transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] flex items-center justify-center gap-3 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <span className="material-symbols-outlined text-2xl group-hover/btn:translate-x-1 transition-transform">play_circle</span>
-                                {filteredHackathons[0] ? "Continue where you left off" : "Create a Hackathon first"}
-                            </button>
+                                return (
+                                    <>
+                                        <h3 className="text-xl font-bold mb-2">{resumable?.name || "No Active Hackathon"}</h3>
+                                        <p className="text-slate-400 text-sm mb-8 max-w-[200px] mx-auto">
+                                            {resumable ? "Jump right back into your hackathon project." : "You haven't joined any hackathons yet."}
+                                        </p>
+
+                                        <button
+                                            onClick={() => resumable && currentTeam?.id && navigate(`/workspace/${currentTeam.id}/${resumable.id}`)}
+                                            disabled={!resumable}
+                                            className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-black text-lg transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] flex items-center justify-center gap-3 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <span className="material-symbols-outlined text-2xl group-hover/btn:translate-x-1 transition-transform">play_circle</span>
+                                            {resumable ? "Continue where you left off" : "Create a Hackathon first"}
+                                        </button>
+                                    </>
+                                );
+                            })()}
                         </div>
                     </div>
                 </div>
@@ -351,6 +370,23 @@ export default function Dashboard() {
                     fetchHackathons();
                 }}
                 teamId={currentTeam?.id}
+            />
+
+            <NewHackathonModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setEditingHackathon(null);
+                }}
+                onSuccess={() => {
+                    setIsEditModalOpen(false);
+                    setEditingHackathon(null);
+                    fetchHackathons();
+                }}
+                teamId={currentTeam?.id}
+                isEdit={true}
+                hackathonId={editingHackathon?.id}
+                initialData={editingHackathon}
             />
         </div>
     );

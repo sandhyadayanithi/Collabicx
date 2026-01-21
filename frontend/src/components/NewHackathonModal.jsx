@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
-import { createHackathon } from '../firebase/functions';
+import React, { useState, useEffect } from 'react';
+import { createHackathon, updateHackathon } from '../firebase/functions';
 
 export default function NewHackathonModal(props) {
-  const { isOpen, onClose, teamId = "default-team", onSuccess } = props;
+  const {
+    isOpen,
+    onClose,
+    teamId = "default-team",
+    onSuccess,
+    isEdit = false,
+    hackathonId = null,
+    initialData = null
+  } = props;
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -15,6 +24,34 @@ export default function NewHackathonModal(props) {
     status: 'Yet to register'
   });
 
+  // Sync with initialData when editing
+  useEffect(() => {
+    if (isEdit && initialData) {
+      setFormData({
+        name: initialData.name || '',
+        description: initialData.description || '',
+        theme: initialData.theme || '',
+        startDate: initialData.startDate || '',
+        endDate: initialData.endDate || '',
+        registrationDeadline: initialData.registrationDeadline || '',
+        submissionDeadline: initialData.submissionDeadline || '',
+        status: initialData.status || 'Yet to register'
+      });
+    } else if (!isEdit) {
+      // Reset form if opening for creation
+      setFormData({
+        name: '',
+        description: '',
+        theme: '',
+        startDate: '',
+        endDate: '',
+        registrationDeadline: '',
+        submissionDeadline: '',
+        status: 'Yet to register'
+      });
+    }
+  }, [isEdit, initialData, isOpen]);
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
@@ -25,14 +62,19 @@ export default function NewHackathonModal(props) {
     e.preventDefault();
     setLoading(true);
     try {
-      await createHackathon(teamId, formData);
+      if (isEdit && hackathonId) {
+        await updateHackathon(teamId, hackathonId, formData);
+      } else {
+        await createHackathon(teamId, formData);
+      }
+
       if (onSuccess) {
         onSuccess();
       } else {
         onClose();
       }
     } catch (error) {
-      console.error("Error creating hackathon:", error);
+      console.error("Error saving hackathon:", error);
     } finally {
       setLoading(false);
     }
@@ -43,8 +85,8 @@ export default function NewHackathonModal(props) {
       <div className="bg-white dark:bg-[#1e293b] w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">New Hackathon</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Add a new hackathon to your workspace</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">{isEdit ? 'Edit Hackathon' : 'New Hackathon'}</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{isEdit ? 'Update hackathon details' : 'Add a new hackathon to your workspace'}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-500 dark:text-slate-400">
             <span className="material-symbols-outlined">close</span>
@@ -179,7 +221,7 @@ export default function NewHackathonModal(props) {
             className="px-5 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50"
           >
             {loading && <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>}
-            {loading ? 'Creating...' : 'Create Hackathon'}
+            {loading ? (isEdit ? 'Saving...' : 'Creating...') : (isEdit ? 'Save Changes' : 'Create Hackathon')}
           </button>
         </div>
       </div>

@@ -11,7 +11,8 @@ import {
     toggleTaskComplete,
     addTask as firebaseAddTask,
     addLink as firebaseAddLink,
-    getHackathonDetails
+    getHackathonDetails,
+    editMessage
 } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -62,6 +63,8 @@ export default function HackathonWorkspace() {
             getHackathonDetails(teamId, hackathonId).then(data => {
                 if (data) {
                     setHackathon(data);
+                    // Persistent session: Save last viewed hackathon for "Resume Work"
+                    localStorage.setItem('lastViewedHackathon', JSON.stringify({ teamId, hackathonId }));
                 } else {
                     // Hackathon not found, maybe redirect
                     console.error("Hackathon not found");
@@ -77,6 +80,7 @@ export default function HackathonWorkspace() {
     // -- State: Chat --
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
+    const [editingMessageId, setEditingMessageId] = useState(null);
     const messagesEndRef = useRef(null);
 
     // Chat Listeners
@@ -96,19 +100,43 @@ export default function HackathonWorkspace() {
     const handleSendMessage = async () => {
         if (!newMessage.trim() || !currentUser || !teamId || !hackathonId) return;
         try {
-            const name = userData?.username || userData?.name || "User";
-            const avatar = userData?.avatar || "";
-            await sendMessage(teamId, hackathonId, currentUser.uid, newMessage, name, avatar);
+            if (editingMessageId) {
+                await editMessage(teamId, hackathonId, editingMessageId, newMessage);
+                setEditingMessageId(null);
+            } else {
+                const name = userData?.username || userData?.name || "User";
+                const avatar = userData?.avatar || "";
+                await sendMessage(teamId, hackathonId, currentUser.uid, newMessage, name, avatar);
+            }
             setNewMessage("");
         } catch (error) {
-            console.error("Error sending message:", error);
+            console.error("Error saving message:", error);
         }
+    };
+
+    const handleCopyMessage = (msg) => {
+        navigator.clipboard.writeText(msg).then(() => {
+            // Optional: Show a toast or feedback
+            console.log("Message copied!");
+        });
+    };
+
+    const handleStartEdit = (msgId, content) => {
+        setEditingMessageId(msgId);
+        setNewMessage(content);
+    };
+
+    const handleCancelEdit = () => {
+        setEditingMessageId(null);
+        setNewMessage("");
     };
 
     const handleChatKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
+        } else if (e.key === 'Escape' && editingMessageId) {
+            handleCancelEdit();
         }
     };
 
@@ -360,7 +388,6 @@ export default function HackathonWorkspace() {
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col font-display">
             {/* Global Header */}
             <Header title={hackathon?.name || "Loading Workspace..."} backPath="/dashboard">
-
             </Header>
 
             <div className="flex flex-1 w-full max-w-[1600px] mx-auto p-6 overflow-hidden">
@@ -464,11 +491,39 @@ export default function HackathonWorkspace() {
                                                         {msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                                     </span>
                                                 </div>
-                                                <div className={`p-3 rounded-xl max-w-[85%] break-words text-sm ${isMe
-                                                    ? 'bg-primary text-white rounded-tr-none'
-                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none'
+                                                <div className={`p-3 rounded-xl max-w-[85%] break-words text-sm relative group/msg transition-all ${isMe
+                                                    ? 'bg-primary text-white rounded-tr-none shadow-sm'
+                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none border border-slate-200 dark:border-slate-700'
                                                     }`}>
-                                                    {msg.message}
+                                                    <div className="whitespace-pre-wrap leading-relaxed">
+                                                        {msg.message}
+                                                    </div>
+
+                                                    {msg.isEdited && (
+                                                        <span className={`text-[9px] mt-1 block opacity-60 italic ${isMe ? 'text-right' : 'text-left'}`}>
+                                                            (edited)
+                                                        </span>
+                                                    )}
+
+                                                    {/* Message Actions */}
+                                                    <div className={`absolute -top-7 ${isMe ? 'right-0' : 'left-0'} flex items-center gap-1 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1 shadow-xl opacity-0 translate-y-2 group-hover/msg:opacity-100 group-hover/msg:translate-y-0 transition-all z-10 pointer-events-none group-hover/msg:pointer-events-auto`}>
+                                                        {isMe && (
+                                                            <button
+                                                                onClick={() => handleStartEdit(msg.id, msg.message)}
+                                                                className="size-6 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-primary transition-colors"
+                                                                title="Edit"
+                                                            >
+                                                                <span className="material-symbols-outlined text-[16px]">edit</span>
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={() => handleCopyMessage(msg.message)}
+                                                            className="size-6 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-emerald-500 transition-colors"
+                                                            title="Copy"
+                                                        >
+                                                            <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         );
@@ -477,13 +532,24 @@ export default function HackathonWorkspace() {
                                 </div>
 
                                 <div className="p-4 bg-white/0 dark:bg-black/0 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                                    {editingMessageId && (
+                                        <div className="mb-2 flex items-center justify-between bg-primary/10 dark:bg-primary/5 rounded-lg p-2 border-l-4 border-primary">
+                                            <div className="flex items-center gap-2 overflow-hidden">
+                                                <span className="material-symbols-outlined text-primary text-sm">edit</span>
+                                                <p className="text-xs text-primary font-bold truncate">Editing message</p>
+                                            </div>
+                                            <button onClick={handleCancelEdit} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                                                <span className="material-symbols-outlined text-sm">close</span>
+                                            </button>
+                                        </div>
+                                    )}
                                     <div className="relative">
                                         <textarea
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
                                             onKeyDown={handleChatKeyDown}
                                             className="form-textarea w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-primary focus:border-primary text-sm min-h-[50px] max-h-[120px] py-3 pr-12 pl-4 custom-scrollbar resize-none dark:text-white dark:placeholder-slate-500"
-                                            placeholder="Type a message..."
+                                            placeholder={editingMessageId ? "Edit your message..." : "Type a message..."}
                                             rows={1}
                                             style={{ height: 'auto', minHeight: '50px' }}
                                         ></textarea>
@@ -491,7 +557,9 @@ export default function HackathonWorkspace() {
                                             onClick={handleSendMessage}
                                             className="absolute bottom-2.5 right-2 size-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
                                         >
-                                            <span className="material-symbols-outlined text-[18px]">send</span>
+                                            <span className="material-symbols-outlined text-[18px]">
+                                                {editingMessageId ? 'check' : 'send'}
+                                            </span>
                                         </button>
                                     </div>
                                 </div>

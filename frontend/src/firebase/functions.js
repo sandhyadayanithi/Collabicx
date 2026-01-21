@@ -194,6 +194,14 @@ export const updateHackathonStatus = async (teamId, hackathonId, status) => {
     await updateDoc(ref, { status });
 };
 
+export const updateHackathon = async (teamId, hackathonId, data) => {
+    const ref = doc(db, `teams/${teamId}/hackathons`, hackathonId);
+    await updateDoc(ref, {
+        ...data,
+        updatedAt: serverTimestamp()
+    });
+};
+
 // --- 5. Notes Functions ---
 
 export const updateQuickNote = async (teamId, hackathonId, content) => {
@@ -309,5 +317,14 @@ export const listenToMessages = (teamId, hackathonId, callback) => {
     return onSnapshot(q, (snapshot) => {
         const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(messages);
+    });
+};
+
+export const editMessage = async (teamId, hackathonId, messageId, newMessage) => {
+    const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/messages`, messageId);
+    await updateDoc(ref, {
+        message: newMessage,
+        updatedAt: serverTimestamp(),
+        isEdited: true
     });
 };

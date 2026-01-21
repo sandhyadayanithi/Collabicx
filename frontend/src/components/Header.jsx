@@ -38,8 +38,13 @@ export default function Header({ title = "Team Alpha-Bits", backPath = "/teams",
                     <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />
                     <h2 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
                 </Link>
+                <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 ml-2"></div>
+                <h1 className="text-slate-900 dark:text-white font-bold text-lg hidden md:block">{title}</h1>
             </div>
 
+            <div className="flex-1 flex items-center justify-center gap-8">
+                {children}
+            </div>
 
             <div className="flex items-center gap-6">
                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
@@ -70,7 +75,7 @@ export default function Header({ title = "Team Alpha-Bits", backPath = "/teams",
                         style={{ backgroundImage: `url(${userData?.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_'})` }}
                     ></div>
                 </div>
-            </div >
-        </header >
+            </div>
+        </header>
     );
 }
