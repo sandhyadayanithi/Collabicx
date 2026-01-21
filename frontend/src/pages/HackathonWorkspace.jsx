@@ -98,19 +98,26 @@ export default function HackathonWorkspace() {
     }, [messages]);
 
     const handleSendMessage = async () => {
-        if (!newMessage.trim() || !currentUser || !teamId || !hackathonId) return;
+        const messageToSend = newMessage.trim();
+        if (!messageToSend || !currentUser || !teamId || !hackathonId) return;
+
+        // Clear input immediately for better UX
+        setNewMessage("");
+
         try {
             if (editingMessageId) {
-                await editMessage(teamId, hackathonId, editingMessageId, newMessage);
+                const mid = editingMessageId;
                 setEditingMessageId(null);
+                await editMessage(teamId, hackathonId, mid, messageToSend);
             } else {
                 const name = userData?.username || userData?.name || "User";
                 const avatar = userData?.avatar || "";
-                await sendMessage(teamId, hackathonId, currentUser.uid, newMessage, name, avatar);
+                await sendMessage(teamId, hackathonId, currentUser.uid, messageToSend, name, avatar);
             }
-            setNewMessage("");
         } catch (error) {
             console.error("Error saving message:", error);
+            // If it failed, we could potentially put the text back, but usually, 
+            // clearing immediately is expected for chat apps.
         }
     };
 
