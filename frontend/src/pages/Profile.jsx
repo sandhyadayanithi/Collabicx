@@ -4,7 +4,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { logout } from '../firebase/functions';
+import { logout, deleteUserAccount } from '../firebase/functions';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
@@ -12,6 +12,7 @@ export default function Profile() {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [bio, setBio] = useState('');
     const [name, setName] = useState('');
     const [role, setRole] = useState('');
@@ -66,6 +67,22 @@ export default function Profile() {
             navigate('/');
         } catch (error) {
             console.error("Logout failed", error);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone and you will be removed from all teams.")) {
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            await deleteUserAccount(auth.currentUser.uid);
+            navigate('/');
+        } catch (error) {
+            console.error("Delete account error:", error);
+            setMessage({ text: 'Failed to delete account. You may need to login again first.', type: 'error' });
+            setIsDeleting(false);
         }
     };
 
@@ -162,16 +179,28 @@ export default function Profile() {
 
                         <div className="mt-12 pt-8 border-t border-slate-100 dark:border-emerald-500/10">
                             <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Account Information</h3>
-                            <div className="flex flex-wrap gap-8 text-sm">
-                                <div>
-                                    <p className="text-slate-500 font-medium mb-1">Email Address</p>
-                                    <p className="text-slate-900 dark:text-white font-bold">{userData?.email}</p>
+                            <div className="flex flex-wrap gap-8 text-sm items-start justify-between">
+                                <div className="flex gap-8">
+                                    <div>
+                                        <p className="text-slate-500 font-medium mb-1">Email Address</p>
+                                        <p className="text-slate-900 dark:text-white font-bold">{userData?.email}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-slate-500 font-medium mb-1">Joined</p>
+                                        <p className="text-slate-900 dark:text-white font-bold">
+                                            {userData?.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() : 'Recent'}
+                                        </p>
+                                    </div>
                                 </div>
                                 <div>
-                                    <p className="text-slate-500 font-medium mb-1">Joined</p>
-                                    <p className="text-slate-900 dark:text-white font-bold">
-                                        {userData?.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() : 'Recent'}
-                                    </p>
+                                    <p className="text-slate-500 font-medium mb-1">Danger Zone</p>
+                                    <button
+                                        onClick={handleDeleteAccount}
+                                        disabled={isDeleting}
+                                        className="text-white font-bold bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-xs transition-colors disabled:opacity-50"
+                                    >
+                                        {isDeleting ? 'Deleting...' : 'Delete Account'}
+                                    </button>
                                 </div>
                             </div>
                         </div>

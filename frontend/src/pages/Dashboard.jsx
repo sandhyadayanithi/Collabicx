@@ -7,6 +7,13 @@ import { getHackathons, getUserTeams, getTeamMembers } from '../firebase/functio
 import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import cover1 from '../assets/hackathon-covers/cover1.png';
+import cover2 from '../assets/hackathon-covers/cover2.png';
+import cover3 from '../assets/hackathon-covers/cover3.png';
+import cover4 from '../assets/hackathon-covers/cover4.png';
+import cover5 from '../assets/hackathon-covers/cover5.png';
+
+const hackathonImages = [cover1, cover2, cover3, cover4, cover5];
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -246,7 +253,7 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {filteredHackathons.map((hackathon) => (
+                                {filteredHackathons.map((hackathon, index) => (
                                     <HackathonCard
                                         key={hackathon.id}
                                         id={hackathon.id}
@@ -256,8 +263,8 @@ export default function Dashboard() {
                                         status={hackathon.status}
                                         progress={hackathon.status === "Completed" ? 100 : hackathon.status === "Ongoing" ? 45 : 0}
                                         daysLeft={Math.max(0, Math.ceil((new Date(hackathon.endDate) - new Date()) / (1000 * 60 * 60 * 24)))}
-                                        nextDeadline="Submission: Friday"
-                                        image="https://lh3.googleusercontent.com/aida-public/AB6AXuB9PAOY0tIhO6AfT2CPKIxambugzwRa53Hrf3QnXFSdGFg-NWOtJ7pNhPOM7HGmtq1RrRWkdaNeq2ntVNuINMsfej13ZfcOWQW67K7DADu5iCo_N5tPXJrjK4f8kkbXOT8Fpk2jJDNlujC-3V8AnjV49G6UgkJZUeeB9CHZOeE4gv3h0oMR9UaoRkQX4uh2WI9UPFvHcq3zAY3z-Kv11Z9nfQ4LBTkS-zxMMQXs5iP0ggXcbS35NVRtltCkIYpyDhHt3pGjzgCoZhOQ"
+                                        nextDeadline={`Submission: ${new Date(hackathon.endDate).toLocaleDateString('en-US', { weekday: 'long' })}`}
+                                        image={hackathonImages[index % hackathonImages.length]}
                                         participants={['https://i.pravatar.cc/150?u=a', 'https://i.pravatar.cc/150?u=b']}
                                         onEdit={() => {
                                             setEditingHackathon(hackathon);

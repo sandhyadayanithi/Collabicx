@@ -4,7 +4,8 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    getAdditionalUserInfo
+    getAdditionalUserInfo,
+    deleteUser
 } from "firebase/auth";
 import {
     doc,
@@ -18,9 +19,11 @@ import {
     updateDoc,
     serverTimestamp,
     onSnapshot,
-    orderBy
+    orderBy,
+    deleteDoc
 } from "firebase/firestore";
-import { auth, db, googleProvider } from "./config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth, db, googleProvider, storage } from "./config";
 
 // --- 0. Helper Functions ---
 export const checkUsernameAvailability = async (username) => {
@@ -33,10 +36,16 @@ export const checkUsernameAvailability = async (username) => {
 
 export const updateUserProfile = async (userId, data) => {
     const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
+    await setDoc(userRef, {
         ...data,
         updatedAt: serverTimestamp()
-    });
+    }, { merge: true });
+};
+
+export const uploadProfileImage = async (userId, file) => {
+    const storageRef = ref(storage, `users/${userId}/avatar_${Date.now()}`);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
 };
 
 // --- 1. Authentication Functions ---
@@ -96,6 +105,28 @@ const createUserProfile = async (user, additionalData = {}) => {
             createdAt: serverTimestamp(),
             ...additionalData
         });
+    }
+};
+
+export const deleteUserAccount = async (userId) => {
+    // 1. Remove user from all teams
+    const teams = await getUserTeams(userId);
+    for (const team of teams) {
+        const membersRef = collection(db, `teams/${team.id}/members`);
+        const q = query(membersRef, where("userId", "==", userId));
+        const snap = await getDocs(q);
+
+        const deletePromises = snap.docs.map(doc => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+    }
+
+    // 2. Delete user profile
+    await deleteDoc(doc(db, "users", userId));
+
+    // 3. Delete auth account
+    const user = auth.currentUser;
+    if (user) {
+        await deleteUser(user);
     }
 };
 
