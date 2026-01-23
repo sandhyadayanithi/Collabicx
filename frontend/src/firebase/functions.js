@@ -23,7 +23,7 @@ import {
     deleteDoc
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, db, googleProvider, storage } from "./config";
+import { auth, db, googleProvider, githubProvider, storage } from "./config";
 
 // --- 0. Helper Functions ---
 export const checkUsernameAvailability = async (username) => {
@@ -53,6 +53,18 @@ export const uploadProfileImage = async (userId, file) => {
 export const googleSignIn = async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        const { isNewUser } = getAdditionalUserInfo(result);
+        await createUserProfile(user);
+        return { user, isNewUser };
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const githubSignIn = async () => {
+    try {
+        const result = await signInWithPopup(auth, githubProvider);
         const user = result.user;
         const { isNewUser } = getAdditionalUserInfo(result);
         await createUserProfile(user);
