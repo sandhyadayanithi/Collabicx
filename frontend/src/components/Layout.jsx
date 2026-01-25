@@ -9,7 +9,7 @@ export default function Layout() {
         <div className="text-slate-900 dark:text-white min-h-screen flex flex-col font-display">
             <Header />
             <div className="flex-1 flex overflow-hidden">
-                <main className="@container flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10 bg-background-light dark:bg-white">
+                <main className="@container flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10 bg-white/30 dark:bg-slate-900/40 backdrop-blur-md">
                     <Outlet />
                 </main>
             </div>

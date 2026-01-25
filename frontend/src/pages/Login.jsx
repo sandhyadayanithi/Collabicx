@@ -94,12 +94,12 @@ export default function Login() {
                         <img src="/logo.png" alt="Collabix" className="w-20 h-20 object-contain" />
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-2">{isSignUp ? 'Join Collabicx' : 'Welcome Back'}</h2>
-                    <p className="text-slate-500 font-medium text-center">
+                    <p className="text-slate-500 dark:text-slate-300 font-medium text-center">
                         {isSignUp ? 'Create your account to start building together' : 'Please enter your details to sign in'}
                     </p>
                 </div>
 
-                <div className="bg-white/10 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 rounded-3xl p-8 md:p-10 shadow-2xl">
+                <div className="vibrant-card border border-emerald-500/20 rounded-3xl p-8 md:p-10 shadow-2xl">
                     {error && (
                         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl flex items-center gap-2">
                             <svg height="18" width="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -147,7 +147,7 @@ export default function Login() {
                     <form className="space-y-5 mb-8" onSubmit={handleSubmit}>
                         {isSignUp && (
                             <div className="space-y-2">
-                                <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500 ml-1">Full Name</label>
+                                <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500 dark:text-emerald-400 ml-1">Full Name</label>
                                 <input
                                     className="w-full h-13 px-5 bg-[#0b101a] border border-slate-800 rounded-xl text-white placeholder:text-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                                     placeholder="John Doe"
@@ -159,9 +159,9 @@ export default function Login() {
                             </div>
                         )}
                         <div className="space-y-2">
-                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500 ml-1">Email Address</label>
+                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary ml-1">Email Address</label>
                             <input
-                                className="w-full h-13 px-5 bg-white/10 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all"
+                                className="w-full h-13 px-5 vibrant-badge rounded-xl text-vibrant-primary focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all font-black placeholder:text-slate-400"
                                 placeholder="name@company.com"
                                 type="email"
                                 value={email}
@@ -171,12 +171,12 @@ export default function Login() {
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between ml-1">
-                                <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500">Password</label>
+                                <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">Password</label>
                                 {!isSignUp && <a className="text-xs font-bold text-emerald-500 hover:underline" href="#">Forgot?</a>}
                             </div>
                             <div className="relative">
                                 <input
-                                    className="w-full h-13 px-5 bg-white/10 dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all pr-12"
+                                    className="w-full h-13 px-5 vibrant-badge rounded-xl text-vibrant-primary focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all pr-12 font-black placeholder:text-slate-400"
                                     placeholder="••••••••"
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
@@ -217,7 +217,7 @@ export default function Login() {
                         </button>
                     </form>
 
-                    <p className="text-center text-slate-500 font-bold text-sm">
+                    <p className="text-center text-slate-500 dark:text-slate-400 font-bold text-sm">
                         {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                         <button onClick={() => setIsSignUp(!isSignUp)} className="text-emerald-500 hover:underline ml-1">
                             {isSignUp ? 'Sign In' : 'Create an account'}

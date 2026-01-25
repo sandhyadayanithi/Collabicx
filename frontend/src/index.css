@@ -3,6 +3,8 @@
 
 @theme {
   --color-primary: #10b981;
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
   --color-background-light: transparent;
   --color-background-dark: transparent;
   --font-display: Inter, sans-serif;
@@ -13,21 +15,80 @@
 }
 
 :root {
-  --gradient-bg: radial-gradient(circle, rgba(215, 238, 174, 1) 0%, rgba(215, 238, 174, 1) 100%);
-  --text-main: #0f172a;
+  --gradient-bg: radial-gradient(circle, #d7eeae 0%, #d7eeae 100%);
+  --text-main: #000000;
+  --text-primary: #000000;
+  --text-secondary: #0f172a;
 }
 
 .dark {
   --gradient-bg: radial-gradient(circle, #013220 0%, #013220 100%);
-  --text-main: #ecfdf5;
+  --text-main: #ffffff;
+  --text-primary: #ffffff;
+  --text-secondary: #ecfdf5;
+}
+
+/* Explicit Themed Classes */
+.text-vibrant-primary {
+  color: var(--text-primary) !important;
+}
+
+.text-vibrant-secondary {
+  color: var(--text-secondary) !important;
+}
+
+
+
+.vibrant-card {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.dark .vibrant-card {
+  background-color: rgba(15, 23, 42, 0.5) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.vibrant-badge {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.dark .vibrant-badge {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.vibrant-subtle-badge {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #10b981 !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+.vibrant-role-button {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #94a3b8 !important;
+  /* slate-400 */
+}
+
+.dark .vibrant-role-button {
+  background-color: rgba(15, 23, 42, 0.4) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
 }
 
 body {
   font-family: var(--font-display);
   background: var(--gradient-bg) no-repeat center center fixed;
   background-size: cover;
-  color: #0f172a;
-  /* Default light */
+  color: var(--text-main);
   min-height: 100vh;
   display: flex;
   flex-direction: column;

@@ -59,7 +59,7 @@ export default function TeamsDashboard() {
                     <>
                         <div
                             onClick={() => navigate('/profile')}
-                            className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-emerald-300/80 hover:text-primary dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                            className="flex items-center gap-3 px-3 py-2 text-black dark:text-emerald-300/80 hover:text-primary dark:hover:text-emerald-400 transition-colors cursor-pointer"
                         >
                             <div
                                 className="size-6 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-800"
@@ -78,24 +78,24 @@ export default function TeamsDashboard() {
                     <span className="material-symbols-outlined dark:text-emerald-400">groups</span>
                     <p className="text-sm font-black">My Teams</p>
                 </a>
-                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-800 dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer" href="#">
+                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-black dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer" href="#">
                     <span className="material-symbols-outlined dark:text-emerald-300/80">explore</span>
                     <p className="text-sm font-black">Discover</p>
                 </a>
-                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-800 dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer" href="#">
+                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-black dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer" href="#">
                     <span className="material-symbols-outlined dark:text-emerald-300/80">settings</span>
                     <p className="text-sm font-black">Account Settings</p>
                 </a>
             </Sidebar>
 
             {/* Main Content Area */}
-            <main className="flex-1 flex flex-col">
+            <main className="flex-1 flex flex-col bg-slate-50/50 dark:bg-transparent">
                 {/* Header Section */}
                 <header className="max-w-[1200px] w-full mx-auto px-8 pt-10 pb-4">
                     <div className="flex flex-wrap items-center justify-between gap-4">
                         <div className="flex flex-col gap-1">
-                            <h2 className="text-slate-900 text-white-forced text-4xl font-black tracking-tight">All Teams Dashboard</h2>
-                            <p className="text-slate-600 text-white-forced-dim font-black">Manage and organize your collaborative hackathon projects.</p>
+                            <h2 className="text-vibrant-primary text-4xl font-black tracking-tight">All Teams Dashboard</h2>
+                            <p className="text-vibrant-secondary font-black">Manage and organize your collaborative hackathon projects.</p>
                         </div>
                         <div className="flex items-center gap-6">
                             <button
@@ -110,7 +110,7 @@ export default function TeamsDashboard() {
 
                             <button
                                 onClick={toggleTheme}
-                                className="size-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-all active:scale-95"
+                                className="size-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-black dark:text-slate-400 hover:text-primary transition-all active:scale-95"
                             >
                                 <span className="material-symbols-outlined text-[20px]">
                                     {isDarkMode ? 'light_mode' : 'dark_mode'}
@@ -121,10 +121,10 @@ export default function TeamsDashboard() {
                     {/* Search/Filter Bar */}
                     <div className="mt-8">
                         <label className="relative block w-full max-w-md">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
                                 <span className="material-symbols-outlined">search</span>
                             </span>
-                            <input className="block w-full bg-white border border-emerald-500/20 rounded-xl py-3 pl-11 pr-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm placeholder:text-slate-500 text-black-forced font-black" name="search" placeholder="Search teams by name or project..." type="text" />
+                            <input className="block w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-xl py-3 pl-11 pr-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm placeholder:text-slate-500 text-vibrant-primary font-black" name="search" placeholder="Search teams by name or project..." type="text" />
                         </label>
                     </div>
                 </header>
@@ -137,9 +137,9 @@ export default function TeamsDashboard() {
                         </div>
                     ) : userTeams.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700 mb-4">groups</span>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Teams Yet</h3>
-                            <p className="text-slate-500 dark:text-slate-400 mb-6">Create your first team to start collaborating!</p>
+                            <span className="material-symbols-outlined text-6xl text-slate-500 dark:text-slate-700 mb-4">groups</span>
+                            <h3 className="text-xl font-bold text-black dark:text-white mb-2">No Teams Yet</h3>
+                            <p className="text-slate-700 dark:text-slate-400 mb-6 font-black">Create your first team to start collaborating!</p>
                             <button
                                 onClick={() => navigate('/teams/select')}
                                 className="flex items-center gap-2 px-6 h-12 bg-primary hover:bg-primary/90 text-white rounded-lg font-bold transition-all shadow-lg shadow-primary/20"
@@ -154,7 +154,7 @@ export default function TeamsDashboard() {
                                 <div
                                     key={team.id}
                                     onClick={() => navigate(`/dashboard/${team.id}`)}
-                                    className="group bg-white backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl p-6 transition-all hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
+                                    className="group vibrant-card border border-slate-300 dark:border-white/10 rounded-xl p-6 transition-all shadow-md hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
                                 >
                                     <div className="mb-4 relative">
                                         <div className="size-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full border-4 border-slate-100 dark:border-slate-700 shadow-inner flex items-center justify-center">
@@ -162,11 +162,11 @@ export default function TeamsDashboard() {
                                         </div>
                                         <div className="absolute bottom-0 right-0 size-6 bg-green-500 rounded-full border-4 border-white dark:border-[#1e293b]"></div>
                                     </div>
-                                    <h3 className="text-slate-900 text-lg font-black mb-1 group-hover:text-primary transition-colors">
+                                    <h3 className="text-vibrant-primary text-lg font-black mb-1 group-hover:text-primary transition-colors">
                                         {team.name}
                                     </h3>
                                     {team.description && (
-                                        <p className="text-slate-500 text-xs mb-3 line-clamp-2">{team.description}</p>
+                                        <p className="text-slate-700 dark:text-slate-300 text-xs mb-3 line-clamp-2 font-black">{team.description}</p>
                                     )}
                                     <div className="flex flex-col gap-2 mt-2 w-full">
                                         <div className="inline-flex items-center justify-center px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 text-xs font-black rounded-full shadow-sm">

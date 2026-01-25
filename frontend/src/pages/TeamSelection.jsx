@@ -74,8 +74,8 @@ export default function TeamSelection() {
                 <div className="w-full max-w-[1100px] flex flex-col gap-12">
                     {/* Page Heading */}
                     <div className="text-center max-w-2xl mx-auto flex flex-col gap-4">
-                        <h1 className="text-slate-900 text-white-forced text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">Join the Innovation</h1>
-                        <p className="text-slate-500 dark:text-[#9da6b9] text-lg font-normal leading-normal">Start your journey by forming a new squad or joining an existing one.</p>
+                        <h1 className="text-text-primary text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">Join the Innovation</h1>
+                        <p className="text-text-secondary text-lg font-normal leading-normal">Start your journey by forming a new squad or joining an existing one.</p>
                     </div>
 
                     {/* Action Grid */}
@@ -86,20 +86,20 @@ export default function TeamSelection() {
                         </div>
 
                         {/* Create Team Card */}
-                        <div className="flex flex-col bg-white dark:bg-[#1c1f27] border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg hover:shadow-primary/5 transition-all p-8 group overflow-hidden relative">
+                        <div className="flex flex-col vibrant-card border border-slate-300 dark:border-slate-800 rounded-xl shadow-xl hover:shadow-primary/5 transition-all p-8 group overflow-hidden relative">
                             <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                     <span className="material-symbols-outlined text-3xl">group_add</span>
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Create a Team</h2>
-                                    <p className="text-sm text-slate-500 dark:text-[#9da6b9]">Form your own squad and lead the way.</p>
+                                    <h2 className="text-xl font-bold text-text-primary">Create a Team</h2>
+                                    <p className="text-sm text-text-secondary">Form your own squad and lead the way.</p>
                                 </div>
                             </div>
                             <div className="flex flex-col gap-6">
                                 <label className="flex flex-col gap-2">
-                                    <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold">Team Name</p>
+                                    <p className="text-text-primary text-sm font-black">Team Name</p>
                                     <input
                                         value={teamName}
                                         onChange={(e) => setTeamName(e.target.value)}
@@ -109,7 +109,7 @@ export default function TeamSelection() {
                                     />
                                 </label>
                                 <label className="flex flex-col gap-2">
-                                    <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold">Description</p>
+                                    <p className="text-text-primary text-sm font-black">Description</p>
                                     <textarea
                                         value={teamDescription}
                                         onChange={(e) => setTeamDescription(e.target.value)}
@@ -129,15 +129,15 @@ export default function TeamSelection() {
                         </div>
 
                         {/* Join Team Card */}
-                        <div className="flex flex-col bg-white dark:bg-[#1c1f27] border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg hover:shadow-primary/5 transition-all p-8 group overflow-hidden relative">
+                        <div className="flex flex-col vibrant-card border border-slate-300 dark:border-slate-800 rounded-xl shadow-xl hover:shadow-primary/5 transition-all p-8 group overflow-hidden relative">
                             <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                     <span className="material-symbols-outlined text-3xl">key</span>
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Join a Team</h2>
-                                    <p className="text-sm text-slate-500 dark:text-[#9da6b9]">Already have an invite? Enter it below.</p>
+                                    <h2 className="text-xl font-bold text-text-primary">Join a Team</h2>
+                                    <p className="text-sm text-text-secondary">Already have an invite? Enter it below.</p>
                                 </div>
                             </div>
                             <div className="flex flex-col gap-6 justify-between flex-grow">
@@ -147,7 +147,7 @@ export default function TeamSelection() {
                                         <p className="text-sm text-slate-600 dark:text-slate-300 italic">"Joining a team allows you to collaborate on existing projects and share tasks instantly."</p>
                                     </div>
                                     <label className="flex flex-col gap-2">
-                                        <p className="text-slate-700 dark:text-slate-200 text-sm font-semibold">Unique Invite Code</p>
+                                        <p className="text-text-primary text-sm font-black">Unique Invite Code</p>
                                         <input
                                             value={joinCode}
                                             onChange={(e) => setJoinCode(e.target.value)}

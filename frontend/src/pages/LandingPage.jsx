@@ -35,8 +35,7 @@ export default function LandingPage() {
                         Build the <br />
                         <span className="text-emerald-500">Future</span> Together
                     </h1>
-                    <p className="text-xl md:text-2xl text-slate-700 dark:text-emerald-100/60
- font-medium leading-relaxed mb-12 max-w-2xl mx-auto">
+                    <p className="text-xl md:text-2xl text-slate-700 dark:text-emerald-100 font-medium leading-relaxed mb-12 max-w-2xl mx-auto">
                         The ultimate collaborative platform for modern hackathons. Organize projects, track progress, and communicate with your team in real-time.
                     </p>
 

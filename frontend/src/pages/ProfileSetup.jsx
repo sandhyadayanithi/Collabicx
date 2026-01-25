@@ -97,10 +97,10 @@ export default function ProfileSetup() {
                         <span className="material-symbols-outlined text-white text-[28px]">account_circle</span>
                     </div>
                     <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Complete Your Profile</h2>
-                    <p className="text-slate-500 font-medium text-center">Let your teammates know who you are</p>
+                    <p className="text-slate-500 dark:text-slate-300 font-medium text-center">Let your teammates know who you are</p>
                 </div>
 
-                <div className="bg-white/80 dark:bg-[#131b2b]/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800/80 rounded-3xl p-8 md:p-10 shadow-2xl">
+                <div className="vibrant-card border border-slate-200 dark:border-slate-800/80 rounded-3xl p-8 md:p-10 shadow-2xl">
                     {error && (
                         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl flex items-center gap-2">
                             <span className="material-symbols-outlined text-[18px]">error</span>
@@ -111,7 +111,7 @@ export default function ProfileSetup() {
                     <div className="space-y-10">
                         {/* Avatar Selection */}
                         <div>
-                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500 mb-6">Choose an Avatar</label>
+                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary mb-6">Choose an Avatar</label>
                             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                                 {presetAvatars.map((avatar, index) => (
                                     <div
@@ -138,11 +138,11 @@ export default function ProfileSetup() {
 
                         {/* Username Input */}
                         <div className="space-y-4">
-                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500">Choose Username</label>
+                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">Choose Username</label>
                             <div className="relative">
                                 <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 font-bold">@</span>
                                 <input
-                                    className="w-full h-13 pl-10 pr-32 bg-white dark:bg-black/40 backdrop-blur-2xl border border-emerald-500/20 dark:border-emerald-500/20 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all"
+                                    className="w-full h-13 pl-10 pr-32 vibrant-badge rounded-xl text-vibrant-primary placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all font-black"
                                     placeholder="username"
                                     type="text"
                                     value={username}
@@ -157,14 +157,14 @@ export default function ProfileSetup() {
 
                         {/* Role Selection */}
                         <div className="space-y-4">
-                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-slate-500">Primary Role</label>
+                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">Primary Role</label>
                             <div className="grid grid-cols-2 gap-3">
                                 {['Developer', 'Designer', 'Product', 'Marketing'].map((r) => (
                                     <button
                                         key={r}
                                         type="button"
                                         onClick={() => setRole(r)}
-                                        className={`h-11 rounded-xl border-2 font-bold text-xs transition-all uppercase tracking-wider ${role === r ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' : 'border-emerald-500/10 text-slate-600 hover:border-emerald-500/30'}`}
+                                        className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${role === r ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 shadow-inner shadow-emerald-500/20' : 'vibrant-role-button hover:border-emerald-500/30'}`}
                                     >
                                         {r}
                                     </button>

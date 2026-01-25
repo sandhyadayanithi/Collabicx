@@ -138,17 +138,17 @@ export default function Dashboard() {
         <div className="max-w-[1600px] mx-auto space-y-8 pb-10">
             {/* Top Section: Profile Header & Search */}
             <div className="flex flex-col gap-6">
-                <div className="relative z-30 flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 bg-white backdrop-blur-2xl p-6 rounded-2xl border border-emerald-500/20 dark:border-emerald-500/20 shadow-xl">
+                <div className="relative z-30 flex flex-col @[520px]:flex-row @[520px]:items-center justify-between gap-6 vibrant-card p-6 rounded-2xl border border-slate-300 dark:border-white/10 shadow-xl">
                     <div className="flex gap-5 items-center">
                         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-20 shadow-lg border-2 border-primary/20" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqKVE-Fbz3DwX1MnQJDpDIqR6p5m0lOIH-zp5X8kkzZgXoTl4c64rAZgNVdEF49u0cXw3QrP2tbgu6yhpsYVi2JTDo8Zn-ntzG6W0-JA9rxNoDAsyjbZZgo_EPnhgppLkpbu6lmE8AF5naq7qR3F_G4E3TjbyryMKlyCH10U52PDC4euYvmZdkJVM4ojFAiQMVbJzs8YM2hH4ArN3JGnTV2MeOT0FYd-Y8MH2tqvhueBgAPCQfHi2aR-cz8monZIWrzZ0a4PJur4wE")' }}></div>
                         <div className="flex flex-col gap-2 justify-center">
                             <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-                                <h1 className="text-slate-900 dark:text-white text-2xl font-black tracking-tight">{currentTeam?.name || 'Loading...'}</h1>
+                                <h1 className="text-vibrant-primary text-2xl font-black tracking-tight">{currentTeam?.name || 'Loading...'}</h1>
                                 <div className="flex items-center gap-3">
                                     {/* Team Members Dropdown */}
                                     <div className="relative group z-40">
-                                        <div className="flex items-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                                            <span className="text-xs font-bold text-slate-500 dark:text-white">{teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}</span>
+                                        <div className="flex items-center gap-2 cursor-pointer vibrant-badge px-3 py-1.5 rounded-full transition-colors">
+                                            <span className="text-xs font-black">{teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}</span>
                                             <div className="flex -space-x-2">
                                                 {teamMembers.slice(0, 3).map((member, idx) => (
                                                     <img key={idx} src={member.user?.avatar || 'https://i.pravatar.cc/150'} className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
@@ -167,8 +167,8 @@ export default function Dashboard() {
                                                     <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
                                                         <img src={member.user?.avatar || 'https://i.pravatar.cc/150'} className="size-8 rounded-full" />
                                                         <div>
-                                                            <p className="text-sm font-bold text-slate-900 dark:text-white">{member.user?.name || 'Unknown'}</p>
-                                                            <p className="text-[10px] text-slate-500 dark:text-white font-medium">{member.role === 'owner' ? 'Team Lead' : 'Member'}</p>
+                                                            <p className="text-sm font-bold text-vibrant-primary">{member.user?.name || 'Unknown'}</p>
+                                                            <p className="text-[10px] text-vibrant-secondary font-black">{member.role === 'owner' ? 'Team Lead' : 'Member'}</p>
                                                         </div>
                                                     </div>
                                                 )) : (
@@ -177,12 +177,12 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-3 py-1 rounded-full">{hackathons.length} Projects</span>
+                                    <span className="text-xs font-black vibrant-badge px-3 py-1 rounded-full">{hackathons.length} Projects</span>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Join Code: {currentTeam?.joinCode || 'N/A'}</span>
+                                <span className="text-xs font-mono vibrant-badge px-2 py-0.5 rounded">Join Code: {currentTeam?.joinCode || 'N/A'}</span>
                                 <button
                                     onClick={handleCopyCode}
                                     className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
@@ -203,11 +203,11 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="relative">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-vibrant-secondary text-[20px]">search</span>
                             <input
                                 type="text"
                                 placeholder="Search projects..."
-                                className="pl-10 pr-4 h-11 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary w-64 transition-all text-black-forced"
+                                className="pl-10 pr-4 h-11 vibrant-badge rounded-xl text-sm font-black focus:ring-2 focus:ring-primary/20 focus:border-primary w-64 transition-all placeholder:text-slate-400"
                             />
                         </div>
                         <button
@@ -226,7 +226,7 @@ export default function Dashboard() {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`pb-3 text-sm font-bold border-b-2 transition-colors ${filter === f ? 'border-primary text-primary' : 'border-transparent text-slate-500 dark:text-white hover:text-slate-700 dark:hover:text-slate-300'}`}
+                            className={`pb-3 text-sm font-black border-b-2 transition-colors ${filter === f ? 'border-primary text-primary' : 'border-transparent text-vibrant-secondary hover:text-black dark:hover:text-white'}`}
                         >
                             {f}
                         </button>
@@ -246,7 +246,7 @@ export default function Dashboard() {
                                 Loading...
                             </div>
                         ) : filteredHackathons.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-white border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50/50 dark:bg-slate-900/50">
+                            <div className="flex flex-col items-center justify-center py-20 text-vibrant-secondary border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-3xl vibrant-card">
                                 <span className="material-symbols-outlined text-4xl mb-4">folder_open</span>
                                 <p className="font-bold">No hackathons found</p>
                                 <p className="text-sm">Try changing filters or create a new one.</p>
@@ -281,9 +281,9 @@ export default function Dashboard() {
                 {/* Right Column: Context Panel */}
                 <div className="xl:col-span-4 space-y-6">
                     {/* Upcoming Deadlines Card */}
-                    <div className="bg-white backdrop-blur-2xl rounded-2xl border border-emerald-500/20 dark:border-emerald-500/20 p-6 shadow-sm">
+                    <div className="vibrant-card rounded-2xl border border-slate-300 dark:border-white/10 p-6 shadow-md">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <h3 className="font-bold text-vibrant-primary flex items-center gap-2">
                                 <span className="material-symbols-outlined text-orange-500">warning</span>
                                 Upcoming Deadlines
                             </h3>
@@ -299,27 +299,24 @@ export default function Dashboard() {
                                 <div
                                     key={deadline.id}
                                     className={`flex gap-4 items-start p-3 rounded-xl transition-all ${index === 0
-                                        ? 'bg-orange-50 dark:bg-orange-500/20 border border-orange-100 dark:border-orange-500/30'
-                                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
+                                        ? 'bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20'
+                                        : 'hover:vibrant-badge cursor-pointer border border-transparent'
                                         }`}
                                 >
-                                    <div className={`${index === 0
-                                        ? 'bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800'
-                                        : 'bg-slate-100 dark:bg-slate-800'
-                                        } rounded-lg p-2 text-center min-w-[50px]`}>
-                                        <span className={`block text-xs font-bold uppercase ${index === 0 ? 'text-orange-500' : 'text-slate-500 dark:text-white'}`}>
+                                    <div className={`vibrant-badge rounded-lg p-2 text-center min-w-[50px] ${index === 0 ? 'border-orange-500/50' : ''}`}>
+                                        <span className={`block text-xs font-black uppercase ${index === 0 ? 'text-orange-500' : 'text-vibrant-secondary'}`}>
                                             {deadline.month}
                                         </span>
-                                        <span className="block text-xl font-black text-slate-900 dark:text-white">
+                                        <span className="block text-xl font-black text-black dark:text-white">
                                             {deadline.day}
                                         </span>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-bold text-slate-900 dark:text-white text-sm truncate">{deadline.title}</p>
-                                        <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">{deadline.time}</p>
+                                        <p className="font-black text-vibrant-primary text-sm truncate">{deadline.title}</p>
+                                        <p className="text-xs text-vibrant-secondary font-bold">{deadline.time}</p>
                                         {index === 0 && (
                                             <div className="mt-2 flex items-center gap-2">
-                                                <span className="text-[10px] font-bold bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-white border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                                                <span className="text-[10px] font-bold vibrant-badge px-2 py-0.5 rounded flex items-center gap-1">
                                                     <span className="material-symbols-outlined text-[12px] text-orange-500">warning</span>
                                                     High Priority
                                                 </span>
@@ -332,12 +329,12 @@ export default function Dashboard() {
                     </div>
 
                     {/* Resume Work Card */}
-                    <div className="bg-[#0f172a] rounded-2xl p-8 text-white relative overflow-hidden group flex flex-col items-center text-center">
+                    <div className="vibrant-card rounded-2xl p-8 relative overflow-hidden group flex flex-col items-center text-center shadow-xl border border-slate-300 dark:border-white/10">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
                         <div className="relative z-10 w-full">
-                            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-sm">
+                            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full vibrant-subtle-badge">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">Resume Work</span>
+                                <span className="text-emerald-500 text-xs font-black uppercase tracking-wider">Resume Work</span>
                             </div>
 
                             {(() => {
@@ -348,8 +345,8 @@ export default function Dashboard() {
 
                                 return (
                                     <>
-                                        <h3 className="text-xl font-bold mb-2">{resumable?.name || "No Active Hackathon"}</h3>
-                                        <p className="text-slate-400 text-sm mb-8 max-w-[200px] mx-auto">
+                                        <h3 className="text-xl font-black mb-2 text-vibrant-primary">{resumable?.name || "No Active Hackathon"}</h3>
+                                        <p className="text-vibrant-secondary text-sm mb-8 max-w-[200px] mx-auto font-black">
                                             {resumable ? "Jump right back into your hackathon project." : "You haven't joined any hackathons yet."}
                                         </p>
 

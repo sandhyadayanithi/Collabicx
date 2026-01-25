@@ -418,23 +418,23 @@ export default function HackathonWorkspace() {
                 <main className="flex gap-6 w-full h-full overflow-x-auto pb-2 custom-scrollbar">
 
                     {/* Quick Notes */}
-                    <section className="flex-1 min-w-[280px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0">
+                    <section className="flex-1 min-w-[280px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col vibrant-card shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center transition-colors">
-                            <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Quick Notes</h3>
+                            <h3 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Quick Notes</h3>
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
                                     <span className={`flex h-2 w-2 rounded-full ${lastSaved ? 'bg-green-500' : 'bg-orange-500'}`}></span>
-                                    <span className="text-[10px] font-medium text-slate-400">{lastSaved ? 'SAVED' : 'UNSAVED'}</span>
+                                    <span className="text-[10px] font-black text-slate-500">{lastSaved ? 'SAVED' : 'UNSAVED'}</span>
                                 </div>
                             </div>
                         </div>
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             <div className="flex flex-col h-full">
-                                <div className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                                <div className="flex-1 rounded-lg vibrant-badge p-4">
                                     <textarea
                                         value={noteContent}
                                         onChange={handleNoteChange}
-                                        className="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 font-mono text-sm leading-relaxed"
+                                        className="w-full h-full resize-none bg-transparent border-none focus:ring-0 text-text-primary dark:text-slate-100 placeholder:text-slate-400 font-mono text-sm leading-relaxed"
                                         placeholder="Start typing ideas..."
                                     ></textarea>
                                 </div>
@@ -456,7 +456,7 @@ export default function HackathonWorkspace() {
 
                     {/* Team Chat */}
                     <section
-                        className={`h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark/50 shrink-0 relative transition-[flex-basis] duration-75 ${isResizing ? 'border-primary shadow-primary/10' : ''}`}
+                        className={`h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col vibrant-card shrink-0 relative transition-[flex-basis] duration-75 ${isResizing ? 'border-primary shadow-primary/10' : ''}`}
                         style={{ flexBasis: `${chatWidth}px` }}
                     >
                         {/* Resize Handle (Right) */}
@@ -470,7 +470,7 @@ export default function HackathonWorkspace() {
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('teamChat')}>
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">chat_bubble</span>
-                                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Team Chat</h3>
+                                <h3 className="text-sm font-bold text-text-primary">Team Chat</h3>
                             </div>
                             <span className={`material-symbols-outlined text-slate-400 transition-transform ${expandedSections.teamChat ? 'rotate-180' : ''}`}>
                                 expand_more
@@ -482,7 +482,7 @@ export default function HackathonWorkspace() {
                                 <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
                                     <div className="flex items-center gap-4">
                                         <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase">Today</span>
+                                        <span className="text-[10px] text-slate-400 dark:text-slate-300 font-bold uppercase">Today</span>
                                         <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
                                     </div>
                                     {messages.map((msg) => {
@@ -502,16 +502,16 @@ export default function HackathonWorkspace() {
                                                             )}
                                                         </div>
                                                     )}
-                                                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                                    <span className="text-xs font-bold text-text-primary">
                                                         {isMe ? (userData?.username ? `@${userData.username}` : 'You') : (msg.userName ? (msg.userName.startsWith('@') ? msg.userName : `@${msg.userName}`) : `User ${msg.userId.substring(0, 4)}`)}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-400">
+                                                    <span className="text-[10px] text-slate-400 dark:text-slate-300">
                                                         {msg.createdAt?.seconds ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                                     </span>
                                                 </div>
                                                 <div className={`p-3 rounded-xl max-w-[85%] break-words text-sm relative group/msg transition-all ${isMe
                                                     ? 'bg-primary text-white rounded-tr-none shadow-sm'
-                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-tl-none border border-slate-200 dark:border-slate-700'
+                                                    : 'vibrant-badge text-text-secondary dark:text-slate-300 rounded-tl-none'
                                                     }`}>
                                                     <div className="whitespace-pre-wrap leading-relaxed">
                                                         {msg.message}
@@ -524,7 +524,7 @@ export default function HackathonWorkspace() {
                                                     )}
 
                                                     {/* Message Actions */}
-                                                    <div className={`absolute -top-7 ${isMe ? 'right-0' : 'left-0'} flex items-center gap-1 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1 shadow-xl opacity-0 translate-y-2 group-hover/msg:opacity-100 group-hover/msg:translate-y-0 transition-all z-10 pointer-events-none group-hover/msg:pointer-events-auto`}>
+                                                    <div className={`absolute -top-7 ${isMe ? 'right-0' : 'left-0'} flex items-center gap-1 vibrant-badge rounded-lg p-1 shadow-xl opacity-0 translate-y-2 group-hover/msg:opacity-100 group-hover/msg:translate-y-0 transition-all z-10 pointer-events-none group-hover/msg:pointer-events-auto`}>
                                                         {isMe && (
                                                             <button
                                                                 onClick={() => handleStartEdit(msg.id, msg.message)}
@@ -566,7 +566,7 @@ export default function HackathonWorkspace() {
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
                                             onKeyDown={handleChatKeyDown}
-                                            className="form-textarea w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 focus:ring-primary focus:border-primary text-sm min-h-[50px] max-h-[120px] py-3 pr-12 pl-4 custom-scrollbar resize-none dark:text-white dark:placeholder-slate-500"
+                                            className="form-textarea w-full rounded-xl vibrant-badge focus:ring-primary focus:border-primary text-sm min-h-[50px] max-h-[120px] py-3 pr-12 pl-4 custom-scrollbar resize-none text-vibrant-primary dark:placeholder-slate-500"
                                             placeholder={editingMessageId ? "Edit your message..." : "Type a message..."}
                                             rows={1}
                                             style={{ height: 'auto', minHeight: '50px' }}
@@ -586,10 +586,10 @@ export default function HackathonWorkspace() {
                     </section>
 
                     {/* Sprint Tasks */}
-                    <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col bg-white dark:bg-background-dark shrink-0">
+                    <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col vibrant-card shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('sprintTasks')}>
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400">Sprint Tasks</h3>
+                                <h3 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Sprint Tasks</h3>
                                 <div className="flex items-center gap-2">
                                     <button onClick={(e) => { e.stopPropagation(); addTask(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
                                         <span className="material-symbols-outlined text-sm">add</span> Add
@@ -599,10 +599,10 @@ export default function HackathonWorkspace() {
                                     </span>
                                 </div>
                             </div>
-                            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div className="vibrant-badge p-4 rounded-xl">
                                 <div className="flex justify-between items-end mb-2">
                                     <div>
-                                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{progress}%</p>
+                                        <p className="text-2xl font-black text-text-primary">{progress}%</p>
                                     </div>
                                     <div className="text-right">
                                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${progress >= 50 ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
@@ -619,7 +619,7 @@ export default function HackathonWorkspace() {
                             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
                                 <div className="space-y-2">
                                     {tasks.map(task => (
-                                        <div key={task.id} className={`flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
+                                        <div key={task.id} className={`flex items-center gap-3 p-3 vibrant-badge rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
                                             <input
                                                 type="checkbox"
                                                 checked={task.completed}
@@ -627,7 +627,7 @@ export default function HackathonWorkspace() {
                                                 className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer"
                                             />
                                             <div className="flex-1">
-                                                <p className={`text-sm text-slate-900 dark:text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                                                <p className={`text-sm text-text-primary font-black ${task.completed ? 'line-through text-slate-500' : ''}`}>
                                                     {task.title}
                                                 </p>
                                             </div>
@@ -641,7 +641,7 @@ export default function HackathonWorkspace() {
                                 {/* Nested Assets Section */}
                                 <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
                                     <div className="flex justify-between items-center mb-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-2 rounded-lg transition-colors" onClick={() => toggleSection('assets')}>
-                                        <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Submission Assets</h4>
+                                        <h4 className="font-bold text-xs uppercase tracking-wider text-text-secondary dark:text-emerald-400">Submission Assets</h4>
                                         <div className="flex items-center gap-2">
                                             <button onClick={(e) => { e.stopPropagation(); addAsset(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-xs font-bold">
                                                 <span className="material-symbols-outlined text-xs">add</span> New
@@ -654,13 +654,13 @@ export default function HackathonWorkspace() {
                                     {expandedSections.assets && (
                                         <div className="space-y-3">
                                             {assets.map(asset => (
-                                                <div key={asset.id} className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
+                                                <div key={asset.id} className="vibrant-badge p-3 rounded-xl shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
                                                     <div className={`size-8 ${asset.color || 'bg-slate-500'} text-white rounded-lg flex items-center justify-center shrink-0`}>
                                                         <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
                                                     </div>
                                                     <div className="min-w-0 flex-1">
                                                         <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.label || asset.title}</h5>
-                                                        <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:text-primary truncate block">{asset.url}</a>
+                                                        <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-600 dark:text-slate-400 font-bold hover:text-primary truncate block">{asset.url}</a>
                                                     </div>
                                                     <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
                                                         <span className="material-symbols-outlined text-sm">open_in_new</span>

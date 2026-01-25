@@ -26,7 +26,7 @@ export default function Header({ title = "Team Dashboard", backPath = "/teams", 
     }, []);
 
     return (
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-emerald-500/20 dark:border-emerald-500/20 px-6 lg:px-10 py-3 bg-white backdrop-blur-2xl sticky top-0 z-50">
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-slate-300 dark:border-white/10 px-6 lg:px-10 py-3 bg-white dark:bg-slate-900/80 backdrop-blur-2xl sticky top-0 z-50">
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate(backPath)}
@@ -39,7 +39,7 @@ export default function Header({ title = "Team Dashboard", backPath = "/teams", 
                     <h2 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
                 </Link>
                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 ml-2"></div>
-                <h1 className="text-slate-900 dark:text-white font-bold text-lg hidden md:block">{title}</h1>
+                <h1 className="text-black dark:text-white font-black text-lg hidden md:block">{title}</h1>
             </div>
 
             <div className="flex-1 flex items-center justify-center gap-8">
@@ -63,10 +63,10 @@ export default function Header({ title = "Team Dashboard", backPath = "/teams", 
                     className="flex items-center gap-3 px-2 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group"
                 >
                     <div className="hidden md:flex flex-col items-end">
-                        <p className="text-xs font-black text-black-forced leading-none mb-1">
+                        <p className="text-xs font-black text-black dark:text-white leading-none mb-1">
                             {userData?.username ? `@${userData.username}` : (userData?.name || 'User')}
                         </p>
-                        <p className="text-[10px] font-bold text-black-forced leading-none opacity-60 uppercase tracking-wider">
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-emerald-400/80 leading-none opacity-60 uppercase tracking-wider">
                             {userData?.role || 'Member'}
                         </p>
                     </div>

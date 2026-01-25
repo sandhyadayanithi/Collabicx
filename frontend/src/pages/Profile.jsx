@@ -99,12 +99,12 @@ export default function Profile() {
             <Header title="My Profile" backPath="/dashboard" />
 
             <main className="flex-1 p-6 md:p-10 lg:p-16 max-w-4xl mx-auto w-full">
-                <div className="bg-white dark:bg-black/40 backdrop-blur-2xl rounded-[32px] border border-emerald-500/20 dark:border-emerald-500/20 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="vibrant-card rounded-[32px] border border-emerald-500/20 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
                     {/* Profile Header Background */}
                     <div className="h-32 bg-gradient-to-r from-emerald-500/30 via-green-600/20 to-transparent relative">
-                        <div className="absolute -bottom-16 left-10 p-1.5 bg-white dark:bg-black/40 backdrop-blur-2xl rounded-full">
+                        <div className="absolute -bottom-16 left-10 p-1.5 vibrant-card rounded-full border-none">
                             <div
-                                className="size-32 rounded-full border-4 border-white dark:border-emerald-900/50 shadow-xl bg-slate-100 dark:bg-emerald-900/20 bg-cover bg-center"
+                                className="size-32 rounded-full border-4 border-white dark:border-emerald-900 shadow-xl bg-slate-100 dark:bg-emerald-900/40 bg-cover bg-center"
                                 style={{ backgroundImage: `url(${userData?.avatar})` }}
                             ></div>
                         </div>
@@ -113,10 +113,10 @@ export default function Profile() {
                     <div className="pt-20 px-10 pb-10">
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                             <div>
-                                <h1 className="text-3xl font-black text-black-forced mb-1">
+                                <h1 className="text-3xl font-black text-vibrant-primary mb-1">
                                     {userData?.name || 'User'}
                                 </h1>
-                                <p className="text-primary font-bold tracking-wide text-black-forced">
+                                <p className="text-vibrant-secondary font-black tracking-wide">
                                     @{userData?.username || 'username'}
                                 </p>
                             </div>
@@ -141,23 +141,23 @@ export default function Profile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 ml-1">Full Name</label>
+                                    <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-vibrant-secondary ml-1">Full Name</label>
                                     <input
-                                        className="w-full h-13 px-5 bg-white dark:bg-black/20 border border-slate-200 dark:border-emerald-500/20 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                                        className="w-full h-13 px-5 vibrant-badge rounded-xl text-vibrant-primary placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-black"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         placeholder="Your Name"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 ml-1">Primary Role</label>
+                                    <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-vibrant-secondary ml-1">Primary Role</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         {['Developer', 'Designer', 'Product', 'Marketing'].map((r) => (
                                             <button
                                                 key={r}
                                                 type="button"
                                                 onClick={() => setRole(r)}
-                                                className={`h-11 rounded-xl border-2 font-bold text-xs transition-all uppercase tracking-wider ${role === r ? 'border-primary bg-primary/10 text-primary' : 'border-slate-200 dark:border-emerald-500/20 text-slate-600 hover:border-slate-300 dark:hover:border-emerald-500/40'}`}
+                                                className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${role === r ? 'border-primary bg-primary/10 text-primary shadow-inner shadow-primary/20' : 'vibrant-role-button hover:border-slate-500 dark:hover:border-emerald-500/40'}`}
                                             >
                                                 {r}
                                             </button>
@@ -167,9 +167,9 @@ export default function Profile() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-slate-500 ml-1">Bio</label>
+                                <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-vibrant-secondary ml-1">Bio</label>
                                 <textarea
-                                    className="w-full h-[164px] p-5 bg-white dark:bg-black/20 border border-slate-200 dark:border-emerald-500/20 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all resize-none"
+                                    className="w-full h-[164px] p-5 vibrant-badge rounded-xl text-vibrant-primary placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all resize-none font-bold"
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
                                     placeholder="Tell your team about yourself..."
@@ -178,22 +178,22 @@ export default function Profile() {
                         </div>
 
                         <div className="mt-12 pt-8 border-t border-slate-100 dark:border-emerald-500/10">
-                            <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Account Information</h3>
+                            <h3 className="text-sm font-black text-vibrant-secondary uppercase tracking-[0.2em] mb-4">Account Information</h3>
                             <div className="flex flex-wrap gap-8 text-sm items-start justify-between">
                                 <div className="flex gap-8">
                                     <div>
-                                        <p className="text-slate-500 font-medium mb-1">Email Address</p>
-                                        <p className="text-slate-900 dark:text-white font-bold">{userData?.email}</p>
+                                        <p className="text-vibrant-secondary font-black mb-1">Email Address</p>
+                                        <p className="text-vibrant-primary font-black">{userData?.email}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-500 font-medium mb-1">Joined</p>
-                                        <p className="text-slate-900 dark:text-white font-bold">
+                                        <p className="text-vibrant-secondary font-black mb-1">Joined</p>
+                                        <p className="text-vibrant-primary font-black">
                                             {userData?.createdAt?.toDate ? userData.createdAt.toDate().toLocaleDateString() : 'Recent'}
                                         </p>
                                     </div>
                                 </div>
                                 <div>
-                                    <p className="text-slate-500 font-medium mb-1">Danger Zone</p>
+                                    <p className="text-vibrant-secondary font-black mb-1">Danger Zone</p>
                                     <button
                                         onClick={handleDeleteAccount}
                                         disabled={isDeleting}

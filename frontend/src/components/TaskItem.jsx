@@ -22,7 +22,7 @@ export default function TaskItem({ title, assignee, priority, done }) {
             </div>
             <div className="flex-1">
                 <p className="text-sm font-bold text-slate-900 dark:text-white">{title}</p>
-                <p className="text-xs text-slate-500">{assignee || 'Unassigned'}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-300">{assignee || 'Unassigned'}</p>
             </div>
             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${priorityColors[priority] || 'bg-slate-100 text-slate-500'}`}>
                 {priority}

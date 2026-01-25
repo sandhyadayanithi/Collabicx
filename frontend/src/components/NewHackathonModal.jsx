@@ -86,7 +86,7 @@ export default function NewHackathonModal(props) {
         <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">{isEdit ? 'Edit Hackathon' : 'New Hackathon'}</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{isEdit ? 'Update hackathon details' : 'Add a new hackathon to your workspace'}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">{isEdit ? 'Update hackathon details' : 'Add a new hackathon to your workspace'}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-500 dark:text-slate-400">
             <span className="material-symbols-outlined">close</span>
@@ -97,7 +97,7 @@ export default function NewHackathonModal(props) {
           <form id="hackathon-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Basic Info</h3>
+              <h3 className="text-sm font-black uppercase tracking-wider text-slate-600 dark:text-slate-500">Basic Info</h3>
               <div className="grid gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Hackathon Name</label>
@@ -137,7 +137,7 @@ export default function NewHackathonModal(props) {
 
             {/* Timeline */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Timeline</h3>
+              <h3 className="text-sm font-black uppercase tracking-wider text-slate-600 dark:text-slate-500">Timeline</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Start Date & Time</label>
@@ -186,7 +186,7 @@ export default function NewHackathonModal(props) {
 
             {/* Status */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Status</h3>
+              <h3 className="text-sm font-black uppercase tracking-wider text-slate-600 dark:text-slate-500">Status</h3>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Current Status</label>
                 <select
@@ -210,7 +210,7 @@ export default function NewHackathonModal(props) {
           <button
             onClick={onClose}
             type="button"
-            className="px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            className="px-5 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
           >
             Cancel
           </button>
