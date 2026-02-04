@@ -16,6 +16,7 @@ export default function Profile() {
     const [bio, setBio] = useState('');
     const [name, setName] = useState('');
     const [role, setRole] = useState('');
+    const [college, setCollege] = useState('');
     const [message, setMessage] = useState({ text: '', type: '' });
 
     useEffect(() => {
@@ -29,6 +30,7 @@ export default function Profile() {
                     setName(data.name || '');
                     setRole(data.role || '');
                     setBio(data.bio || '');
+                    setCollege(data.college || '');
                 }
             } else {
                 navigate('/login');
@@ -50,6 +52,7 @@ export default function Profile() {
                 name,
                 role,
                 bio,
+                college,
                 updatedAt: new Date()
             });
             setMessage({ text: 'Profile updated successfully!', type: 'success' });
@@ -163,6 +166,15 @@ export default function Profile() {
                                             </button>
                                         ))}
                                     </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-vibrant-secondary ml-1">College</label>
+                                    <input
+                                        className="w-full h-13 px-5 vibrant-badge rounded-xl text-vibrant-primary placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-black"
+                                        value={college}
+                                        onChange={(e) => setCollege(e.target.value)}
+                                        placeholder="Your College"
+                                    />
                                 </div>
                             </div>
 

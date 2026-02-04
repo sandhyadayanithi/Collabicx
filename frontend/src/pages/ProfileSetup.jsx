@@ -18,6 +18,7 @@ export default function ProfileSetup() {
     const [username, setUsername] = useState('');
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(null); // null, true, false
     const [role, setRole] = useState('Developer');
+    const [college, setCollege] = useState('');
     const [selectedAvatar, setSelectedAvatar] = useState(avatar1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -75,7 +76,8 @@ export default function ProfileSetup() {
             await updateUserProfile(user.uid, {
                 username: username.toLowerCase(),
                 role,
-                avatar: selectedAvatar
+                avatar: selectedAvatar,
+                college
             });
             navigate('/teams');
         } catch (err) {
@@ -170,6 +172,18 @@ export default function ProfileSetup() {
                                     </button>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* College Input */}
+                        <div className="space-y-4">
+                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">College</label>
+                            <input
+                                className="w-full h-13 px-5 vibrant-badge rounded-xl text-vibrant-primary placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all font-black"
+                                placeholder="Your college name"
+                                type="text"
+                                value={college}
+                                onChange={(e) => setCollege(e.target.value)}
+                            />
                         </div>
 
                         <button
