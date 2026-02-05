@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import {
     applyToTeamOpening,
+    getUserTeams,
     listenToMyApplications,
     listenToTeamOpenings,
     withdrawApplication
@@ -31,6 +32,7 @@ export default function Discover() {
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [collegeFilter, setCollegeFilter] = useState('ALL');
     const [loading, setLoading] = useState(true);
+    const [userTeams, setUserTeams] = useState([]);
     const [toast, setToast] = useState(null);
     const toastTimer = useRef(null);
 
@@ -47,6 +49,12 @@ export default function Discover() {
             if (!user) return navigate('/login');
             const snap = await getDoc(doc(db, 'users', user.uid));
             if (snap.exists()) setUserData({ id: user.uid, ...snap.data() });
+            try {
+                const teams = await getUserTeams(user.uid);
+                setUserTeams(teams);
+            } catch (error) {
+                console.error("Error fetching teams:", error);
+            }
         });
         return () => unsub();
     }, [navigate]);
@@ -131,6 +139,11 @@ export default function Discover() {
         return opening.collegeScope?.collegeName?.toLowerCase() === userData.college.toLowerCase();
     };
 
+    const isAlreadyInTeam = (opening) => {
+        if (!opening?.teamId) return false;
+        return userTeams.some(team => team.id === opening.teamId);
+    };
+
     const openApply = (opening) => {
         setApplyModal({ open: true, opening });
         setGithubUrl('');
@@ -208,8 +221,8 @@ export default function Discover() {
 
                     <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <label className="relative block">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
-                                <span className="material-symbols-outlined">search</span>
+                            <span className="absolute inset-y-0 left-0 w-11 flex items-center justify-center text-slate-600 pointer-events-none">
+                                <span className="material-symbols-outlined text-lg leading-none">search</span>
                             </span>
                             <input
                                 className="block w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-white/10 rounded-xl py-3 pl-11 pr-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm placeholder:text-slate-500 text-vibrant-primary font-black"
@@ -302,14 +315,14 @@ export default function Discover() {
                                     </div>
 
                                     <button
-                                        disabled={!isEligible(opening)}
+                                        disabled={!isEligible(opening) || isAlreadyInTeam(opening)}
                                         onClick={() => openApply(opening)}
-                                        className={`w-full h-11 rounded-xl font-black transition-all shadow-lg ${isEligible(opening)
-                                            ? 'bg-primary hover:bg-primary/90 text-white shadow-primary/20'
-                                            : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                                        className={`w-full h-11 rounded-xl font-black transition-all shadow-lg ${!isEligible(opening) || isAlreadyInTeam(opening)
+                                            ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                                            : 'bg-primary hover:bg-primary/90 text-white shadow-primary/20'
                                             }`}
                                     >
-                                        {isEligible(opening) ? 'Apply to Join' : 'Not Eligible'}
+                                        {isAlreadyInTeam(opening) ? 'Already in Team' : (isEligible(opening) ? 'Apply to Join' : 'Not Eligible')}
                                     </button>
                                 </div>
                             ))}

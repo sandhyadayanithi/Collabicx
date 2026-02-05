@@ -231,6 +231,11 @@ export const createHackathon = async (teamId, data) => {
         ...data,
         createdAt: serverTimestamp()
     });
+
+    await logActivity(teamId, auth.currentUser?.uid, 'create_hackathon', {
+        hackathonName: data.name
+    });
+
     return hackathonRef.id;
 };
 
@@ -269,6 +274,11 @@ export const updateQuickNote = async (teamId, hackathonId, content) => {
         content,
         updatedAt: serverTimestamp()
     }, { merge: true });
+
+    await logActivity(teamId, auth.currentUser?.uid, 'update_note', {
+        hackathonId,
+        contentPreview: content.substring(0, 50)
+    });
 };
 
 export const listenToQuickNote = (teamId, hackathonId, callback) => {
@@ -303,6 +313,12 @@ export const addTask = async (teamId, hackathonId, title, category = "General") 
         completed: false,
         createdAt: serverTimestamp()
     });
+
+    await logActivity(teamId, auth.currentUser?.uid, 'add_task', {
+        title,
+        category,
+        hackathonId
+    });
 };
 
 export const listenToTasks = (teamId, hackathonId, callback) => {
@@ -319,7 +335,15 @@ export const listenToTasks = (teamId, hackathonId, callback) => {
 export const toggleTaskComplete = async (teamId, hackathonId, taskId) => {
     const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`, taskId);
     const snap = await getDoc(ref);
-    await updateDoc(ref, { completed: !snap.data().completed });
+    const isCompleted = !snap.data().completed;
+    await updateDoc(ref, { completed: isCompleted });
+
+    if (isCompleted) {
+        await logActivity(teamId, auth.currentUser?.uid, 'complete_task', {
+            title: snap.data().title,
+            hackathonId
+        });
+    }
 };
 
 export const getTasks = async (teamId, hackathonId) => {
@@ -339,14 +363,12 @@ export const addLink = async (teamId, hackathonId, label, url, type = "link", ic
         createdAt: serverTimestamp()
     });
 
-    // Log Activity if it's a GitHub repo or significant asset
-    if (type === 'github' || type === 'figma') {
-        await logActivity(teamId, auth.currentUser?.uid, 'connect_repo', {
-            type,
-            label,
-            url
-        });
-    }
+    // Log Activity for any asset/link addition so teammates see it in real time
+    await logActivity(teamId, auth.currentUser?.uid, 'add_asset', {
+        type,
+        label,
+        url
+    });
 };
 
 export const listenToLinks = (teamId, hackathonId, callback) => {
@@ -653,7 +675,14 @@ export const listenToActivities = (teamIds, callback) => {
         chunks.push(teamIds.slice(i, i + 10));
     }
 
-    const unsubscribes = chunks.map(chunk => {
+    const resultsByChunk = new Map();
+    const emitMerged = () => {
+        const merged = Array.from(resultsByChunk.values()).flat();
+        const unique = Array.from(new Map(merged.map(activity => [activity.id, activity])).values());
+        callback(unique.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+    };
+
+    const unsubscribes = chunks.map((chunk, index) => {
         const q = query(
             collection(db, "activities"),
             where("teamId", "in", chunk),
@@ -661,8 +690,10 @@ export const listenToActivities = (teamIds, callback) => {
         );
         return onSnapshot(q, (snapshot) => {
             const activities = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            callback(activities); // Note: This will only provide activities for this specific chunk
-            // In a real app, you'd merge these results. For simplicity here, we assume user has < 10 teams.
+            resultsByChunk.set(index, activities);
+            emitMerged();
+        }, (error) => {
+            console.error("Error listening to activities:", error);
         });
     });
 

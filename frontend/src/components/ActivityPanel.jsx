@@ -21,9 +21,11 @@ const getTarget = (metadata = {}) => {
   const target =
     metadata.teamName ||
     metadata.projectName ||
+    metadata.hackathonName ||
     metadata.repoName ||
     metadata.label ||
     metadata.url ||
+    metadata.title ||
     '';
 
   return maskSensitive(target);
@@ -46,9 +48,14 @@ const ActivityItem = ({ activity }) => {
       case 'join_team': return 'person_add';
       case 'send_message': return 'chat';
       case 'connect_repo': return 'code';
+      case 'add_asset': return 'attach_file';
       case 'share_secret': return 'key';
       case 'create_team_opening': return 'campaign';
       case 'apply_to_team': return 'forward_to_inbox';
+      case 'create_hackathon': return 'event_available';
+      case 'add_task': return 'task_alt';
+      case 'complete_task': return 'check_circle';
+      case 'update_note': return 'edit_note';
       default: return 'notifications';
     }
   };
@@ -60,9 +67,14 @@ const ActivityItem = ({ activity }) => {
       case 'join_team': return activity?.metadata?.source === 'discover' ? 'joined team via Discover' : 'joined team';
       case 'send_message': return 'sent a message in';
       case 'connect_repo': return 'connected repo to';
+      case 'add_asset': return 'added an asset to';
       case 'share_secret': return 'shared a secret in';
       case 'create_team_opening': return 'posted a team opening for';
       case 'apply_to_team': return 'applied to join';
+      case 'create_hackathon': return 'added a new hackathon:';
+      case 'add_task': return 'added a task:';
+      case 'complete_task': return 'completed a task:';
+      case 'update_note': return 'updated the shared notes';
       default: return 'performed an action in';
     }
   };
@@ -102,7 +114,7 @@ const ActivityItem = ({ activity }) => {
         <p className="text-sm font-black text-vibrant-primary flex flex-wrap gap-1">
           <span className="text-primary">{user?.username || user?.name || 'Someone'}</span>
           <span>{getActionText(activity)}</span>
-          {target ? <span className="text-slate-700 dark:text-slate-200">{target}</span> : null}
+          {target ? <span className="text-slate-700 dark:text-slate-200">{activity.type.includes('task') ? `"${target}"` : target}</span> : null}
         </p>
         {secondaryDetail ? (
           <p className="text-[11px] text-slate-500 font-medium line-clamp-1">{secondaryDetail}</p>
@@ -119,6 +131,8 @@ export default function ActivityPanel({ teamIds = [] }) {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const hasLoadedOnce = useRef(false);
+  const teamIdsKey = teamIds.join(',');
+  const maxItems = 5;
 
   const mergeActivities = (incoming, markNew = false) => {
     setActivities(prev => {
@@ -133,16 +147,19 @@ export default function ActivityPanel({ teamIds = [] }) {
       const merged = Array.from(map.values());
       return merged
         .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-        .slice(0, 20);
+        .slice(0, maxItems);
     });
   };
 
   useEffect(() => {
     if (teamIds.length === 0) {
       setLoading(false);
+      setActivities([]);
+      hasLoadedOnce.current = false;
       return;
     }
 
+    setLoading(true);
     const unsubscribe = listenToActivities(teamIds, (newActivities) => {
       mergeActivities(newActivities, hasLoadedOnce.current);
       setLoading(false);
@@ -150,7 +167,7 @@ export default function ActivityPanel({ teamIds = [] }) {
     });
 
     return () => unsubscribe();
-  }, [teamIds]);
+  }, [teamIdsKey]);
 
   useEffect(() => {
     if (!teamIds.length) return;
@@ -167,7 +184,7 @@ export default function ActivityPanel({ teamIds = [] }) {
       socket.off('activity:new');
       socket.disconnect();
     };
-  }, [teamIds.join(',')]);
+  }, [teamIdsKey]);
 
   useEffect(() => {
     if (!activities.some(a => a.isNew)) return;
