@@ -234,7 +234,7 @@ export default function TeamsDashboard() {
             {/* Middle & Right Section Wrapper */}
             <div className="flex-1 flex overflow-hidden">
                 {/* Main Content Area (Teams List) */}
-                <main className="flex-1 flex flex-col bg-slate-50/50 dark:bg-transparent overflow-y-auto custom-scrollbar">
+                <main className="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-y-auto custom-scrollbar">
                     {/* Header Section */}
                     <header className="max-w-[1200px] w-full mx-auto px-8 pt-10 pb-4">
                         <div className="flex flex-wrap items-center justify-between gap-4">

@@ -390,7 +390,7 @@ export default function HackathonWorkspace() {
 
     if (loading) {
         return (
-            <div className="h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-slate-900 text-slate-500">
+            <div className="h-screen w-full flex flex-col items-center justify-center bg-background-light dark:bg-background-dark text-slate-500">
                 <span className="material-symbols-outlined animate-spin text-4xl mb-4 text-primary">progress_activity</span>
                 <p className="font-bold text-lg">Loading Workspace...</p>
             </div>
@@ -399,7 +399,7 @@ export default function HackathonWorkspace() {
 
     if (!hackathon) {
         return (
-            <div className="h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-slate-900 text-slate-500">
+            <div className="h-screen w-full flex flex-col items-center justify-center bg-background-light dark:bg-background-dark text-slate-500">
                 <span className="material-symbols-outlined text-4xl mb-4 text-red-500">error</span>
                 <p className="font-bold text-lg mb-4">Hackathon not found</p>
                 <button onClick={() => navigate('/dashboard')} className="px-6 py-2 bg-primary text-white rounded-lg font-bold">Go to Dashboard</button>
