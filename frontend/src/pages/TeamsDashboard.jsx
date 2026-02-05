@@ -31,6 +31,7 @@ export default function TeamsDashboard() {
     const [toast, setToast] = useState(null);
     const toastTimer = useRef(null);
     const prevPendingCount = useRef(0);
+    const [deleteTarget, setDeleteTarget] = useState(null);
 
     const [isOpeningModalOpen, setIsOpeningModalOpen] = useState(false);
     const [openingForm, setOpeningForm] = useState({
@@ -195,14 +196,19 @@ export default function TeamsDashboard() {
 
     const handleDeleteTeam = async (team) => {
         if (!team?.id || !currentUserId) return;
-        const confirmed = window.confirm(`Delete "${team.name}"? This will remove the team and all its data.`);
-        if (!confirmed) return;
+        setDeleteTarget(team);
+    };
+
+    const confirmDeleteTeam = async () => {
+        if (!deleteTarget?.id || !currentUserId) return;
         try {
-            await deleteTeam(team.id, currentUserId);
-            setUserTeams(prev => prev.filter(t => t.id !== team.id));
+            await deleteTeam(deleteTarget.id, currentUserId);
+            setUserTeams(prev => prev.filter(t => t.id !== deleteTarget.id));
             pushToast('Team deleted.', 'success');
         } catch (error) {
             pushToast(error.message || 'Failed to delete team.', 'error');
+        } finally {
+            setDeleteTarget(null);
         }
     };
 
@@ -345,7 +351,7 @@ export default function TeamsDashboard() {
                                                         e.stopPropagation();
                                                         handleDeleteTeam(team);
                                                     }}
-                                                    className="absolute top-3 right-3 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all bg-white/90 dark:bg-slate-900/90 border border-red-200 dark:border-red-900 text-red-500 hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 rounded-lg size-8 flex items-center justify-center shadow-sm"
+                                                    className="absolute top-3 right-3 z-20 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity bg-white/95 dark:bg-slate-900/95 border border-red-200 dark:border-red-900 text-red-500 hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 rounded-lg size-8 flex items-center justify-center shadow-sm"
                                                     title="Delete team"
                                                 >
                                                     <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -621,6 +627,35 @@ export default function TeamsDashboard() {
                         : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                         }`}>
                         {toast.message}
+                    </div>
+                </div>
+            )}
+
+            {deleteTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                            <h3 className="text-lg font-black text-vibrant-primary">Delete Team?</h3>
+                            <p className="text-sm text-slate-500 font-bold mt-2">
+                                This will remove <span className="text-vibrant-primary">{deleteTarget.name}</span> and all its data.
+                            </p>
+                        </div>
+                        <div className="p-6 flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setDeleteTarget(null)}
+                                className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={confirmDeleteTeam}
+                                className="flex-1 py-2.5 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

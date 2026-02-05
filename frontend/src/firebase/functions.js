@@ -300,6 +300,26 @@ export const getHackathonDetails = async (teamId, hackathonId) => {
     return null;
 };
 
+export const deleteHackathon = async (teamId, hackathonId) => {
+    if (!teamId || !hackathonId) throw new Error("Missing team or hackathon.");
+
+    // Remove subcollections first
+    const notesSnap = await getDocs(collection(db, `teams/${teamId}/hackathons/${hackathonId}/notes`));
+    await Promise.all(notesSnap.docs.map(docSnap => deleteDoc(docSnap.ref)));
+
+    const tasksSnap = await getDocs(collection(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`));
+    await Promise.all(tasksSnap.docs.map(docSnap => deleteDoc(docSnap.ref)));
+
+    const linksSnap = await getDocs(collection(db, `teams/${teamId}/hackathons/${hackathonId}/links`));
+    await Promise.all(linksSnap.docs.map(docSnap => deleteDoc(docSnap.ref)));
+
+    const messagesSnap = await getDocs(collection(db, `teams/${teamId}/hackathons/${hackathonId}/messages`));
+    await Promise.all(messagesSnap.docs.map(docSnap => deleteDoc(docSnap.ref)));
+
+    // Delete hackathon document
+    await deleteDoc(doc(db, `teams/${teamId}/hackathons`, hackathonId));
+};
+
 export const updateHackathonStatus = async (teamId, hackathonId, status) => {
     const ref = doc(db, `teams/${teamId}/hackathons`, hackathonId);
     await updateDoc(ref, { status });

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import HackathonCard from '../components/HackathonCard';
 import NewHackathonModal from '../components/NewHackathonModal';
 import TaskItem from '../components/TaskItem';
-import { getHackathons, getUserTeams, getTeamMembers } from '../firebase/functions';
+import { deleteHackathon, getHackathons, getUserTeams, getTeamMembers } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -25,6 +25,7 @@ export default function Dashboard() {
     const [copied, setCopied] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingHackathon, setEditingHackathon] = useState(null);
+    const [deleteTarget, setDeleteTarget] = useState(null);
 
     // Real user data states
     const [currentUser, setCurrentUser] = useState(null);
@@ -107,6 +108,23 @@ export default function Dashboard() {
             navigator.clipboard.writeText(currentTeam.joinCode);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    const handleDeleteHackathon = (hackathon) => {
+        if (!currentTeam?.id || !hackathon?.id) return;
+        setDeleteTarget(hackathon);
+    };
+
+    const confirmDeleteHackathon = async () => {
+        if (!currentTeam?.id || !deleteTarget?.id) return;
+        try {
+            await deleteHackathon(currentTeam.id, deleteTarget.id);
+            setHackathons(prev => prev.filter(h => h.id !== deleteTarget.id));
+        } catch (error) {
+            console.error("Failed to delete hackathon:", error);
+        } finally {
+            setDeleteTarget(null);
         }
     };
 
@@ -270,6 +288,7 @@ export default function Dashboard() {
                                             setEditingHackathon(hackathon);
                                             setIsEditModalOpen(true);
                                         }}
+                                        onDelete={() => handleDeleteHackathon(hackathon)}
                                     />
                                 ))}
                             </div>
@@ -392,6 +411,35 @@ export default function Dashboard() {
                 hackathonId={editingHackathon?.id}
                 initialData={editingHackathon}
             />
+
+            {deleteTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                            <h3 className="text-lg font-black text-vibrant-primary">Delete Hackathon?</h3>
+                            <p className="text-sm text-slate-500 font-bold mt-2">
+                                This will remove <span className="text-vibrant-primary">{deleteTarget.name}</span> and all its data.
+                            </p>
+                        </div>
+                        <div className="p-6 flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setDeleteTarget(null)}
+                                className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={confirmDeleteHackathon}
+                                className="flex-1 py-2.5 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

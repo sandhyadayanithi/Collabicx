@@ -33,6 +33,7 @@ const getTarget = (metadata = {}) => {
 
 const ActivityItem = ({ activity }) => {
   const [user, setUser] = useState(null);
+  const [teamName, setTeamName] = useState('');
 
   useEffect(() => {
     if (activity.userId) {
@@ -41,6 +42,18 @@ const ActivityItem = ({ activity }) => {
       });
     }
   }, [activity.userId]);
+
+  useEffect(() => {
+    if (activity?.metadata?.teamName) {
+      setTeamName(activity.metadata.teamName);
+      return;
+    }
+    if (activity.teamId) {
+      getDoc(doc(db, "teams", activity.teamId)).then(snap => {
+        if (snap.exists()) setTeamName(snap.data().name || '');
+      });
+    }
+  }, [activity.teamId, activity?.metadata?.teamName]);
 
   const getIcon = (type) => {
     switch (type) {
@@ -115,6 +128,8 @@ const ActivityItem = ({ activity }) => {
           <span className="text-primary">{user?.username || user?.name || 'Someone'}</span>
           <span>{getActionText(activity)}</span>
           {target ? <span className="text-slate-700 dark:text-slate-200">{activity.type.includes('task') ? `"${target}"` : target}</span> : null}
+          {teamName ? <span className="text-slate-500 dark:text-slate-400">in</span> : null}
+          {teamName ? <span className="text-slate-700 dark:text-slate-200">{teamName}</span> : null}
         </p>
         {secondaryDetail ? (
           <p className="text-[11px] text-slate-500 font-medium line-clamp-1">{secondaryDetail}</p>

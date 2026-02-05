@@ -11,7 +11,8 @@ export default function HackathonCard({
     image,
     daysLeft,
     nextDeadline,
-    onEdit
+    onEdit,
+    onDelete
 }) {
     const navigate = useNavigate();
     const isCompleted = status === 'Completed';
@@ -82,6 +83,16 @@ export default function HackathonCard({
                             title="Edit"
                         >
                             <span className="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (onDelete) onDelete();
+                            }}
+                            className="p-2 text-slate-500 dark:text-white hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Delete"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
                         </button>
                         <button
                             onClick={() => navigate(`/workspace/${teamId}/${id}`)}
