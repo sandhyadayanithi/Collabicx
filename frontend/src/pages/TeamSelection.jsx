@@ -79,9 +79,9 @@ export default function TeamSelection() {
                     </div>
 
                     {/* Action Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch relative">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-stretch relative">
                         {/* Vertical Divider (Visible on Desktop) */}
-                        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 size-12 items-center justify-center rounded-full bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-800">
+                        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 size-10 items-center justify-center rounded-full bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-800 pointer-events-none">
                             <span className="text-xs font-bold text-slate-400">OR</span>
                         </div>
 

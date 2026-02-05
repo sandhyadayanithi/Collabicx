@@ -223,6 +223,53 @@ export const getTeamMembers = async (teamId) => {
     return members;
 };
 
+const deleteQueryDocs = async (q) => {
+    const snap = await getDocs(q);
+    const deletes = snap.docs.map(docSnap => deleteDoc(docSnap.ref));
+    await Promise.all(deletes);
+};
+
+export const deleteTeam = async (teamId, userId) => {
+    if (!teamId || !userId) throw new Error("Missing team or user.");
+
+    const member = await getTeamMemberRecord(teamId, userId);
+    if (!member || member.role !== 'owner') {
+        throw new Error("Only team leads can delete the team.");
+    }
+
+    // Delete team subcollections
+    await deleteQueryDocs(query(collection(db, `teams/${teamId}/members`)));
+
+    const hackathonsSnap = await getDocs(collection(db, `teams/${teamId}/hackathons`));
+    for (const hackathonDoc of hackathonsSnap.docs) {
+        const hackathonId = hackathonDoc.id;
+        await deleteQueryDocs(query(collection(db, `teams/${teamId}/hackathons/${hackathonId}/notes`)));
+        await deleteQueryDocs(query(collection(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`)));
+        await deleteQueryDocs(query(collection(db, `teams/${teamId}/hackathons/${hackathonId}/links`)));
+        await deleteQueryDocs(query(collection(db, `teams/${teamId}/hackathons/${hackathonId}/messages`)));
+        await deleteDoc(doc(db, `teams/${teamId}/hackathons`, hackathonId));
+    }
+
+    // Delete team openings + related applications
+    const openingsSnap = await getDocs(query(collection(db, "teamOpenings"), where("teamId", "==", teamId)));
+    for (const openingDoc of openingsSnap.docs) {
+        await deleteQueryDocs(query(
+            collection(db, "teamApplications"),
+            where("teamOpeningId", "==", openingDoc.id)
+        ));
+        await deleteDoc(openingDoc.ref);
+    }
+
+    // Delete any remaining applications tied to the team
+    await deleteQueryDocs(query(collection(db, "teamApplications"), where("teamId", "==", teamId)));
+
+    // Delete activities for this team
+    await deleteQueryDocs(query(collection(db, "activities"), where("teamId", "==", teamId)));
+
+    // Finally delete team
+    await deleteDoc(doc(db, "teams", teamId));
+};
+
 // --- 4. Hackathon Functions ---
 
 export const createHackathon = async (teamId, data) => {

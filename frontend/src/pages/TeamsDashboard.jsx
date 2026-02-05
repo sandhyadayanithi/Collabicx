@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import {
     logout,
     getUserTeams,
+    deleteTeam,
     createTeamOpening,
     listenToTeamOpeningsByLead,
     listenToApplicationsByOpeningIds,
@@ -192,6 +193,19 @@ export default function TeamsDashboard() {
         }
     };
 
+    const handleDeleteTeam = async (team) => {
+        if (!team?.id || !currentUserId) return;
+        const confirmed = window.confirm(`Delete "${team.name}"? This will remove the team and all its data.`);
+        if (!confirmed) return;
+        try {
+            await deleteTeam(team.id, currentUserId);
+            setUserTeams(prev => prev.filter(t => t.id !== team.id));
+            pushToast('Team deleted.', 'success');
+        } catch (error) {
+            pushToast(error.message || 'Failed to delete team.', 'error');
+        }
+    };
+
     return (
         <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen flex">
             {/* Sidebar Navigation */}
@@ -322,8 +336,21 @@ export default function TeamsDashboard() {
                                         <div
                                             key={team.id}
                                             onClick={() => navigate(`/dashboard/${team.id}`)}
-                                            className="group vibrant-card border border-slate-300 dark:border-white/10 rounded-xl p-6 transition-all shadow-md hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
+                                            className="group relative vibrant-card border border-slate-300 dark:border-white/10 rounded-xl p-6 transition-all shadow-md hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
                                         >
+                                            {team.role === 'owner' && (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteTeam(team);
+                                                    }}
+                                                    className="absolute top-3 right-3 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all bg-white/90 dark:bg-slate-900/90 border border-red-200 dark:border-red-900 text-red-500 hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 rounded-lg size-8 flex items-center justify-center shadow-sm"
+                                                    title="Delete team"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                                                </button>
+                                            )}
                                             <div className="mb-4 relative">
                                                 <div className="size-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full border-4 border-slate-100 dark:border-slate-700 shadow-inner flex items-center justify-center">
                                                     <span className="material-symbols-outlined text-4xl text-primary">groups</span>

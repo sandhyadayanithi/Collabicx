@@ -205,7 +205,7 @@ export default function Discover() {
             </Sidebar>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-                <header className="max-w-[1200px] w-full mx-auto px-8 pt-10 pb-6">
+                <header className="max-w-300 w-full mx-auto px-8 pt-10 pb-6">
                     <div className="flex flex-wrap items-center justify-between gap-6">
                         <div className="flex flex-col gap-2">
                             <h2 className="text-vibrant-primary text-4xl font-black tracking-tight">Discover Teams</h2>

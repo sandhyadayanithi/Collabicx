@@ -211,6 +211,7 @@ export default function HackathonWorkspace() {
     const [noteContent, setNoteContent] = useState("");
     const [lastSaved, setLastSaved] = useState(null);
     const noteContentRef = useRef(noteContent);
+    const lastSavedContentRef = useRef("");
     const isTypingRef = useRef(false);
 
     // Load initial note and listen for changes
@@ -218,8 +219,11 @@ export default function HackathonWorkspace() {
         if (!teamId || !hackathonId) return;
         const unsubscribe = listenToQuickNote(teamId, hackathonId, (content) => {
             if (!isTypingRef.current) {
-                setNoteContent(content || "");
-                noteContentRef.current = content || "";
+                const nextContent = content || "";
+                setNoteContent(nextContent);
+                noteContentRef.current = nextContent;
+                lastSavedContentRef.current = nextContent;
+                setLastSaved(nextContent ? new Date() : null);
             }
         });
         return () => unsubscribe();
@@ -238,20 +242,12 @@ export default function HackathonWorkspace() {
         }, 2000);
     };
 
-    // Autosave on unmount
-    useEffect(() => {
-        return () => {
-            if (noteContentRef.current && teamId && hackathonId) {
-                console.log("Autosaving note on navigation:", noteContentRef.current);
-                updateQuickNote(teamId, hackathonId, noteContentRef.current);
-            }
-        };
-    }, [teamId, hackathonId]);
-
     const saveNote = async () => {
         if (!teamId || !hackathonId) return;
+        if (noteContent === lastSavedContentRef.current) return;
         try {
             await updateQuickNote(teamId, hackathonId, noteContent);
+            lastSavedContentRef.current = noteContent;
             setLastSaved(new Date());
         } catch (error) {
             console.error("Failed to save note:", error);
@@ -441,7 +437,7 @@ export default function HackathonWorkspace() {
                                 <div className="mt-2 flex justify-end">
                                     <button
                                         onClick={saveNote}
-                                        disabled={lastSaved}
+                                        disabled={noteContent === lastSavedContentRef.current}
                                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${lastSaved
                                             ? 'bg-green-500/10 text-green-500 cursor-default'
                                             : 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20'
