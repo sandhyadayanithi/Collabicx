@@ -573,6 +573,29 @@ export const updateTeamOpeningStatus = async (openingId, status) => {
     await updateDoc(ref, { status });
 };
 
+export const deleteTeamOpening = async (openingId, userId) => {
+    const ref = doc(db, "teamOpenings", openingId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) throw new Error("Opening not found.");
+
+    const opening = snap.data();
+    const member = await getTeamMemberRecord(opening.teamId, userId);
+    if (!member || member.role !== 'owner') {
+        throw new Error("Only team leads can delete openings.");
+    }
+
+    // Delete associated applications
+    const appsSnap = await getDocs(query(
+        collection(db, "teamApplications"),
+        where("teamOpeningId", "==", openingId)
+    ));
+    const deletePromises = appsSnap.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+
+    // Delete the opening itself
+    await deleteDoc(ref);
+};
+
 export const listenToTeamOpenings = (callback) => {
     const q = query(
         collection(db, "teamOpenings"),
@@ -666,6 +689,76 @@ export const listenToMyApplications = (applicantId, callback) => {
     }, (error) => {
         console.error("Error listening to my applications:", error);
     });
+};
+
+export const listenToTeamOpeningsByTeamIds = (teamIds, callback) => {
+    if (!teamIds || teamIds.length === 0) {
+        callback([]);
+        return () => { };
+    }
+
+    const chunks = [];
+    for (let i = 0; i < teamIds.length; i += 10) {
+        chunks.push(teamIds.slice(i, i + 10));
+    }
+
+    const resultsByChunk = new Map();
+    const emitMerged = () => {
+        const merged = Array.from(resultsByChunk.values()).flat();
+        callback(merged.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+    };
+
+    const unsubscribes = chunks.map((chunk, index) => {
+        const q = query(
+            collection(db, "teamOpenings"),
+            where("teamId", "in", chunk),
+            orderBy("createdAt", "desc")
+        );
+        return onSnapshot(q, (snapshot) => {
+            const openings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            resultsByChunk.set(index, openings);
+            emitMerged();
+        }, (error) => {
+            console.error(`Error listening to openings for teams chunk ${index}:`, error);
+        });
+    });
+
+    return () => unsubscribes.forEach(unsub => unsub());
+};
+
+export const listenToApplicationsByTeamIds = (teamIds, callback) => {
+    if (!teamIds || teamIds.length === 0) {
+        callback([]);
+        return () => { };
+    }
+
+    const chunks = [];
+    for (let i = 0; i < teamIds.length; i += 10) {
+        chunks.push(teamIds.slice(i, i + 10));
+    }
+
+    const resultsByChunk = new Map();
+    const emitMerged = () => {
+        const merged = Array.from(resultsByChunk.values()).flat();
+        callback(merged.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+    };
+
+    const unsubscribes = chunks.map((chunk, index) => {
+        const q = query(
+            collection(db, "teamApplications"),
+            where("teamId", "in", chunk),
+            orderBy("createdAt", "desc")
+        );
+        return onSnapshot(q, (snapshot) => {
+            const apps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            resultsByChunk.set(index, apps);
+            emitMerged();
+        }, (error) => {
+            console.error(`Error listening to applications for teams chunk ${index}:`, error);
+        });
+    });
+
+    return () => unsubscribes.forEach(unsub => unsub());
 };
 
 export const listenToApplicationsByOpeningIds = (openingIds, callback) => {

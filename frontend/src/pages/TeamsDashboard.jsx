@@ -6,10 +6,11 @@ import {
     getUserTeams,
     deleteTeam,
     createTeamOpening,
-    listenToTeamOpeningsByLead,
-    listenToApplicationsByOpeningIds,
+    listenToTeamOpeningsByTeamIds,
+    listenToApplicationsByTeamIds,
     reviewTeamApplication,
     updateTeamOpeningStatus,
+    deleteTeamOpening,
     leaveTeam
 } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
@@ -33,6 +34,7 @@ export default function TeamsDashboard() {
     const toastTimer = useRef(null);
     const prevPendingCount = useRef(0);
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleteOpeningTarget, setDeleteOpeningTarget] = useState(null);
 
     const [isOpeningModalOpen, setIsOpeningModalOpen] = useState(false);
     const [openingForm, setOpeningForm] = useState({
@@ -73,12 +75,16 @@ export default function TeamsDashboard() {
     }, [navigate]);
 
     useEffect(() => {
-        if (!currentUserId) return;
-        const unsubscribe = listenToTeamOpeningsByLead(currentUserId, (data) => {
+        const teamIds = leadTeams.map(t => t.id);
+        if (teamIds.length === 0) {
+            setLeadOpenings([]);
+            return;
+        }
+        const unsubscribe = listenToTeamOpeningsByTeamIds(teamIds, (data) => {
             setLeadOpenings(data);
         });
         return () => unsubscribe();
-    }, [currentUserId]);
+    }, [leadTeams.map(t => t.id).join(',')]);
 
     useEffect(() => {
         if (!openingForm.teamId && leadTeams.length > 0) {
@@ -87,13 +93,13 @@ export default function TeamsDashboard() {
     }, [leadTeams, openingForm.teamId]);
 
     useEffect(() => {
-        const openingIds = leadOpenings.map(o => o.id);
-        if (openingIds.length === 0) {
+        const teamIds = leadTeams.map(t => t.id);
+        if (teamIds.length === 0) {
             setApplications([]);
             return;
         }
 
-        const unsubscribe = listenToApplicationsByOpeningIds(openingIds, (apps) => {
+        const unsubscribe = listenToApplicationsByTeamIds(teamIds, (apps) => {
             setApplications(apps);
             const pending = apps.filter(app => app.status === 'PENDING').length;
             if (prevPendingCount.current && pending > prevPendingCount.current) {
@@ -104,11 +110,10 @@ export default function TeamsDashboard() {
             apps.forEach(app => fetchApplicant(app.applicantId));
         }, (error) => {
             console.error("Applications listener error:", error);
-            // pushToast("Error loading applications.", "error");
         });
 
         return () => unsubscribe();
-    }, [leadOpenings]);
+    }, [leadTeams.map(t => t.id).join(',')]);
 
     const handleLogout = async (e) => {
         e.preventDefault();
@@ -182,6 +187,27 @@ export default function TeamsDashboard() {
             pushToast(`Opening ${nextStatus.toLowerCase()}.`, 'success');
         } catch (error) {
             pushToast(error.message || 'Failed to update opening.', 'error');
+        }
+    };
+
+    const handleDeleteOpening = (opening) => {
+        setDeleteOpeningTarget(opening);
+    };
+
+    const confirmDeleteOpening = async () => {
+        if (!deleteOpeningTarget?.id || !currentUserId) return;
+        try {
+            await deleteTeamOpening(deleteOpeningTarget.id, currentUserId);
+
+            // Optimistic UI update: Remove from local state immediately
+            setLeadOpenings(prev => prev.filter(o => o.id !== deleteOpeningTarget.id));
+            setApplications(prev => prev.filter(a => a.teamOpeningId !== deleteOpeningTarget.id));
+
+            pushToast('Opening deleted permanently.', 'success');
+        } catch (error) {
+            pushToast(error.message || 'Failed to delete opening.', 'error');
+        } finally {
+            setDeleteOpeningTarget(null);
         }
     };
 
@@ -454,12 +480,24 @@ export default function TeamsDashboard() {
                                             <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                                 {opening.collegeScope?.type === 'ALL' ? 'All Colleges' : opening.collegeScope?.collegeName}
                                             </span>
-                                            <button
-                                                onClick={() => toggleOpeningStatus(opening)}
-                                                className="text-xs font-black text-primary hover:underline"
-                                            >
-                                                {opening.status === 'OPEN' ? 'Close' : 'Reopen'}
-                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <button
+                                                    onClick={() => toggleOpeningStatus(opening)}
+                                                    className="text-xs font-black text-primary hover:underline flex items-center gap-1"
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">
+                                                        {opening.status === 'OPEN' ? 'block' : 'check_circle'}
+                                                    </span>
+                                                    {opening.status === 'OPEN' ? 'Close' : 'Reopen'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteOpening(opening)}
+                                                    className="text-xs font-black text-red-500 hover:text-red-600 flex items-center gap-1"
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">delete</span>
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -685,6 +723,35 @@ export default function TeamsDashboard() {
                                 className="flex-1 py-2.5 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
                             >
                                 Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {deleteOpeningTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                            <h3 className="text-lg font-black text-vibrant-primary">Delete Opening?</h3>
+                            <p className="text-sm text-slate-500 font-bold mt-2">
+                                This will permanently remove the opening and <span className="text-red-500 underline text-xs">all associated applications</span>.
+                            </p>
+                        </div>
+                        <div className="p-6 flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setDeleteOpeningTarget(null)}
+                                className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={confirmDeleteOpening}
+                                className="flex-1 py-2.5 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+                            >
+                                Delete Opening
                             </button>
                         </div>
                     </div>
