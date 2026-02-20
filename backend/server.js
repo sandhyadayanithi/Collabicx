@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import admin from 'firebase-admin';
+import admin, { db } from './firebase.js';
 import activityRoutes from './routes/activity.js';
 
 const app = express();
@@ -10,20 +10,6 @@ app.use(cors());
 app.use(express.json());
 
 const port = process.env.PORT || 4000;
-
-// Firebase Admin initialization
-if (!admin.apps.length) {
-  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (serviceAccountJson) {
-    admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(serviceAccountJson))
-    });
-  } else {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault()
-    });
-  }
-}
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 app.use('/api/activities', activityRoutes);
@@ -52,7 +38,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const db = admin.firestore();
+// db is imported from firebase.js
 const activitiesRef = db.collection('activities').orderBy('createdAt', 'desc').limit(1);
 
 activitiesRef.onSnapshot((snapshot) => {

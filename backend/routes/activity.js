@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import admin from 'firebase-admin';
+import { db } from '../firebase.js';
 
 const router = Router();
-const db = admin.firestore();
 
 /**
  * @route GET /api/activities
