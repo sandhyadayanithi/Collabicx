@@ -208,11 +208,18 @@ export const getUserTeams = async (userId) => {
                     id: teamSnap.id,
                     ...teamSnap.data(),
                     role: memberData.role,
-                    memberId: memberDoc.id
+                    memberId: memberDoc.id,
+                    joinedAt: memberData.joinedAt
                 });
             }
         }
-        return teams;
+
+        // Sort by joinedAt descending (most recent first)
+        return teams.sort((a, b) => {
+            const timeA = a.joinedAt?.toMillis?.() || 0;
+            const timeB = b.joinedAt?.toMillis?.() || 0;
+            return timeB - timeA;
+        });
     } catch (error) {
         console.error("Error in getUserTeams:", error);
         throw error;
