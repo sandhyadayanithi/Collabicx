@@ -275,8 +275,13 @@ export const deleteTeam = async (teamId, userId) => {
     // Delete any remaining applications tied to the team
     await deleteQueryDocs(query(collection(db, "teamApplications"), where("teamId", "==", teamId)));
 
-    // Delete activities for this team
-    await deleteQueryDocs(query(collection(db, "activities"), where("teamId", "==", teamId)));
+    // Log Activity before full deletion (optional: we can keep it or log it to user)
+    // We log it against the teamId being deleted, but we only delete the doc after.
+    // To make it show in "Recent Activity" for the user/others, we should keep activities.
+    await logActivity(teamId, userId, 'delete_team', { teamName: (await getDoc(doc(db, "teams", teamId))).data()?.name || "Deleted Team" });
+
+    // Commenting out activity deletion so history is preserved
+    // await deleteQueryDocs(query(collection(db, "activities"), where("teamId", "==", teamId)));
 
     // Finally delete team
     await deleteDoc(doc(db, "teams", teamId));

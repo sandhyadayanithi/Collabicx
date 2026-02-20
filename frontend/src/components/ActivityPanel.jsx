@@ -69,6 +69,7 @@ const ActivityItem = ({ activity }) => {
       case 'add_task': return 'task_alt';
       case 'complete_task': return 'check_circle';
       case 'update_note': return 'edit_note';
+      case 'delete_team': return 'delete_forever';
       default: return 'notifications';
     }
   };
@@ -88,6 +89,7 @@ const ActivityItem = ({ activity }) => {
       case 'add_task': return 'added a task:';
       case 'complete_task': return 'completed a task:';
       case 'update_note': return 'updated the shared notes';
+      case 'delete_team': return 'deleted the team';
       default: return 'performed an action in';
     }
   };
@@ -128,8 +130,14 @@ const ActivityItem = ({ activity }) => {
           <span className="text-primary">{user?.username || user?.name || 'Someone'}</span>
           <span>{getActionText(activity)}</span>
           {target ? <span className="text-slate-700 dark:text-slate-200">{activity.type.includes('task') ? `"${target}"` : target}</span> : null}
-          {teamName ? <span className="text-slate-500 dark:text-slate-400">in</span> : null}
-          {teamName ? <span className="text-slate-700 dark:text-slate-200">{teamName}</span> : null}
+          {teamName &&
+            teamName.toLowerCase() !== target.toLowerCase() &&
+            !['create_team', 'join_team'].includes(activity.type) ? (
+            <>
+              <span className="text-slate-500 dark:text-slate-400">in</span>
+              <span className="text-slate-700 dark:text-slate-200">{teamName}</span>
+            </>
+          ) : null}
         </p>
         {secondaryDetail ? (
           <p className="text-[11px] text-slate-500 font-medium line-clamp-1">{secondaryDetail}</p>

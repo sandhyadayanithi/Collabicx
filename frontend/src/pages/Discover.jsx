@@ -15,10 +15,13 @@ import { doc, getDoc } from 'firebase/firestore';
 const ROLE_OPTIONS = ['Frontend', 'Backend', 'AI', 'Design', 'Product', 'Marketing', 'DevOps'];
 
 const Toast = ({ message, type }) => (
-    <div className={`px-4 py-3 rounded-xl text-sm font-bold shadow-lg border animate-in fade-in slide-in-from-top-2 duration-300 ${type === 'error'
-        ? 'bg-red-500/10 text-red-500 border-red-500/20'
-        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+    <div className={`px-5 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-[0.1em] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] border animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-xl flex items-center gap-3 ${type === 'error'
+        ? 'bg-red-600 text-white border-red-400/50'
+        : 'bg-emerald-600 text-white border-emerald-400/50'
         }`}>
+        <span className="material-symbols-outlined text-[18px]">
+            {type === 'error' ? 'report' : 'verified'}
+        </span>
         {message}
     </div>
 );
@@ -194,7 +197,7 @@ export default function Discover() {
     };
 
     return (
-        <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen flex bg-background-light dark:bg-[#070b14]">
+        <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen flex bg-background-light dark:bg-[#072724]">
             <Sidebar
                 showLogo={true}
                 footer={
@@ -238,7 +241,7 @@ export default function Discover() {
                         {/* Header */}
                         <header className="space-y-4">
                             <div>
-                                <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-white mb-2">Discover Teams</h1>
+                                <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-white mb-2">Discover Teams</h1>
                                 <p className="text-slate-400 font-medium">Find your next project. Join. Build. Grow.</p>
                             </div>
 

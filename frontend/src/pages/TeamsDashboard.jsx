@@ -617,11 +617,14 @@ export default function TeamsDashboard() {
             )}
 
             {toast && (
-                <div className="fixed top-6 right-6 z-[60]">
-                    <div className={`px-4 py-3 rounded-xl text-sm font-bold shadow-lg border ${toast.type === 'error'
-                        ? 'bg-red-500/10 text-red-500 border-red-500/20'
-                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                <div className="fixed top-8 right-8 z-[110] pointer-events-none">
+                    <div className={`px-5 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-[0.1em] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] border animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-xl flex items-center gap-3 ${toast.type === 'error'
+                        ? 'bg-red-600 text-white border-red-400/50'
+                        : 'bg-emerald-600 text-white border-emerald-400/50'
                         }`}>
+                        <span className="material-symbols-outlined text-[18px]">
+                            {toast.type === 'error' ? 'report' : 'verified'}
+                        </span>
                         {toast.message}
                     </div>
                 </div>
