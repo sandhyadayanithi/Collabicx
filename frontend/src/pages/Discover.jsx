@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import {
+    applyToTeamOpening,
     getUserTeams,
     listenToMyApplications,
     listenToTeamOpenings,
