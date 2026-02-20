@@ -54,12 +54,10 @@ export default function TeamsDashboard() {
                 try {
                     setCurrentUserId(user.uid);
                     const userRef = doc(db, "users", user.uid);
-                    const userSnap = await getDoc(userRef);
-                    if (userSnap.exists()) {
-                        setUserData(userSnap.data());
-                    }
+                    const snap = await getDoc(userRef);
+                    if (snap.exists()) setUserData(snap.data());
 
-                    // Fetch user's teams
+                    // Initial fetch
                     const teams = await getUserTeams(user.uid);
                     setUserTeams(teams);
                 } catch (error) {
@@ -73,6 +71,19 @@ export default function TeamsDashboard() {
         });
         return () => unsubscribe();
     }, [navigate]);
+
+    // Force refresh teams occasionally or when focused (simple heartbeat)
+    useEffect(() => {
+        if (!currentUserId) return;
+        const interval = setInterval(async () => {
+            const teams = await getUserTeams(currentUserId);
+            // Only update if something changed to avoid flicker
+            if (JSON.stringify(teams.map(t => t.id)) !== JSON.stringify(userTeams.map(t => t.id))) {
+                setUserTeams(teams);
+            }
+        }, 30000);
+        return () => clearInterval(interval);
+    }, [currentUserId, userTeams]);
 
     useEffect(() => {
         const teamIds = leadTeams.map(t => t.id);
@@ -337,12 +348,17 @@ export default function TeamsDashboard() {
                             </button>
                             <button
                                 onClick={() => setActiveTab('openings')}
-                                className={`pb-3 text-sm font-black border-b-2 transition-colors ${activeTab === 'openings'
+                                className={`pb-3 text-sm font-black border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'openings'
                                     ? 'border-primary text-primary'
                                     : 'border-transparent text-vibrant-secondary hover:text-black dark:hover:text-white'
                                     }`}
                             >
                                 Team Openings
+                                {applications.filter(a => a.status === 'PENDING').length > 0 && (
+                                    <span className="size-5 rounded-full bg-primary text-white text-[10px] flex items-center justify-center animate-pulse">
+                                        {applications.filter(a => a.status === 'PENDING').length}
+                                    </span>
+                                )}
                             </button>
                         </div>
                         {activeTab === 'teams' && (

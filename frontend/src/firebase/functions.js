@@ -711,8 +711,7 @@ export const listenToTeamOpeningsByTeamIds = (teamIds, callback) => {
     const unsubscribes = chunks.map((chunk, index) => {
         const q = query(
             collection(db, "teamOpenings"),
-            where("teamId", "in", chunk),
-            orderBy("createdAt", "desc")
+            where("teamId", "in", chunk)
         );
         return onSnapshot(q, (snapshot) => {
             const openings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -740,14 +739,15 @@ export const listenToApplicationsByTeamIds = (teamIds, callback) => {
     const resultsByChunk = new Map();
     const emitMerged = () => {
         const merged = Array.from(resultsByChunk.values()).flat();
-        callback(merged.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+        // De-duplicate in case of overlapping results
+        const unique = Array.from(new Map(merged.map(app => [app.id, app])).values());
+        callback(unique.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
     };
 
     const unsubscribes = chunks.map((chunk, index) => {
         const q = query(
             collection(db, "teamApplications"),
-            where("teamId", "in", chunk),
-            orderBy("createdAt", "desc")
+            where("teamId", "in", chunk)
         );
         return onSnapshot(q, (snapshot) => {
             const apps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -839,10 +839,11 @@ export const reviewTeamApplication = async ({ applicationId, reviewerId, decisio
             }
 
             const nextSlots = Math.max(0, (opening.slotsOpen || 0) - 1);
-            transaction.update(openingRef, {
-                slotsOpen: nextSlots,
-                status: nextSlots === 0 ? "CLOSED" : opening.status
-            });
+            if (nextSlots === 0) {
+                transaction.delete(openingRef);
+            } else {
+                transaction.update(openingRef, { slotsOpen: nextSlots });
+            }
 
             transaction.update(appRef, { status: "APPROVED", reviewedAt: serverTimestamp() });
         });
