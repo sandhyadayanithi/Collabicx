@@ -312,6 +312,7 @@ export default function Discover() {
                             <h2 className="text-lg font-black uppercase tracking-[0.2em] text-emerald-500 flex items-center gap-3">
                                 <span className="w-8 h-px bg-emerald-500/30"></span>
                                 Open Team Opportunities
+                                <span className="w-8 h-px bg-emerald-500/30"></span>
                             </h2>
 
                             {loading ? (
