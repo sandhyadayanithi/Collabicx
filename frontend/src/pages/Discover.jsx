@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import {
-    applyToTeamOpening,
     getUserTeams,
     listenToMyApplications,
     listenToTeamOpenings,
-    withdrawApplication
+    withdrawApplication,
+    logout
 } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -183,9 +183,39 @@ export default function Discover() {
         }
     };
 
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        try {
+            await logout();
+            navigate('/');
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
+
     return (
         <div className="text-slate-900 dark:text-slate-100 font-display min-h-screen flex bg-background-light dark:bg-[#070b14]">
-            <Sidebar showLogo={true} footer={null}>
+            <Sidebar
+                showLogo={true}
+                footer={
+                    <>
+                        <div
+                            onClick={() => navigate('/profile')}
+                            className="flex items-center gap-3 px-3 py-2 text-black dark:text-emerald-300/80 hover:text-primary dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                        >
+                            <div
+                                className="size-6 rounded-full bg-cover bg-center border border-slate-200 dark:border-slate-800"
+                                style={{ backgroundImage: `url(${userData?.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCKjUQ66xDalBfRsaC936ij73oYH25Apri9FE6H6BODXUu6yDFtQCLf6dmmT4HPojEzYpJb6DxQRSa87aYM6wXtpd73Y29VWkJiqx2XfUT0oiGB0Y8hlQ1L1FQxYtQeNtcFtZGUfn-3lWBkgn8tesgpeKsvpLxCGUS5YNnELL55p1QZFeSc8C8t5V2MsuYqWbaf78d7yBszxR2Y2V4FulzYB4XgVVGQd747I7GFda_r1YdZZUAj34NUFGTMI7epdBJecOou6ca9pnR_'})` }}
+                            ></div>
+                            <p className="text-sm font-black">My Profile</p>
+                        </div>
+                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors cursor-pointer text-left">
+                            <span className="material-symbols-outlined">logout</span>
+                            <p className="text-sm font-black">Logout</p>
+                        </button>
+                    </>
+                }
+            >
                 <a
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-black dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer"
                     onClick={() => navigate('/teams')}
