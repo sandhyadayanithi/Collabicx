@@ -48,19 +48,19 @@ export default function TeamsDashboard() {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                setCurrentUserId(user.uid);
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    setUserData(userSnap.data());
-                }
-
-                // Fetch user's teams
                 try {
+                    setCurrentUserId(user.uid);
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
+                    if (userSnap.exists()) {
+                        setUserData(userSnap.data());
+                    }
+
+                    // Fetch user's teams
                     const teams = await getUserTeams(user.uid);
                     setUserTeams(teams);
                 } catch (error) {
-                    console.error("Error fetching teams:", error);
+                    console.error("Initialization error:", error);
                 } finally {
                     setLoading(false);
                 }

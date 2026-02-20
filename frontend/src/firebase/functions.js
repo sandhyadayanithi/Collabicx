@@ -21,7 +21,8 @@ import {
     onSnapshot,
     orderBy,
     deleteDoc,
-    runTransaction
+    runTransaction,
+    collectionGroup
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, googleProvider, githubProvider, storage } from "./config";
@@ -56,7 +57,7 @@ export const googleSignIn = async () => {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
         const { isNewUser } = getAdditionalUserInfo(result);
-        // await createUserProfile(user); // Frontend-only: skip DB write
+        await createUserProfile(user);
         return { user, isNewUser };
     } catch (error) {
         throw error;
@@ -68,7 +69,7 @@ export const githubSignIn = async () => {
         const result = await signInWithPopup(auth, githubProvider);
         const user = result.user;
         const { isNewUser } = getAdditionalUserInfo(result);
-        // await createUserProfile(user); // Frontend-only: skip DB write
+        await createUserProfile(user);
         return { user, isNewUser };
     } catch (error) {
         throw error;
@@ -79,7 +80,7 @@ export const signUpWithEmail = async (email, password, name) => {
     try {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
-        // await createUserProfile(user, { name }); // Frontend-only: skip DB write
+        await createUserProfile(user, { name });
         return user;
     } catch (error) {
         throw error;
@@ -192,19 +193,30 @@ export const joinTeamByCode = async (code, userId) => {
 };
 
 export const getUserTeams = async (userId) => {
-    // This is a bit tricky with the subcollection structure without collection groups. 
-    // Usually, we'd store a list of team IDs on the user doc or use a top-level memberships collection.
-    // For simplicity per requested structure:
-    const teams = [];
-    const teamsSnap = await getDocs(collection(db, "teams"));
-    for (const teamDoc of teamsSnap.docs) {
-        const memberSnap = await getDocs(query(collection(db, `teams/${teamDoc.id}/members`), where("userId", "==", userId)));
-        if (!memberSnap.empty) {
-            const memberData = memberSnap.docs[0].data();
-            teams.push({ id: teamDoc.id, ...teamDoc.data(), role: memberData.role, memberId: memberSnap.docs[0].id });
+    try {
+        const teams = [];
+        // Use Collection Group query to find membership records across all teams
+        const q = query(collectionGroup(db, "members"), where("userId", "==", userId));
+        const membershipSnap = await getDocs(q);
+
+        for (const memberDoc of membershipSnap.docs) {
+            const teamRef = memberDoc.ref.parent.parent;
+            const teamSnap = await getDoc(teamRef);
+            if (teamSnap.exists()) {
+                const memberData = memberDoc.data();
+                teams.push({
+                    id: teamSnap.id,
+                    ...teamSnap.data(),
+                    role: memberData.role,
+                    memberId: memberDoc.id
+                });
+            }
         }
+        return teams;
+    } catch (error) {
+        console.error("Error in getUserTeams:", error);
+        throw error;
     }
-    return teams;
 };
 
 export const getTeamMemberRecord = async (teamId, userId) => {
@@ -537,6 +549,11 @@ export const listenToTeamOpenings = (callback) => {
     return onSnapshot(q, (snapshot) => {
         const openings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(openings);
+    }, (error) => {
+        console.error("Error listening to team openings:", error);
+        if (error.code === 'failed-precondition') {
+            console.warn("This query likely requires a Firestore index. Check the link in the full error object.");
+        }
     });
 };
 
@@ -549,6 +566,8 @@ export const listenToTeamOpeningsByLead = (userId, callback) => {
     return onSnapshot(q, (snapshot) => {
         const openings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(openings);
+    }, (error) => {
+        console.error("Error listening to team openings by lead:", error);
     });
 };
 
@@ -612,6 +631,8 @@ export const listenToMyApplications = (applicantId, callback) => {
     return onSnapshot(q, (snapshot) => {
         const apps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         callback(apps);
+    }, (error) => {
+        console.error("Error listening to my applications:", error);
     });
 };
 

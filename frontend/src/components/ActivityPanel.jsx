@@ -78,7 +78,7 @@ const ActivityItem = ({ activity }) => {
     switch (type) {
       case 'create_team': return 'created team';
       case 'join_team': return activity?.metadata?.source === 'discover' ? 'joined team via Discover' : 'joined team';
-      case 'send_message': return 'sent a message in';
+      case 'send_message': return 'sent a message';
       case 'connect_repo': return 'connected repo to';
       case 'add_asset': return 'added an asset to';
       case 'share_secret': return 'shared a secret in';
@@ -106,7 +106,7 @@ const ActivityItem = ({ activity }) => {
   const target = getTarget(activity.metadata);
   const secondaryDetail = maskSensitive(
     activity?.metadata?.maskedValue ||
-    activity?.metadata?.messagePreview ||
+    (activity.type !== 'send_message' ? activity?.metadata?.messagePreview : '') ||
     activity?.metadata?.secretName ||
     ''
   );
