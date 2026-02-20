@@ -102,6 +102,9 @@ export default function TeamsDashboard() {
             prevPendingCount.current = pending;
 
             apps.forEach(app => fetchApplicant(app.applicantId));
+        }, (error) => {
+            console.error("Applications listener error:", error);
+            // pushToast("Error loading applications.", "error");
         });
 
         return () => unsubscribe();
@@ -480,8 +483,13 @@ export default function TeamsDashboard() {
                                                             style={{ backgroundImage: `url(${applicant?.avatar || 'https://i.pravatar.cc/150'})` }}
                                                         ></div>
                                                         <div>
-                                                            <p className="text-sm font-black text-vibrant-primary">{applicant?.name || 'Applicant'}</p>
-                                                            <p className="text-[11px] font-bold text-slate-500">{app.status}</p>
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="text-sm font-black text-vibrant-primary">{applicant?.name || 'Applicant'}</p>
+                                                                <span className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded font-black uppercase">
+                                                                    {app.teamName}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-[11px] font-bold text-slate-500">{app.status} • {app.createdAt?.toDate ? app.createdAt.toDate().toLocaleDateString() : 'Just now'}</p>
                                                         </div>
                                                     </div>
                                                     <div className="flex-1 min-w-[200px]">

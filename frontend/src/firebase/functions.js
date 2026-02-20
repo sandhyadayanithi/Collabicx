@@ -696,6 +696,8 @@ export const listenToApplicationsByOpeningIds = (openingIds, callback) => {
             const apps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             resultsByChunk.set(index, apps);
             emitMerged();
+        }, (error) => {
+            console.error(`Error listening to applications chunk ${index}:`, error);
         });
     });
 

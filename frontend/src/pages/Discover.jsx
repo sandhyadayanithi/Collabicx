@@ -148,6 +148,10 @@ export default function Discover() {
         return userTeams.some(team => team.id === opening.teamId);
     };
 
+    const hasApplied = (opening) => {
+        return myApplications.some(app => app.teamOpeningId === opening.id && app.status !== 'WITHDRAWN');
+    };
+
     const openApply = (opening) => {
         setApplyModal({ open: true, opening });
         setGithubUrl('');
@@ -373,14 +377,14 @@ export default function Discover() {
                                                 </div>
 
                                                 <button
-                                                    disabled={!isEligible(opening) || isAlreadyInTeam(opening)}
+                                                    disabled={!isEligible(opening) || isAlreadyInTeam(opening) || hasApplied(opening)}
                                                     onClick={() => openApply(opening)}
-                                                    className={`w-full py-3.5 rounded-xl font-black transition-all text-xs tracking-widest uppercase shadow-lg ${!isEligible(opening) || isAlreadyInTeam(opening)
+                                                    className={`w-full py-3.5 rounded-xl font-black transition-all text-xs tracking-widest uppercase shadow-lg ${!isEligible(opening) || isAlreadyInTeam(opening) || hasApplied(opening)
                                                         ? 'bg-slate-800/50 text-slate-500 cursor-not-allowed border border-white/5'
                                                         : 'bg-emerald-600 hover:bg-emerald-500 text-emerald-950 hover:shadow-emerald-500/20 active:translate-y-0.5'
                                                         }`}
                                                 >
-                                                    {isAlreadyInTeam(opening) ? 'Already in Team' : (isEligible(opening) ? 'Apply to Join' : 'Not Eligible')}
+                                                    {isAlreadyInTeam(opening) ? 'Already in Team' : (hasApplied(opening) ? 'Already Applied' : (isEligible(opening) ? 'Apply to Join' : 'Not Eligible'))}
                                                 </button>
                                             </div>
                                         </div>
