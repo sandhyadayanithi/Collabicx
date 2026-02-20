@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { googleSignIn, githubSignIn, loginWithEmail, signUpWithEmail } from '../firebase/functions';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase/config';
+import { auth } from '../firebase/config';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -23,13 +22,9 @@ export default function Login() {
                 await signUpWithEmail(email, password, name);
                 navigate('/profile-setup');
             } else {
-                const user = await loginWithEmail(email, password);
-                const userSnap = await getDoc(doc(db, "users", user.uid));
-                if (userSnap.exists() && userSnap.data().username) {
-                    navigate('/teams');
-                } else {
-                    navigate('/profile-setup');
-                }
+                await loginWithEmail(email, password);
+                // Frontend-only mode: assume returning user goes to teams
+                navigate('/teams');
             }
         } catch (err) {
             setError(err.message);
@@ -42,18 +37,9 @@ export default function Login() {
         setError('');
         setLoading(true);
         try {
-            const { user, isNewUser } = await googleSignIn();
-            if (isNewUser) {
-                navigate('/profile-setup');
-            } else {
-                // Also check if they finished their profile setup
-                const userSnap = await getDoc(doc(db, "users", user.uid));
-                if (userSnap.exists() && userSnap.data().username) {
-                    navigate('/teams');
-                } else {
-                    navigate('/profile-setup');
-                }
-            }
+            await googleSignIn();
+            // Frontend-only mode: always go to teams or profile setup
+            navigate('/teams');
         } catch (err) {
             setError(err.message);
         } finally {
@@ -65,17 +51,8 @@ export default function Login() {
         setError('');
         setLoading(true);
         try {
-            const { user, isNewUser } = await githubSignIn();
-            if (isNewUser) {
-                navigate('/profile-setup');
-            } else {
-                const userSnap = await getDoc(doc(db, "users", user.uid));
-                if (userSnap.exists() && userSnap.data().username) {
-                    navigate('/teams');
-                } else {
-                    navigate('/profile-setup');
-                }
-            }
+            await githubSignIn();
+            navigate('/teams');
         } catch (err) {
             setError(err.message);
         } finally {

@@ -56,7 +56,7 @@ export const googleSignIn = async () => {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
         const { isNewUser } = getAdditionalUserInfo(result);
-        await createUserProfile(user);
+        // await createUserProfile(user); // Frontend-only: skip DB write
         return { user, isNewUser };
     } catch (error) {
         throw error;
@@ -68,7 +68,7 @@ export const githubSignIn = async () => {
         const result = await signInWithPopup(auth, githubProvider);
         const user = result.user;
         const { isNewUser } = getAdditionalUserInfo(result);
-        await createUserProfile(user);
+        // await createUserProfile(user); // Frontend-only: skip DB write
         return { user, isNewUser };
     } catch (error) {
         throw error;
@@ -79,7 +79,7 @@ export const signUpWithEmail = async (email, password, name) => {
     try {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
-        await createUserProfile(user, { name });
+        // await createUserProfile(user, { name }); // Frontend-only: skip DB write
         return user;
     } catch (error) {
         throw error;
