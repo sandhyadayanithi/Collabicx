@@ -235,6 +235,26 @@ export const getTeamMembers = async (teamId) => {
     return members;
 };
 
+export const leaveTeam = async (teamId, userId) => {
+    if (!teamId || !userId) throw new Error("Missing team or user.");
+
+    const member = await getTeamMemberRecord(teamId, userId);
+    if (!member) throw new Error("Not a member of this team.");
+
+    if (member.role === 'owner') {
+        throw new Error("Owners cannot leave. Delete the team instead.");
+    }
+
+    const teamSnap = await getDoc(doc(db, "teams", teamId));
+    const teamName = teamSnap.exists() ? teamSnap.data().name : "Unknown Team";
+
+    // Delete membership record
+    await deleteDoc(doc(db, `teams/${teamId}/members`, member.id));
+
+    // Log Activity
+    await logActivity(teamId, userId, 'leave_team', { teamName });
+};
+
 const deleteQueryDocs = async (q) => {
     const snap = await getDocs(q);
     const deletes = snap.docs.map(docSnap => deleteDoc(docSnap.ref));

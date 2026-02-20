@@ -70,6 +70,7 @@ const ActivityItem = ({ activity }) => {
       case 'complete_task': return 'check_circle';
       case 'update_note': return 'edit_note';
       case 'delete_team': return 'delete_forever';
+      case 'leave_team': return 'logout';
       default: return 'notifications';
     }
   };
@@ -90,6 +91,7 @@ const ActivityItem = ({ activity }) => {
       case 'complete_task': return 'completed a task:';
       case 'update_note': return 'updated the shared notes';
       case 'delete_team': return 'deleted the team';
+      case 'leave_team': return 'left the team';
       default: return 'performed an action in';
     }
   };

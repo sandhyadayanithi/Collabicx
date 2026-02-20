@@ -9,7 +9,8 @@ import {
     listenToTeamOpeningsByLead,
     listenToApplicationsByOpeningIds,
     reviewTeamApplication,
-    updateTeamOpeningStatus
+    updateTeamOpeningStatus,
+    leaveTeam
 } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
@@ -199,6 +200,17 @@ export default function TeamsDashboard() {
         setDeleteTarget(team);
     };
 
+    const handleLeaveTeam = async (team) => {
+        if (!window.confirm(`Are you sure you want to leave ${team.name}?`)) return;
+        try {
+            await leaveTeam(team.id, currentUserId);
+            setUserTeams(prev => prev.filter(t => t.id !== team.id));
+            pushToast('Successfully left the team.', 'success');
+        } catch (error) {
+            pushToast(error.message || 'Failed to leave team.', 'error');
+        }
+    };
+
     const confirmDeleteTeam = async () => {
         if (!deleteTarget?.id || !currentUserId) return;
         try {
@@ -340,7 +352,7 @@ export default function TeamsDashboard() {
                                             onClick={() => navigate(`/dashboard/${team.id}`)}
                                             className="group relative vibrant-card border border-slate-300 dark:border-white/10 rounded-xl p-6 transition-all shadow-md hover:shadow-xl hover:border-primary/40 flex flex-col items-center text-center cursor-pointer"
                                         >
-                                            {team.role === 'owner' && (
+                                            {(team.role === 'owner' || team.createdBy === currentUserId) ? (
                                                 <button
                                                     type="button"
                                                     onClick={(e) => {
@@ -348,9 +360,21 @@ export default function TeamsDashboard() {
                                                         handleDeleteTeam(team);
                                                     }}
                                                     className="absolute top-3 right-3 z-20 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity bg-white/95 dark:bg-slate-900/95 border border-red-200 dark:border-red-900 text-red-500 hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 rounded-lg size-8 flex items-center justify-center shadow-sm"
-                                                    title="Delete team"
+                                                    title="Delete team (Leads)"
                                                 >
                                                     <span className="material-symbols-outlined text-[18px]">delete</span>
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleLeaveTeam(team);
+                                                    }}
+                                                    className="absolute top-3 right-3 z-20 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700 text-slate-600 hover:text-red-500 hover:border-red-300 rounded-lg size-8 flex items-center justify-center shadow-sm"
+                                                    title="Leave team"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">logout</span>
                                                 </button>
                                             )}
                                             <div className="mb-4 relative">
