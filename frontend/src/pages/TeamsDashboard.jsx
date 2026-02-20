@@ -156,7 +156,7 @@ export default function TeamsDashboard() {
         if (!openingForm.teamId || !currentUserId) return;
 
         try {
-            await createTeamOpening(openingForm.teamId, currentUserId, {
+            const newOpening = await createTeamOpening(openingForm.teamId, currentUserId, {
                 description: openingForm.description,
                 requiredRoles: openingForm.requiredRoles,
                 collegeScope: openingForm.collegeScopeType === 'ALL'
@@ -165,6 +165,10 @@ export default function TeamsDashboard() {
                 slotsOpen: Number(openingForm.slotsOpen || 1),
                 status: 'OPEN'
             });
+
+            // Optimistic UI update: Add to list immediately
+            setLeadOpenings(prev => [newOpening, ...prev]);
+
             pushToast('Team opening created.', 'success');
             setIsOpeningModalOpen(false);
             setOpeningForm({
