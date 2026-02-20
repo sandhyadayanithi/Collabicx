@@ -245,10 +245,6 @@ export default function TeamsDashboard() {
                     <span className="material-symbols-outlined dark:text-emerald-300/80">explore</span>
                     <p className="text-sm font-black">Discover</p>
                 </a>
-                <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-black dark:text-emerald-300/80 hover:bg-slate-100 dark:hover:bg-emerald-500/20 transition-colors cursor-pointer" href="#">
-                    <span className="material-symbols-outlined dark:text-emerald-300/80">settings</span>
-                    <p className="text-sm font-black">Account Settings</p>
-                </a>
             </Sidebar>
 
             {/* Middle & Right Section Wrapper */}
