@@ -93,23 +93,31 @@ export default function HackathonWorkspace() {
     }, [teamId, hackathonId]);
 
     // Scroll effect when messages change
-    const isFirstScroll = useRef(true);
+
     useEffect(() => {
         if (messages.length > 0) {
             const scroll = () => {
                 messagesEndRef.current?.scrollIntoView({
-                    behavior: isFirstScroll.current ? "auto" : "smooth",
-                    block: "nearest"
+                    behavior: "auto",
+                    block: "end"
                 });
-                if (isFirstScroll.current) isFirstScroll.current = false;
             };
 
             // Immediate scroll
             scroll();
 
-            // Backup scroll for slower renders
-            const timer = setTimeout(scroll, 100);
-            return () => clearTimeout(timer);
+            // Multiple retries to ensure we stay at the bottom after dynamic content/images load
+            const t1 = setTimeout(scroll, 50);
+            const t2 = setTimeout(scroll, 150);
+            const t3 = setTimeout(scroll, 300);
+            const t4 = setTimeout(scroll, 600); // Late retry for safety
+
+            return () => {
+                clearTimeout(t1);
+                clearTimeout(t2);
+                clearTimeout(t3);
+                clearTimeout(t4);
+            };
         }
     }, [messages]);
 
@@ -736,61 +744,7 @@ export default function HackathonWorkspace() {
                 )
             }
 
-            {/* Asset Input Modal */}
-            {
-                isAssetModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                        <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in zoom-in-95 duration-200">
-                            <div className="p-6">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Add New Asset</h3>
-                                    <button onClick={() => setIsAssetModalOpen(false)} className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
-                                        <span className="material-symbols-outlined">close</span>
-                                    </button>
-                                </div>
-                                <form onSubmit={handleAddAssetSubmit} className="space-y-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Asset Title</label>
-                                        <input
-                                            type="text"
-                                            value={newAssetTitle}
-                                            onChange={(e) => setNewAssetTitle(e.target.value)}
-                                            placeholder="e.g., Design System"
-                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
-                                            autoFocus
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">URL</label>
-                                        <input
-                                            type="text"
-                                            value={newAssetUrl}
-                                            onChange={(e) => setNewAssetUrl(e.target.value)}
-                                            placeholder="e.g., figma.com/..."
-                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
-                                        />
-                                    </div>
-                                    <div className="pt-4 flex gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsAssetModalOpen(false)}
-                                            className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="flex-1 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-                                        >
-                                            Add Asset
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
+
 
             {/* Task Input Modal */}
             {
