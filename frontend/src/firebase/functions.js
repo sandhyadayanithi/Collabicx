@@ -498,6 +498,11 @@ export const getLinks = async (teamId, hackathonId) => {
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+export const deleteLink = async (teamId, hackathonId, linkId) => {
+    const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/links`, linkId);
+    await deleteDoc(ref);
+};
+
 // --- 8. Chat Functions ---
 
 export const sendMessage = async (teamId, hackathonId, userId, message, userName = "Unknown", userAvatar = "") => {

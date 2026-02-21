@@ -4,10 +4,10 @@ export default function Sidebar({ children, showLogo = false, footer }) {
     return (
         <aside className="w-16 md:w-64 border-r border-slate-300 dark:border-white/10 flex flex-col items-center md:items-stretch py-6 gap-8 bg-white dark:bg-slate-900/80 backdrop-blur-2xl sticky top-0 h-screen">
             {showLogo && (
-                <div className="flex items-center gap-3 px-6 mb-2">
-                    <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />
+                <div className="flex items-center gap-1 px-6 mb-2">
+                    <img src="/logo.png" alt="Collabicx" className="size-14 object-contain" />
                     <div className="hidden md:flex flex-col text-white-forced">
-                        <h1 className="text-emerald-900 dark:text-emerald-400 text-lg font-black leading-tight">Collabicx</h1>
+                        <h1 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight">Collabicx</h1>
                     </div>
                 </div>
             )}

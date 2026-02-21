@@ -34,8 +34,8 @@ export default function Header({ title = "Team Dashboard", backPath = "/teams", 
                 >
                     <span className="material-symbols-outlined">arrow_back</span>
                 </button>
-                <Link to="/teams" className="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
-                    <img src="/logo.png" alt="Collabicx" className="size-16 object-contain" />
+                <Link to="/teams" className="flex items-center gap-1 text-primary hover:opacity-80 transition-opacity">
+                    <img src="/logo.png" alt="Collabicx" className="size-14 object-contain" />
                     <h2 className="text-emerald-900 dark:text-emerald-400 text-xl font-black leading-tight tracking-tight">Collabicx</h2>
                 </Link>
                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 ml-2"></div>

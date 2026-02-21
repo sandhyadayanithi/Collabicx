@@ -11,6 +11,7 @@ import {
     toggleTaskComplete,
     addTask as firebaseAddTask,
     addLink as firebaseAddLink,
+    deleteLink,
     getHackathonDetails,
     editMessage
 } from '../firebase/functions';
@@ -377,6 +378,16 @@ export default function HackathonWorkspace() {
         }
     };
 
+    const handleRemoveAsset = async (assetId) => {
+        if (window.confirm("Are you sure you want to remove this asset?")) {
+            try {
+                await deleteLink(teamId, hackathonId, assetId);
+            } catch (error) {
+                console.error("Error removing asset:", error);
+            }
+        }
+    };
+
     const old_addAsset = () => {
         const url = prompt("Enter asset URL:");
         if (url) {
@@ -645,10 +656,10 @@ export default function HackathonWorkspace() {
                                 {/* Nested Assets Section */}
                                 <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
                                     <div className="flex justify-between items-center mb-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-2 rounded-lg transition-colors" onClick={() => toggleSection('assets')}>
-                                        <h4 className="font-bold text-xs uppercase tracking-wider text-text-secondary dark:text-emerald-400">Submission Assets</h4>
+                                        <h4 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Submission Assets</h4>
                                         <div className="flex items-center gap-2">
                                             <button onClick={(e) => { e.stopPropagation(); addAsset(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-xs font-bold">
-                                                <span className="material-symbols-outlined text-xs">add</span> New
+                                                <span className="material-symbols-outlined text-sm">add</span> New
                                             </button>
                                             <span className={`material-symbols-outlined text-slate-400 text-sm transition-transform ${expandedSections.assets ? 'rotate-180' : ''}`}>
                                                 expand_more
@@ -666,9 +677,18 @@ export default function HackathonWorkspace() {
                                                         <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.label || asset.title}</h5>
                                                         <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-600 dark:text-slate-400 font-bold hover:text-primary truncate block">{asset.url}</a>
                                                     </div>
-                                                    <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary transition-colors">
-                                                        <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                                    </a>
+                                                    <div className="flex items-center gap-1">
+                                                        <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="size-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-primary transition-colors" title="Open Link">
+                                                            <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                                        </a>
+                                                        <button
+                                                            onClick={() => handleRemoveAsset(asset.id)}
+                                                            className="size-8 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors"
+                                                            title="Remove Asset"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">delete</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))}
                                             {assets.length === 0 && (
