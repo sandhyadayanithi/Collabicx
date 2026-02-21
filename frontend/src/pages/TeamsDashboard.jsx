@@ -45,6 +45,7 @@ export default function TeamsDashboard() {
         collegeName: '',
         slotsOpen: 1
     });
+    const [isSubmittingOpening, setIsSubmittingOpening] = useState(false);
     const leadTeams = userTeams.filter(team => team.role === 'owner');
 
 
@@ -164,8 +165,9 @@ export default function TeamsDashboard() {
 
     const handleCreateOpening = async (e) => {
         e.preventDefault();
-        if (!openingForm.teamId || !currentUserId) return;
+        if (!openingForm.teamId || !currentUserId || isSubmittingOpening) return;
 
+        setIsSubmittingOpening(true);
         try {
             const newOpening = await createTeamOpening(openingForm.teamId, currentUserId, {
                 description: openingForm.description,
@@ -176,9 +178,6 @@ export default function TeamsDashboard() {
                 slotsOpen: Number(openingForm.slotsOpen || 1),
                 status: 'OPEN'
             });
-
-            // Optimistic UI update: Add to list immediately
-            setLeadOpenings(prev => [newOpening, ...prev]);
 
             pushToast('Team opening created.', 'success');
             setIsOpeningModalOpen(false);
@@ -192,6 +191,8 @@ export default function TeamsDashboard() {
             });
         } catch (error) {
             pushToast(error.message || 'Failed to create opening.', 'error');
+        } finally {
+            setIsSubmittingOpening(false);
         }
     };
 
@@ -213,10 +214,6 @@ export default function TeamsDashboard() {
         if (!deleteOpeningTarget?.id || !currentUserId) return;
         try {
             await deleteTeamOpening(deleteOpeningTarget.id, currentUserId);
-
-            // Optimistic UI update: Remove from local state immediately
-            setLeadOpenings(prev => prev.filter(o => o.id !== deleteOpeningTarget.id));
-            setApplications(prev => prev.filter(a => a.teamOpeningId !== deleteOpeningTarget.id));
 
             pushToast('Opening deleted permanently.', 'success');
         } catch (error) {
@@ -696,9 +693,11 @@ export default function TeamsDashboard() {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+                                    disabled={isSubmittingOpening}
+                                    className="flex-1 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    Create Opening
+                                    {isSubmittingOpening && <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>}
+                                    {isSubmittingOpening ? 'Creating...' : 'Create Opening'}
                                 </button>
                             </div>
                         </form>

@@ -199,8 +199,12 @@ export const getUserTeams = async (userId) => {
         const q = query(collectionGroup(db, "members"), where("userId", "==", userId));
         const membershipSnap = await getDocs(q);
 
+        const seenTeamIds = new Set();
+
         for (const memberDoc of membershipSnap.docs) {
             const teamRef = memberDoc.ref.parent.parent;
+            if (seenTeamIds.has(teamRef.id)) continue;
+
             const teamSnap = await getDoc(teamRef);
             if (teamSnap.exists()) {
                 const memberData = memberDoc.data();
@@ -211,6 +215,7 @@ export const getUserTeams = async (userId) => {
                     memberId: memberDoc.id,
                     joinedAt: memberData.joinedAt
                 });
+                seenTeamIds.add(teamSnap.id);
             }
         }
 
@@ -702,15 +707,20 @@ export const listenToTeamOpeningsByTeamIds = (teamIds, callback) => {
         return () => { };
     }
 
+    // De-duplicate teamIds to prevent redundant listeners
+    const uniqueTeamIds = Array.from(new Set(teamIds));
+
     const chunks = [];
-    for (let i = 0; i < teamIds.length; i += 10) {
-        chunks.push(teamIds.slice(i, i + 10));
+    for (let i = 0; i < uniqueTeamIds.length; i += 10) {
+        chunks.push(uniqueTeamIds.slice(i, i + 10));
     }
 
     const resultsByChunk = new Map();
     const emitMerged = () => {
         const merged = Array.from(resultsByChunk.values()).flat();
-        callback(merged.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+        // De-duplicate results across chunks
+        const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
+        callback(unique.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
     };
 
     const unsubscribes = chunks.map((chunk, index) => {
