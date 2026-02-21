@@ -128,16 +128,16 @@ const ActivityItem = ({ activity }) => {
       </div>
 
       <div className="flex-1 flex flex-col gap-0.5">
-        <p className="text-sm font-black text-vibrant-primary flex flex-wrap gap-1">
+        <p className="text-sm font-black text-slate-800 dark:text-emerald-100 flex flex-wrap gap-1">
           <span className="text-primary">{user?.username || user?.name || 'Someone'}</span>
           <span>{getActionText(activity)}</span>
-          {target ? <span className="text-slate-700 dark:text-slate-200">{activity.type.includes('task') ? `"${target}"` : target}</span> : null}
+          {target ? <span className="text-slate-700 dark:text-emerald-300">{activity.type.includes('task') ? `"${target}"` : target}</span> : null}
           {teamName &&
             teamName.toLowerCase() !== target.toLowerCase() &&
             !['create_team', 'join_team'].includes(activity.type) ? (
             <>
-              <span className="text-slate-500 dark:text-slate-400">in</span>
-              <span className="text-slate-700 dark:text-slate-200">{teamName}</span>
+              <span className="text-slate-500 dark:text-emerald-500/60">in</span>
+              <span className="text-slate-700 dark:text-emerald-300">{teamName}</span>
             </>
           ) : null}
         </p>
@@ -220,9 +220,12 @@ export default function ActivityPanel({ teamIds = [] }) {
   }, [activities]);
 
   return (
-    <aside className="w-80 border-l border-slate-200 dark:border-white/10 flex flex-col h-full bg-white dark:bg-transparent overflow-hidden">
+    <aside
+      className="w-80 border-l border-slate-200 dark:border-white/10 flex flex-col h-full bg-white overflow-hidden"
+      style={{ backgroundColor: '#09141D' }}
+    >
       <div className="p-6 border-b border-slate-200 dark:border-white/10">
-        <h3 className="text-lg font-black text-vibrant-primary flex items-center gap-2">
+        <h3 className="text-lg font-black text-slate-800 dark:text-emerald-400 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">history</span>
           Recent Activity
         </h3>
@@ -248,8 +251,8 @@ export default function ActivityPanel({ teamIds = [] }) {
         )}
       </div>
 
-      <div className="p-4 bg-slate-50/50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10">
-        <p className="text-[10px] text-center text-slate-500 font-black uppercase tracking-widest">
+      <div className="p-4 bg-slate-50/50 dark:bg-emerald-500/5 border-t border-slate-200 dark:border-white/10">
+        <p className="text-[10px] text-center text-slate-500 dark:text-emerald-500/40 font-black uppercase tracking-widest">
           SYNCED WITH REAL-TIME FEED
         </p>
       </div>

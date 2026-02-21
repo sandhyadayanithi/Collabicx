@@ -600,7 +600,7 @@ export default function HackathonWorkspace() {
                         )}
                     </section>
 
-                    {/* Sprint Tasks */}
+                    {/* Sprint Tasks & Submission Assets combined */}
                     <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col vibrant-card shrink-0">
                         <div className="p-4 border-b border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('sprintTasks')}>
                             <div className="flex items-center justify-between mb-4">
@@ -630,9 +630,11 @@ export default function HackathonWorkspace() {
                                 </div>
                             </div>
                         </div>
-                        {expandedSections.sprintTasks && (
-                            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
-                                <div className="space-y-2">
+
+                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                            {/* Task List */}
+                            {expandedSections.sprintTasks && (
+                                <div className="space-y-2 mb-8">
                                     {tasks.map(task => (
                                         <div key={task.id} className={`flex items-center gap-3 p-3 vibrant-badge rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
                                             <input
@@ -652,55 +654,57 @@ export default function HackathonWorkspace() {
                                         <p className="text-center text-slate-400 text-sm py-8 italic">No tasks.</p>
                                     )}
                                 </div>
+                            )}
 
-                                {/* Nested Assets Section */}
-                                <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
-                                    <div className="flex justify-between items-center mb-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-2 rounded-lg transition-colors" onClick={() => toggleSection('assets')}>
-                                        <h4 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Submission Assets</h4>
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={(e) => { e.stopPropagation(); addAsset(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-xs font-bold">
-                                                <span className="material-symbols-outlined text-sm">add</span> New
-                                            </button>
-                                            <span className={`material-symbols-outlined text-slate-400 text-sm transition-transform ${expandedSections.assets ? 'rotate-180' : ''}`}>
-                                                expand_more
-                                            </span>
-                                        </div>
+                            {/* Submission Assets Header & List */}
+                            <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
+                                <div className="flex justify-between items-center mb-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/30 p-2 rounded-lg transition-colors" onClick={() => toggleSection('assets')}>
+                                    <h4 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Submission Assets</h4>
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={(e) => { e.stopPropagation(); addAsset(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-xs font-bold">
+                                            <span className="material-symbols-outlined text-sm">add</span> New
+                                        </button>
+                                        <span className={`material-symbols-outlined text-slate-400 text-sm transition-transform ${expandedSections.assets ? 'rotate-180' : ''}`}>
+                                            expand_more
+                                        </span>
                                     </div>
-                                    {expandedSections.assets && (
-                                        <div className="space-y-3">
-                                            {assets.map(asset => (
-                                                <div key={asset.id} className="vibrant-badge p-3 rounded-xl shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
-                                                    <div className={`size-8 ${asset.color || 'bg-slate-500'} text-white rounded-lg flex items-center justify-center shrink-0`}>
-                                                        <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
-                                                    </div>
-                                                    <div className="min-w-0 flex-1">
-                                                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.label || asset.title}</h5>
-                                                        <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-600 dark:text-slate-400 font-bold hover:text-primary truncate block">{asset.url}</a>
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="size-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-primary transition-colors" title="Open Link">
-                                                            <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                                        </a>
-                                                        <button
-                                                            onClick={() => handleRemoveAsset(asset.id)}
-                                                            className="size-8 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors"
-                                                            title="Remove Asset"
-                                                        >
-                                                            <span className="material-symbols-outlined text-sm">delete</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            {assets.length === 0 && (
-                                                <button onClick={addAsset} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
-                                                    Add Asset
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
                                 </div>
+
+                                {expandedSections.assets && (
+                                    <div className="space-y-3">
+                                        {assets.map(asset => (
+                                            <div key={asset.id} className="vibrant-badge p-3 rounded-xl shadow-sm transition-all hover:border-primary/50 group flex items-center gap-3">
+                                                <div className={`size-8 ${asset.color || 'bg-slate-500'} text-white rounded-lg flex items-center justify-center shrink-0`}>
+                                                    <span className="material-symbols-outlined text-sm">{asset.icon || 'link'}</span>
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">{asset.label || asset.title}</h5>
+                                                    <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-600 dark:text-slate-400 font-bold hover:text-primary truncate block">{asset.url}</a>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <a href={asset.url.startsWith('http') ? asset.url : `https://${asset.url}`} target="_blank" rel="noopener noreferrer" className="size-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-primary transition-colors" title="Open Link">
+                                                        <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                                    </a>
+                                                    <button
+                                                        onClick={() => handleRemoveAsset(asset.id)}
+                                                        className="size-8 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors"
+                                                        title="Remove Asset"
+                                                    >
+                                                        <span className="material-symbols-outlined text-sm">delete</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {assets.length === 0 && (
+                                            <button onClick={addAsset} className="w-full py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 text-sm font-medium flex items-center justify-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors">
+                                                <span className="material-symbols-outlined">add_link</span>
+                                                Add Asset
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
                     </section>
 
 
