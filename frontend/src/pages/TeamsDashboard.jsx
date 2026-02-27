@@ -56,7 +56,14 @@ export default function TeamsDashboard() {
                     setCurrentUserId(user.uid);
                     const userRef = doc(db, "users", user.uid);
                     const snap = await getDoc(userRef);
-                    if (snap.exists()) setUserData(snap.data());
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        setUserData(data);
+                        if (!data.usageRole) {
+                            navigate('/profile-setup');
+                            return;
+                        }
+                    }
 
                     // Initial fetch
                     const teams = await getUserTeams(user.uid);

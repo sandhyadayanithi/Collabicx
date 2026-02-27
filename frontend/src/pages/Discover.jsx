@@ -52,7 +52,14 @@ export default function Discover() {
         const unsub = onAuthStateChanged(auth, async (user) => {
             if (!user) return navigate('/login');
             const snap = await getDoc(doc(db, 'users', user.uid));
-            if (snap.exists()) setUserData({ id: user.uid, ...snap.data() });
+            if (snap.exists()) {
+                const data = snap.data();
+                setUserData({ id: user.uid, ...data });
+                if (!data.usageRole) {
+                    navigate('/profile-setup');
+                    return;
+                }
+            }
             try {
                 const teams = await getUserTeams(user.uid);
                 setUserTeams(teams);

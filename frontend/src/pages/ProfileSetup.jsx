@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
 import {
     checkUsernameAvailability,
     updateUserProfile
 } from '../firebase/functions';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
 
 // Import Avatars
 import avatar1 from '../assets/avatars/avatar1.png';
@@ -15,10 +16,10 @@ import avatar5 from '../assets/avatars/avatar5.png';
 
 export default function ProfileSetup() {
     const navigate = useNavigate();
+    const [usageRole, setUsageRole] = useState('student');
     const [username, setUsername] = useState('');
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(null); // null, true, false
     const [role, setRole] = useState('Developer');
-    const [college, setCollege] = useState('');
     const [selectedAvatar, setSelectedAvatar] = useState(avatar1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -28,9 +29,24 @@ export default function ProfileSetup() {
 
     // Auth Check
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+        const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
+                try {
+                    const snap = await getDoc(doc(db, "users", currentUser.uid));
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (data.username) {
+                            setUsername(data.username);
+                            setIsUsernameAvailable(true);
+                        }
+                        if (data.role) setRole(data.role);
+                        if (data.avatar) setSelectedAvatar(data.avatar);
+                        if (data.usageRole) setUsageRole(data.usageRole);
+                    }
+                } catch (err) {
+                    console.error("Error fetching user data", err);
+                }
             } else {
                 navigate('/login');
             }
@@ -69,16 +85,40 @@ export default function ProfileSetup() {
             return;
         }
 
+        if (usageRole === 'student') {
+            const domain = user.email.split('@')[1]?.toLowerCase();
+            const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'mail.com', 'zoho.com', 'yandex.com', 'protonmail.com'];
+            if (personalDomains.includes(domain)) {
+                setError('Student accounts require a valid college-issued email address.');
+                return;
+            }
+        }
+
         setLoading(true);
         setError('');
 
         try {
-            await updateUserProfile(user.uid, {
-                username: username.toLowerCase(),
-                role,
-                avatar: selectedAvatar,
-                college
+            const idToken = await user.getIdToken();
+            const response = await fetch('http://localhost:4000/api/auth/verify-role', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    username: username.toLowerCase(),
+                    role,
+                    avatar: selectedAvatar,
+                    usageRole
+                })
             });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to verify role and update profile.');
+            }
+
             navigate('/teams');
         } catch (err) {
             console.error("Profile setup error:", err);
@@ -157,6 +197,27 @@ export default function ProfileSetup() {
                             </div>
                         </div>
 
+                        {/* Usage Role Selection */}
+                        <div className="space-y-4 mb-4">
+                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">How will you be using Collabix?</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setUsageRole('student')}
+                                    className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${usageRole === 'student' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 shadow-inner shadow-emerald-500/20' : 'vibrant-role-button hover:border-emerald-500/30'}`}
+                                >
+                                    Student
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setUsageRole('professional')}
+                                    className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${usageRole === 'professional' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 shadow-inner shadow-emerald-500/20' : 'vibrant-role-button hover:border-emerald-500/30'}`}
+                                >
+                                    Professional / Other
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Role Selection */}
                         <div className="space-y-4">
                             <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">Primary Role</label>
@@ -172,18 +233,6 @@ export default function ProfileSetup() {
                                     </button>
                                 ))}
                             </div>
-                        </div>
-
-                        {/* College Input */}
-                        <div className="space-y-4">
-                            <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">College</label>
-                            <input
-                                className="w-full h-13 px-5 vibrant-badge rounded-xl text-vibrant-primary placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all font-black"
-                                placeholder="Your college name"
-                                type="text"
-                                value={college}
-                                onChange={(e) => setCollege(e.target.value)}
-                            />
                         </div>
 
                         <button

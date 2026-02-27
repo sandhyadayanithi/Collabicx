@@ -37,8 +37,11 @@ export default function Login() {
         setError('');
         setLoading(true);
         try {
-            await googleSignIn();
-            // Frontend-only mode: always go to teams or profile setup
+            const result = await googleSignIn();
+            if (result.isNewUser) {
+                navigate('/profile-setup');
+                return;
+            }
             navigate('/teams');
         } catch (err) {
             setError(err.message);
@@ -51,7 +54,11 @@ export default function Login() {
         setError('');
         setLoading(true);
         try {
-            await githubSignIn();
+            const result = await githubSignIn();
+            if (result.isNewUser) {
+                navigate('/profile-setup');
+                return;
+            }
             navigate('/teams');
         } catch (err) {
             setError(err.message);

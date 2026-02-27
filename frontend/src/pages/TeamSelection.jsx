@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { createTeam, joinTeamByCode } from '../firebase/functions';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function TeamSelection() {
     const navigate = useNavigate();
@@ -11,6 +13,19 @@ export default function TeamSelection() {
     const [joinCode, setJoinCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const docRef = doc(db, 'users', user.uid);
+                const snap = await getDoc(docRef);
+                if (snap.exists() && !snap.data().usageRole) {
+                    navigate('/profile-setup');
+                }
+            }
+        });
+        return () => unsubscribe();
+    }, [navigate]);
 
     const handleCreateTeam = async (e) => {
         e.stopPropagation();

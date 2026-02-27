@@ -52,7 +52,13 @@ export default function HackathonWorkspace() {
     useEffect(() => {
         if (currentUser) {
             getDoc(doc(db, "users", currentUser.uid)).then(snap => {
-                if (snap.exists()) setUserData(snap.data());
+                if (snap.exists()) {
+                    const data = snap.data();
+                    setUserData(data);
+                    if (!data.usageRole) {
+                        navigate('/profile-setup');
+                    }
+                }
             });
         }
     }, [currentUser]);

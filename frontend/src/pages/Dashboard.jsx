@@ -42,6 +42,10 @@ export default function Dashboard() {
                 // Fetch user data
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
+                if (userSnap.exists() && !userSnap.data().usageRole) {
+                    navigate('/profile-setup');
+                    return;
+                }
 
                 // Fetch user's teams
                 setLoadingTeams(true);

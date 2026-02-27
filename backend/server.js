@@ -4,6 +4,7 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import admin, { db } from './firebase.js';
 import activityRoutes from './routes/activity.js';
+import authRoutes from './routes/auth.js';
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,7 @@ const port = process.env.PORT || 4000;
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 app.use('/api/activities', activityRoutes);
+app.use('/api/auth', authRoutes);
 
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
