@@ -18,6 +18,7 @@ export default function ProfileSetup() {
     const navigate = useNavigate();
     const [usageRole, setUsageRole] = useState('student');
     const [username, setUsername] = useState('');
+    const [initialUsername, setInitialUsername] = useState('');
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(null); // null, true, false
     const [role, setRole] = useState('Developer');
     const [selectedAvatar, setSelectedAvatar] = useState(avatar1);
@@ -38,6 +39,7 @@ export default function ProfileSetup() {
                         const data = snap.data();
                         if (data.username) {
                             setUsername(data.username);
+                            setInitialUsername(data.username);
                             setIsUsernameAvailable(true);
                         }
                         if (data.role) setRole(data.role);
@@ -58,6 +60,10 @@ export default function ProfileSetup() {
     useEffect(() => {
         const timer = setTimeout(async () => {
             if (username.length >= 3) {
+                if (initialUsername && username.toLowerCase() === initialUsername.toLowerCase()) {
+                    setIsUsernameAvailable(true);
+                    return;
+                }
                 try {
                     const available = await checkUsernameAvailability(username);
                     setIsUsernameAvailable(available);
@@ -71,7 +77,7 @@ export default function ProfileSetup() {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [username]);
+    }, [username, initialUsername]);
 
     const handleCompleteSetup = async () => {
         if (!user) {
