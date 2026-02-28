@@ -19,8 +19,11 @@ export default function TeamSelection() {
             if (user) {
                 const docRef = doc(db, 'users', user.uid);
                 const snap = await getDoc(docRef);
-                if (snap.exists() && !snap.data().usageRole) {
-                    navigate('/profile-setup');
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (!(data.profession || data.usageRole || data.username)) {
+                        navigate('/profile-setup');
+                    }
                 }
             }
         });

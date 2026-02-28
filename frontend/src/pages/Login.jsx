@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { googleSignIn, githubSignIn, loginWithEmail, signUpWithEmail } from '../firebase/functions';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isSignUp, setIsSignUp] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [name, setName] = useState('');
-    const [error, setError] = useState('');
+    const [error, setError] = useState(location.state?.error || '');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.error) {
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,9 +30,16 @@ export default function Login() {
                 await signUpWithEmail(email, password, name);
                 navigate('/profile-setup');
             } else {
-                await loginWithEmail(email, password);
-                // Frontend-only mode: assume returning user goes to teams
-                navigate('/teams');
+                const user = await loginWithEmail(email, password);
+                // Check if user has completed onboarding
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                const data = userSnap.data();
+                if (userSnap.exists() && (data?.profession || data?.usageRole || data?.username)) {
+                    navigate('/teams');
+                } else {
+                    navigate('/profile-setup');
+                }
             }
         } catch (err) {
             setError(err.message);
@@ -42,7 +57,16 @@ export default function Login() {
                 navigate('/profile-setup');
                 return;
             }
-            navigate('/teams');
+
+            // For returning users, check profile completeness
+            const userRef = doc(db, "users", result.user.uid);
+            const userSnap = await getDoc(userRef);
+            const data = userSnap.data();
+            if (userSnap.exists() && (data?.profession || data?.usageRole || data?.username)) {
+                navigate('/teams');
+            } else {
+                navigate('/profile-setup');
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -59,7 +83,16 @@ export default function Login() {
                 navigate('/profile-setup');
                 return;
             }
-            navigate('/teams');
+
+            // For returning users, check profile completeness
+            const userRef = doc(db, "users", result.user.uid);
+            const userSnap = await getDoc(userRef);
+            const data = userSnap.data();
+            if (userSnap.exists() && (data?.profession || data?.usageRole || data?.username)) {
+                navigate('/teams');
+            } else {
+                navigate('/profile-setup');
+            }
         } catch (err) {
             setError(err.message);
         } finally {

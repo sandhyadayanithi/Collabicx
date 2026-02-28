@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import {
     checkUsernameAvailability,
-    updateUserProfile
+    updateUserProfile,
+    logout
 } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
 
@@ -16,11 +17,12 @@ import avatar5 from '../assets/avatars/avatar5.png';
 
 export default function ProfileSetup() {
     const navigate = useNavigate();
-    const [usageRole, setUsageRole] = useState('student');
+    const [profession, setProfession] = useState('Student');
     const [username, setUsername] = useState('');
     const [initialUsername, setInitialUsername] = useState('');
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(null); // null, true, false
     const [role, setRole] = useState('Developer');
+    const [college, setCollege] = useState('');
     const [selectedAvatar, setSelectedAvatar] = useState(avatar1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -44,7 +46,8 @@ export default function ProfileSetup() {
                         }
                         if (data.role) setRole(data.role);
                         if (data.avatar) setSelectedAvatar(data.avatar);
-                        if (data.usageRole) setUsageRole(data.usageRole);
+                        if (data.profession) setProfession(data.profession);
+                        if (data.college) setCollege(data.college);
                     }
                 } catch (err) {
                     console.error("Error fetching user data", err);
@@ -55,6 +58,35 @@ export default function ProfileSetup() {
         });
         return () => unsubscribe();
     }, [navigate]);
+
+    // College Detection Logic
+    useEffect(() => {
+        if (profession === 'Student' && user?.email && !college) {
+            const domain = user.email.split('@')[1]?.toLowerCase();
+            const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'mail.com', 'zoho.com', 'yandex.com', 'protonmail.com'];
+
+            if (!personalDomains.includes(domain)) {
+                const fetchCollege = async () => {
+                    try {
+                        const response = await fetch(`http://universities.hipolabs.com/search?domain=${domain}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data && data.length > 0) {
+                                setCollege(data[0].name);
+                            } else {
+                                // Fallback
+                                const prefix = domain.split('.')[0];
+                                setCollege(prefix.charAt(0).toUpperCase() + prefix.slice(1) + " University");
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error fetching college name:", err);
+                    }
+                };
+                fetchCollege();
+            }
+        }
+    }, [profession, user, college]);
 
     // Username Availability Check Logic
     useEffect(() => {
@@ -91,11 +123,17 @@ export default function ProfileSetup() {
             return;
         }
 
-        if (usageRole === 'student') {
-            const domain = user.email.split('@')[1]?.toLowerCase();
+        if (profession === 'Student') {
+            const email = user.email || "";
+            const domain = email.split('@')[1]?.toLowerCase();
             const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'mail.com', 'zoho.com', 'yandex.com', 'protonmail.com'];
             if (personalDomains.includes(domain)) {
-                setError('Student accounts require a valid college-issued email address.');
+                try {
+                    await logout();
+                } catch (err) {
+                    console.error('Logout error:', err);
+                }
+                navigate('/login', { state: { error: 'Student accounts require a valid college-issued email address. Please sign in with your college email.' } });
                 return;
             }
         }
@@ -115,7 +153,7 @@ export default function ProfileSetup() {
                     username: username.toLowerCase(),
                     role,
                     avatar: selectedAvatar,
-                    usageRole
+                    profession
                 })
             });
 
@@ -203,26 +241,40 @@ export default function ProfileSetup() {
                             </div>
                         </div>
 
-                        {/* Usage Role Selection */}
+                        {/* profession Selection */}
                         <div className="space-y-4 mb-4">
                             <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">How will you be using Collabix?</label>
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button"
-                                    onClick={() => setUsageRole('student')}
-                                    className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${usageRole === 'student' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 shadow-inner shadow-emerald-500/20' : 'vibrant-role-button hover:border-emerald-500/30'}`}
+                                    onClick={() => setProfession('Student')}
+                                    className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${profession === 'Student' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 shadow-inner shadow-emerald-500/20' : 'vibrant-role-button hover:border-emerald-500/30'}`}
                                 >
                                     Student
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setUsageRole('professional')}
-                                    className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${usageRole === 'professional' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 shadow-inner shadow-emerald-500/20' : 'vibrant-role-button hover:border-emerald-500/30'}`}
+                                    onClick={() => setProfession('Other')}
+                                    className={`h-11 rounded-xl border-2 font-black text-xs transition-all uppercase tracking-wider ${profession === 'Other' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500 shadow-inner shadow-emerald-500/20' : 'vibrant-role-button hover:border-emerald-500/30'}`}
                                 >
                                     Professional / Other
                                 </button>
                             </div>
                         </div>
+
+                        {/* College Info (Read-only for Student) */}
+                        {profession === 'Student' && (
+                            <div className="space-y-4">
+                                <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary">Institution</label>
+                                <div className="w-full h-13 px-5 flex items-center bg-emerald-500/5 border border-emerald-500/20 rounded-xl text-emerald-500/80 font-black text-sm">
+                                    <span className="material-symbols-outlined text-[18px] mr-2">school</span>
+                                    {college || "Detecting institution..."}
+                                </div>
+                                <p className="text-[10px] text-vibrant-secondary font-bold px-1 italic">
+                                    * Institution is automatically verified based on your email.
+                                </p>
+                            </div>
+                        )}
 
                         {/* Role Selection */}
                         <div className="space-y-4">
