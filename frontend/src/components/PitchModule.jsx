@@ -16,6 +16,7 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
     // Voice Recording State
     const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
+    const [recordingStatus, setRecordingStatus] = useState("Idle"); // Idle, Listening, Processing, Error
     const [finalTranscript, setFinalTranscript] = useState("");
     const [interimTranscript, setInterimTranscript] = useState("");
     const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
@@ -23,52 +24,73 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
     const recognitionRef = useRef(null);
     const timerRef = useRef(null);
 
-    // Initialize Speech Recognition
+    // Initialize Speech Recognition once
     useEffect(() => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
-            recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = true;
-            recognitionRef.current.interimResults = true;
-            recognitionRef.current.lang = 'en-US';
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false; // Using false + manual restart for maximum compatibility
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
 
-            recognitionRef.current.onresult = (event) => {
-                let currentInterim = "";
-                let currentFinal = "";
+            recognition.onstart = () => {
+                setRecordingStatus("Listening");
+            };
 
+            recognition.onresult = (event) => {
+                let interim = "";
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    const transcript = event.results[i][0].transcript;
                     if (event.results[i].isFinal) {
-                        currentFinal += event.results[i][0].transcript;
+                        setFinalTranscript(prev => prev + transcript + " ");
                     } else {
-                        currentInterim += event.results[i][0].transcript;
+                        interim += transcript;
                     }
                 }
-
-                if (currentFinal) {
-                    setFinalTranscript((prev) => prev + currentFinal);
-                }
-                setInterimTranscript(currentInterim);
+                setInterimTranscript(interim);
             };
 
-            recognitionRef.current.onerror = (event) => {
+            recognition.onerror = (event) => {
                 console.error("Speech recognition error", event.error);
-                stopRecording();
-            };
-
-            recognitionRef.current.onend = () => {
-                // Automatically restart if still supposed to be recording
-                if (isRecording) {
-                    recognitionRef.current.start();
+                if (event.error === 'no-speech') {
+                    // Ignore no-speech and let onend handle the restart
+                } else if (event.error === 'audio-capture' || event.error === 'not-allowed') {
+                    setRecordingStatus("Error");
+                    stopRecording();
                 }
             };
+
+            recognition.onend = () => {
+                // Manual restart loop
+                if (isRecordingRef.current) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        // ignore
+                    }
+                } else {
+                    setRecordingStatus("Idle");
+                }
+            };
+
+            recognitionRef.current = recognition;
         }
 
         return () => {
             if (recognitionRef.current) {
-                recognitionRef.current.stop();
+                recognitionRef.current.onend = null;
+                try {
+                    recognitionRef.current.stop();
+                } catch (e) { }
             }
             if (timerRef.current) clearInterval(timerRef.current);
         };
+    }, []);
+
+    // Sync isRecording to a ref for the onend callback
+    const isRecordingRef = useRef(isRecording);
+    useEffect(() => {
+        isRecordingRef.current = isRecording;
     }, [isRecording]);
 
     const startRecording = () => {
@@ -76,22 +98,34 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
             alert("Speech recognition is not supported in this browser.");
             return;
         }
+
+        // Reset transcripts and timer
         setFinalTranscript("");
         setInterimTranscript("");
         setTimeLeft(300);
         setIsRecording(true);
         setIsRecordingModalOpen(true);
+        setRecordingStatus("Initializing...");
 
+        // Start Speech Recognition
         try {
             recognitionRef.current.start();
         } catch (e) {
-            console.error("Failed to start speech recognition:", e);
+            console.warn("Speech recognition already started or failed to start:", e);
         }
 
+        // Start Timer
+        if (timerRef.current) clearInterval(timerRef.current);
         timerRef.current = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
-                    stopRecording();
+                    setIsRecording(false);
+                    if (recognitionRef.current) {
+                        try {
+                            recognitionRef.current.stop();
+                        } catch (e) { }
+                    }
+                    clearInterval(timerRef.current);
                     return 0;
                 }
                 return prev - 1;
@@ -101,18 +135,21 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
 
     const stopRecording = () => {
         setIsRecording(false);
+        setRecordingStatus("Processing...");
         if (recognitionRef.current) {
-            recognitionRef.current.stop();
+            try {
+                recognitionRef.current.stop();
+            } catch (e) { }
         }
         if (timerRef.current) {
             clearInterval(timerRef.current);
         }
 
-        // Append the final recorded text to the editor
-        commitVoiceText();
+        // Small delay to ensure final transcript results are processed
         setTimeout(() => {
+            commitVoiceText();
             setIsRecordingModalOpen(false);
-        }, 500);
+        }, 400);
     };
 
     const commitVoiceText = () => {
@@ -306,9 +343,7 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                             <div className="vibrant-badge px-3 py-1 rounded-full text-[10px] font-black uppercase text-emerald-500 border border-emerald-500/20">
                                 {pitchContent.split(/\s+/).filter(Boolean).length} Words
                             </div>
-                            <div className="vibrant-badge px-3 py-1 rounded-full text-[10px] font-black uppercase text-slate-400 border border-white/5">
-                                {credits} Credits
-                            </div>
+
                         </div>
                         <button
                             onClick={analyzePitch}
@@ -462,7 +497,14 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                                 </div>
 
                                 <h3 className="text-3xl font-black text-white mb-2 tracking-tight">
-                                    {isRecording ? <span className="animate-pulse">Capturing Voice...</span> : "Ready to speak?"}
+                                    {isRecording ? (
+                                        <span className="animate-pulse">
+                                            {recordingStatus === "Listening" ? "Capturing Voice..." : recordingStatus}
+                                        </span>
+                                    ) : (
+                                        recordingStatus === "Error" ? "Recording Error" :
+                                            recordingStatus === "Processing..." ? "Syncing..." : "Ready to speak?"
+                                    )}
                                 </h3>
                                 <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/80 border border-white/5">
                                     <div className={`size-1.5 rounded-full ${isRecording ? 'bg-emerald-500 animate-ping' : 'bg-slate-600'}`}></div>

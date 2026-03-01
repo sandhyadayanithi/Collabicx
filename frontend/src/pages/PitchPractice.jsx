@@ -104,10 +104,10 @@ export default function PitchPractice() {
         <main className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10">
           <div className="max-w-6xl mx-auto">
             <header className="mb-10 text-center md:text-left">
-              <h1 className="text-5xl font-black text-white mb-3 tracking-tight drop-shadow-sm">
+              <h1 className="text-4xl font-black text-white mb-3 tracking-tight drop-shadow-sm">
                 Pitch <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Practice</span>
               </h1>
-              <p className="text-slate-400 font-medium text-lg max-w-2xl">
+              <p className="text-slate-400 font-medium text-md max-w-3xl">
                 Refine your elevator pitch with <span className="text-emerald-500/80 font-bold">AI-powered</span> feedback. Modern, minimal, and built for clarity.
               </p>
             </header>
