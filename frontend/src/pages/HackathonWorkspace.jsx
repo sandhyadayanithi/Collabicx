@@ -302,9 +302,9 @@ export default function HackathonWorkspace() {
             if (ideaToUse !== hackathon?.theme) {
                 await updateHackathon(teamId, hackathonId, { theme: ideaToUse });
                 // Optimistically update local state
-                setHackathon(prev => ({...prev, theme: ideaToUse}));
+                setHackathon(prev => ({ ...prev, theme: ideaToUse }));
             }
-            
+
             const newTasks = await generateTasksFromIdea(ideaToUse);
             for (const task of newTasks) {
                 await firebaseAddTask(teamId, hackathonId, task.title, task.category || "General");
@@ -482,7 +482,12 @@ export default function HackathonWorkspace() {
     return (
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col font-display">
             {/* Global Header */}
-            <Header title={hackathon?.name || "Loading Workspace..."} backPath="/dashboard">
+            <Header
+                title={hackathon?.name || "Loading Workspace..."}
+                backPath="/dashboard"
+                ideaContent={hackathon?.theme || null}
+                onAddIdea={() => setIsIdeaPromptOpen(true)}
+            >
             </Header>
 
             <div className="flex flex-1 w-full max-w-[1600px] mx-auto p-6 overflow-hidden">
@@ -667,7 +672,7 @@ export default function HackathonWorkspace() {
                                         {isGeneratingTasks ? (
                                             <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
                                         ) : (
-                                            <span className="material-symbols-outlined text-sm">auto_awesome</span> 
+                                            <span className="material-symbols-outlined text-sm">auto_awesome</span>
                                         )}
                                         {isGeneratingTasks ? 'Generating...' : 'AI Suggest Tasks'}
                                     </button>
