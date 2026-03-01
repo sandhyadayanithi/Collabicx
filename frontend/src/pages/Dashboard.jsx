@@ -42,7 +42,8 @@ export default function Dashboard() {
                 // Fetch user data
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
-                if (userSnap.exists() && !userSnap.data().usageRole) {
+                const data = userSnap.data();
+                if (userSnap.exists() && !(data.profession || data.usageRole || data.username)) {
                     navigate('/profile-setup');
                     return;
                 }

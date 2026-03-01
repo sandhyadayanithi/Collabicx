@@ -55,7 +55,7 @@ export default function Discover() {
             if (snap.exists()) {
                 const data = snap.data();
                 setUserData({ id: user.uid, ...data });
-                if (!data.usageRole) {
+                if (!(data.profession || data.usageRole || data.username)) {
                     navigate('/profile-setup');
                     return;
                 }

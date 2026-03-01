@@ -18,8 +18,7 @@ export default function Profile() {
     const [role, setRole] = useState('');
     const [college, setCollege] = useState('');
     const [verifiedStudent, setVerifiedStudent] = useState(false);
-    const [collegeName, setCollegeName] = useState('');
-    const [usageRole, setUsageRole] = useState('');
+    const [profession, setProfession] = useState('');
     const [message, setMessage] = useState({ text: '', type: '' });
 
     useEffect(() => {
@@ -29,7 +28,7 @@ export default function Profile() {
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     const data = userSnap.data();
-                    if (!data.usageRole) {
+                    if (!data.profession) {
                         navigate('/profile-setup');
                         return;
                     }
@@ -39,8 +38,7 @@ export default function Profile() {
                     setBio(data.bio || '');
                     setCollege(data.college || '');
                     setVerifiedStudent(data.verifiedStudent || false);
-                    setCollegeName(data.collegeName || '');
-                    setUsageRole(data.usageRole || '');
+                    setProfession(data.profession || '');
                 }
             } else {
                 navigate('/login');
@@ -62,7 +60,7 @@ export default function Profile() {
                 name,
                 role,
                 bio,
-                college: verifiedStudent ? (collegeName || college) : college,
+                college,
                 updatedAt: new Date()
             });
             setMessage({ text: 'Profile updated successfully!', type: 'success' });
@@ -179,7 +177,7 @@ export default function Profile() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="block text-[11px] font-black uppercase tracking-[0.15em] text-vibrant-secondary ml-1 flex items-center gap-1.5">
-                                        College
+                                        {profession === 'Student' ? 'College' : 'Company/Organization (Optional)'}
                                         {verifiedStudent && (
                                             <span className="flex items-center gap-1 text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20" title="Verified Institution">
                                                 <span className="material-symbols-outlined text-[13px]">verified</span>
@@ -189,9 +187,9 @@ export default function Profile() {
                                     </label>
                                     <input
                                         className={`w-full h-13 px-5 vibrant-badge rounded-xl text-vibrant-primary placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-black ${verifiedStudent ? 'opacity-80 cursor-not-allowed bg-emerald-500/5 border-emerald-500/20' : ''}`}
-                                        value={verifiedStudent ? (collegeName || college) : college}
+                                        value={college}
                                         onChange={(e) => { if (!verifiedStudent) setCollege(e.target.value) }}
-                                        placeholder="Your College"
+                                        placeholder={profession === 'Student' ? 'Your College' : 'Company Name'}
                                         disabled={verifiedStudent}
                                     />
                                 </div>

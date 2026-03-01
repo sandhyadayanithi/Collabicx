@@ -59,7 +59,7 @@ export default function TeamsDashboard() {
                     if (snap.exists()) {
                         const data = snap.data();
                         setUserData(data);
-                        if (!data.usageRole) {
+                        if (!(data.profession || data.usageRole || data.username)) {
                             navigate('/profile-setup');
                             return;
                         }

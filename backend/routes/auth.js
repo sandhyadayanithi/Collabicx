@@ -9,8 +9,26 @@ const PERSONAL_DOMAINS = new Set([
 ]);
 
 router.post('/verify-role', async (req, res) => {
+  console.log("Received /verify-role request:", {
+    headers: req.headers,
+    body: req.body
+  });
   try {
     const authHeader = req.headers.authorization;
+
+    // Defensive logging
+    console.log("--- Verify Role Debug ---");
+    console.log("Auth Header Exists:", !!authHeader);
+    if (authHeader) {
+      console.log("Auth Header Length:", authHeader.length);
+      const tokenParts = authHeader.split('Bearer ');
+      if (tokenParts.length > 1) {
+        console.log("Token Length:", tokenParts[1].length);
+      }
+    }
+    console.log("Firebase Project ID:", admin.app().options.projectId || process.env.FIREBASE_PROJECT_ID || 'Unknown');
+    console.log("-------------------------");
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
     }
@@ -20,24 +38,28 @@ router.post('/verify-role', async (req, res) => {
     try {
       decodedToken = await admin.auth().verifyIdToken(idToken);
     } catch (error) {
-      console.error("Error verifying auth token", error);
-      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+      console.error("Error verifying auth token:", error);
+      return res.status(401).json({
+        error: 'Unauthorized: Invalid token',
+        details: error.message,
+        code: error.code
+      });
     }
 
     const { uid, email } = decodedToken;
-    const { username, role, avatar, usageRole } = req.body;
+    const { username, role, avatar, profession } = req.body;
 
-    if (!usageRole || (usageRole !== 'student' && usageRole !== 'professional')) {
-      return res.status(400).json({ error: 'Invalid usage role' });
+    if (!profession || (profession !== 'Student' && profession !== 'Other')) {
+      return res.status(400).json({ error: 'Invalid profession' });
     }
 
     const domain = email.split('@')[1].toLowerCase();
 
     let verifiedStudent = false;
     let collegeDomain = null;
-    let collegeName = null;
+    let college = null;
 
-    if (usageRole === 'student') {
+    if (profession === 'Student') {
       if (PERSONAL_DOMAINS.has(domain)) {
         return res.status(400).json({ error: 'Student accounts require a valid college-issued email address.' });
       }
@@ -51,17 +73,17 @@ router.post('/verify-role', async (req, res) => {
         if (response.ok) {
           const data = await response.json();
           if (data && data.length > 0) {
-            collegeName = data[0].name;
+            college = data[0].name;
           }
         }
       } catch (err) {
         console.error("Error fetching college name", err);
       }
 
-      if (!collegeName) {
+      if (!college) {
         // Fallback: capitalize domain prefix
         const prefix = domain.split('.')[0];
-        collegeName = prefix.charAt(0).toUpperCase() + prefix.slice(1) + " University";
+        college = prefix.charAt(0).toUpperCase() + prefix.slice(1) + " University";
       }
     }
 
@@ -70,15 +92,14 @@ router.post('/verify-role', async (req, res) => {
       username: username.toLowerCase(),
       role: role || 'Developer',
       avatar: avatar || null,
-      usageRole,
+      profession,
       verifiedStudent,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     };
 
-    if (usageRole === 'student') {
+    if (profession === 'Student') {
       updateData.collegeDomain = collegeDomain;
-      updateData.collegeName = collegeName;
-      updateData.college = collegeName; // For backwards compatibility with Profile
+      updateData.college = college;
     }
 
     await userRef.set(updateData, { merge: true });
