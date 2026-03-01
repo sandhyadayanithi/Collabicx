@@ -9,6 +9,7 @@ import TeamSelection from './pages/TeamSelection'
 import TeamsDashboard from './pages/TeamsDashboard'
 import HackathonWorkspace from './pages/HackathonWorkspace'
 import Discover from './pages/Discover'
+import PitchPractice from './pages/PitchPractice'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
       <Route path="/teams/select" element={<TeamSelection />} />
       <Route path="/teams" element={<TeamsDashboard />} />
       <Route path="/discover" element={<Discover />} />
+      <Route path="/pitch" element={<PitchPractice />} />
       <Route path="/workspace/:teamId/:hackathonId" element={<HackathonWorkspace />} />
     </Routes>
   )

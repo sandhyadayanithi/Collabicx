@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { auth } from '../firebase/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Bold, List, Play, Square, Loader, AlertTriangle, CheckCircle, ChevronRight, Check } from 'lucide-react';
 
@@ -167,38 +168,44 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
 
         setIsAnalyzing(true);
         try {
-            // Mock API Call matching the backend service requirements
-            const reqBody = { userId, targetId, pitchContent };
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Please log in to use AI analysis.");
+                return;
+            }
 
-            // We simulate the fetch here based on the instructions
-            const simulateNetwork = new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    if (credits < 1) {
-                        reject(new Error("INSUFFICIENT_ANALYZE_CREDITS"));
-                    } else {
-                        resolve({
-                            overallScore: Math.floor(Math.random() * 20) + 75,
-                            clarityScore: 82,
-                            confidenceScore: 88,
-                            structureScore: 79,
-                            best_part: "The hook is very engaging.",
-                            worse_part: "The closing CTA is weak.",
-                            strengths: ["Strong problem statement", "Clear solution"],
-                            improvements: ["Add more urgency", "Clarify market size"],
-                            feedback: "Overall good, but can be sharper in the closing."
-                        });
-                    }
-                }, 2000);
+            const idToken = await user.getIdToken();
+            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+
+            const response = await fetch(`${backendUrl}/api/pitch/analyze`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    targetId,
+                    pitchContent
+                })
             });
 
-            const data = await simulateNetwork;
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 402) {
+                    throw new Error("INSUFFICIENT_ANALYZE_CREDITS");
+                }
+                throw new Error(errorData.error || "Failed to analyze pitch");
+            }
+
+            const data = await response.json();
             setAnalysisResult(data);
 
         } catch (err) {
+            console.error("Analysis Error:", err);
             if (err.message === "INSUFFICIENT_ANALYZE_CREDITS") {
                 alert("INSUFFICIENT_ANALYZE_CREDITS: Please recharge your account.");
             } else {
-                alert("An error occurred during analysis.");
+                alert(err.message || "An error occurred during analysis.");
             }
         } finally {
             setIsAnalyzing(false);

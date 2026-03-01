@@ -1,5 +1,5 @@
-const admin = require('firebase-admin');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import admin from 'firebase-admin';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Mock credit functions as requested
 const mockCreditSystem = {
@@ -133,6 +133,7 @@ Here is the pitch text to analyze:
     }
 }
 
-module.exports = {
+export {
     analyzePitch
 };
+
