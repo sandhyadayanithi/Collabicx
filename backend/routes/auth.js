@@ -9,8 +9,26 @@ const PERSONAL_DOMAINS = new Set([
 ]);
 
 router.post('/verify-role', async (req, res) => {
+  console.log("Received /verify-role request:", {
+    headers: req.headers,
+    body: req.body
+  });
   try {
     const authHeader = req.headers.authorization;
+
+    // Defensive logging
+    console.log("--- Verify Role Debug ---");
+    console.log("Auth Header Exists:", !!authHeader);
+    if (authHeader) {
+      console.log("Auth Header Length:", authHeader.length);
+      const tokenParts = authHeader.split('Bearer ');
+      if (tokenParts.length > 1) {
+        console.log("Token Length:", tokenParts[1].length);
+      }
+    }
+    console.log("Firebase Project ID:", admin.app().options.projectId || process.env.FIREBASE_PROJECT_ID || 'Unknown');
+    console.log("-------------------------");
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
     }
@@ -20,8 +38,12 @@ router.post('/verify-role', async (req, res) => {
     try {
       decodedToken = await admin.auth().verifyIdToken(idToken);
     } catch (error) {
-      console.error("Error verifying auth token", error);
-      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+      console.error("Error verifying auth token:", error);
+      return res.status(401).json({
+        error: 'Unauthorized: Invalid token',
+        details: error.message,
+        code: error.code
+      });
     }
 
     const { uid, email } = decodedToken;

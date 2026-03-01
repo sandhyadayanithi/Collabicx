@@ -142,7 +142,15 @@ export default function ProfileSetup() {
         setError('');
 
         try {
-            const idToken = await user.getIdToken();
+            // Explicitly ensure Firebase Auth is ready and user is available
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                setError('Authentication state is not ready. Please try again in a moment.');
+                setLoading(false);
+                return;
+            }
+
+            const idToken = await currentUser.getIdToken(true); // Force refresh to get a fresh token
             const response = await fetch('http://localhost:4000/api/auth/verify-role', {
                 method: 'POST',
                 headers: {
@@ -160,7 +168,8 @@ export default function ProfileSetup() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Failed to verify role and update profile.');
+                console.error("Backend error details:", data);
+                throw new Error(data.details || data.error || 'Failed to verify role and update profile.');
             }
 
             navigate('/teams');

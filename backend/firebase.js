@@ -1,16 +1,12 @@
 import admin from 'firebase-admin';
 
+import serviceAccount from './config/serviceAccountKey.json' with { type: 'json' };
+
 if (!admin.apps.length) {
-    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (serviceAccountJson) {
-        admin.initializeApp({
-            credential: admin.credential.cert(JSON.parse(serviceAccountJson))
-        });
-    } else {
-        admin.initializeApp({
-            credential: admin.credential.applicationDefault()
-        });
-    }
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+    console.log("Firebase Admin initialized for project:", admin.app().options.projectId);
 }
 
 export const db = admin.firestore();
