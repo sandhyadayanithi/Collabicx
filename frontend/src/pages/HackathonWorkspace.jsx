@@ -484,7 +484,7 @@ export default function HackathonWorkspace() {
             {/* Global Header */}
             <Header
                 title={hackathon?.name || "Loading Workspace..."}
-                backPath="/dashboard"
+                backPath={teamId ? `/dashboard/${teamId}` : "/dashboard"}
                 ideaContent={hackathon?.theme || null}
                 onAddIdea={() => setIsIdeaPromptOpen(true)}
             >
