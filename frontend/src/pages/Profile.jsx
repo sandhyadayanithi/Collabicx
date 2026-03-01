@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase/config';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { logout, deleteUserAccount } from '../firebase/functions';
 import { useNavigate } from 'react-router-dom';
+
+// Import Avatars
+import avatar1 from '../assets/avatars/avatar1.png';
+import avatar2 from '../assets/avatars/avatar2.png';
+import avatar3 from '../assets/avatars/avatar3.png';
+import avatar4 from '../assets/avatars/avatar4.png';
+import avatar5 from '../assets/avatars/avatar5.png';
 
 export default function Profile() {
     const navigate = useNavigate();
@@ -19,7 +26,11 @@ export default function Profile() {
     const [college, setCollege] = useState('');
     const [verifiedStudent, setVerifiedStudent] = useState(false);
     const [profession, setProfession] = useState('');
+    const [selectedAvatar, setSelectedAvatar] = useState('');
+    const [showAvatarPicker, setShowAvatarPicker] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
+
+    const presetAvatars = [avatar1, avatar2, avatar3, avatar4, avatar5];
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -39,6 +50,7 @@ export default function Profile() {
                     setCollege(data.college || '');
                     setVerifiedStudent(data.verifiedStudent || false);
                     setProfession(data.profession || '');
+                    setSelectedAvatar(data.avatar || avatar1);
                 }
             } else {
                 navigate('/login');
@@ -56,13 +68,16 @@ export default function Profile() {
         setMessage({ text: '', type: '' });
         try {
             const userRef = doc(db, "users", auth.currentUser.uid);
+            console.log("Saving profile with avatar:", selectedAvatar);
             await updateDoc(userRef, {
                 name,
                 role,
                 bio,
                 college,
-                updatedAt: new Date()
+                avatar: selectedAvatar,
+                updatedAt: serverTimestamp()
             });
+            console.log("Profile updated successfully in Firestore");
             setMessage({ text: 'Profile updated successfully!', type: 'success' });
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -113,11 +128,19 @@ export default function Profile() {
                 <div className="vibrant-card rounded-[32px] border border-emerald-500/20 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
                     {/* Profile Header Background */}
                     <div className="h-32 bg-gradient-to-r from-emerald-500/30 via-green-600/20 to-transparent relative">
-                        <div className="absolute -bottom-16 left-10 p-1.5 vibrant-card rounded-full border-none">
+                        <div className="absolute -bottom-16 left-10 p-1.5 vibrant-card rounded-full border-none group">
                             <div
-                                className="size-32 rounded-full border-4 border-white dark:border-emerald-900 shadow-xl bg-slate-100 dark:bg-emerald-900/40 bg-cover bg-center"
-                                style={{ backgroundImage: `url(${userData?.avatar})` }}
-                            ></div>
+                                className="size-32 rounded-full border-4 border-white dark:border-emerald-900 shadow-xl bg-slate-100 dark:bg-emerald-900/40 bg-cover bg-center relative overflow-hidden"
+                                style={{ backgroundImage: `url(${selectedAvatar})` }}
+                            >
+                                <button
+                                    onClick={() => setShowAvatarPicker(true)}
+                                    className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    title="Change Avatar"
+                                >
+                                    <span className="material-symbols-outlined text-white text-3xl">photo_camera</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -236,6 +259,46 @@ export default function Profile() {
                     </div>
                 </div>
             </main>
+
+            {/* Avatar Selection Modal */}
+            {showAvatarPicker && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="vibrant-card rounded-[32px] border border-emerald-500/20 shadow-2xl p-8 max-w-md w-full animate-in zoom-in-95 duration-300">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-black text-vibrant-primary">Choose Avatar</h2>
+                            <button
+                                onClick={() => setShowAvatarPicker(false)}
+                                className="size-8 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-emerald-500/10 text-vibrant-secondary transition-colors"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <div className="flex justify-center gap-4 py-4 overflow-x-auto pb-6">
+                            {presetAvatars.map((ava, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => {
+                                        setSelectedAvatar(ava);
+                                        setShowAvatarPicker(false);
+                                    }}
+                                    className={`size-16 rounded-full border-4 transition-all duration-300 flex-shrink-0 bg-cover bg-center ${selectedAvatar === ava ? 'border-primary scale-110 shadow-lg shadow-primary/30' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'}`}
+                                    style={{ backgroundImage: `url(${ava})` }}
+                                ></button>
+                            ))}
+                        </div>
+
+                        <div className="flex justify-end mt-4">
+                            <button
+                                onClick={() => setShowAvatarPicker(false)}
+                                className="h-11 px-8 bg-slate-200 dark:bg-emerald-900/40 hover:bg-slate-300 dark:hover:bg-emerald-900/60 text-vibrant-primary rounded-xl font-black transition-all"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
