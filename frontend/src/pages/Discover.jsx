@@ -71,12 +71,17 @@ export default function Discover() {
     }, [navigate]);
 
     useEffect(() => {
+        if (!userData) return;
         const unsub = listenToTeamOpenings((data) => {
             setOpenings(data);
             setLoading(false);
+        }, (error) => {
+            console.error("Failed to load openings:", error);
+            setLoading(false); // Stop loading even on error
+            pushToast("Failed to load team openings.", "error");
         });
         return () => unsub();
-    }, []);
+    }, [userData]);
 
     useEffect(() => {
         const fetchLead = async (userId) => {
@@ -123,31 +128,21 @@ export default function Discover() {
                 const term = search.toLowerCase();
                 return (o.teamName || '').toLowerCase().includes(term)
                     || (o.description || '').toLowerCase().includes(term)
-                    || (o.collegeScope?.collegeName || '').toLowerCase().includes(term);
+                    || (o.collegeDomain || '').toLowerCase().includes(term);
             })
             .filter(o => {
                 if (selectedRoles.length === 0) return true;
                 return selectedRoles.some(role => (o.requiredRoles || []).includes(role));
-            })
-            .filter(o => {
-                if (collegeFilter === 'ALL') return true;
-                if (collegeFilter === 'ALL_COLLEGES') return o.collegeScope?.type === 'ALL';
-                if (collegeFilter === 'MY_COLLEGE') {
-                    return o.collegeScope?.type === 'ALL'
-                        || (userData?.college && o.collegeScope?.collegeName?.toLowerCase() === userData.college.toLowerCase());
-                }
-                return true;
             });
-    }, [openings, search, selectedRoles, collegeFilter, userData?.college]);
+    }, [openings, search, selectedRoles]);
 
     const toggleRole = (role) => {
         setSelectedRoles(prev => prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]);
     };
 
     const isEligible = (opening) => {
-        if (opening.collegeScope?.type === 'ALL') return true;
-        if (!userData?.college) return false;
-        return opening.collegeScope?.collegeName?.toLowerCase() === userData.college.toLowerCase();
+        // Backend already filters visibility. Eligibility here can just check if user is in team.
+        return true;
     };
 
     const isAlreadyInTeam = (opening) => {
@@ -273,25 +268,27 @@ export default function Discover() {
                                         />
                                     </div>
 
-                                    {/* Scope Filters */}
-                                    <div className="flex items-center bg-slate-800/50 p-1 rounded-xl border border-white/5 h-fit overflow-hidden">
-                                        {[
-                                            { id: 'ALL', label: 'All' },
-                                            { id: 'ALL_COLLEGES', label: 'All Colleges' },
-                                            { id: 'MY_COLLEGE', label: 'My College' }
-                                        ].map(option => (
-                                            <button
-                                                key={option.id}
-                                                onClick={() => setCollegeFilter(option.id)}
-                                                className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all ${collegeFilter === option.id
-                                                    ? 'bg-emerald-500 text-emerald-950 shadow-lg'
-                                                    : 'text-slate-400 hover:text-white'
-                                                    }`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
-                                    </div>
+                                    {/* Scope Filters - Only for Students */}
+                                    {userData?.profession === 'Student' && (
+                                        <div className="flex items-center bg-slate-800/50 p-1 rounded-xl border border-white/5 h-fit overflow-hidden">
+                                            {[
+                                                { id: 'ALL', label: 'All' },
+                                                { id: 'ALL_COLLEGES', label: 'All Colleges' },
+                                                { id: 'MY_COLLEGE', label: 'My College' }
+                                            ].map(option => (
+                                                <button
+                                                    key={option.id}
+                                                    onClick={() => setCollegeFilter(option.id)}
+                                                    className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all ${collegeFilter === option.id
+                                                        ? 'bg-emerald-500 text-emerald-950 shadow-lg'
+                                                        : 'text-slate-400 hover:text-white'
+                                                        }`}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Skills Toolbar */}
@@ -310,12 +307,14 @@ export default function Discover() {
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="hidden lg:flex items-center gap-2">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">My College:</span>
-                                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase">
-                                            {userData?.college || 'N/A'}
-                                        </span>
-                                    </div>
+                                    {userData?.profession === 'Student' && (
+                                        <div className="hidden lg:flex items-center gap-2">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">My College:</span>
+                                            <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase">
+                                                {userData?.college || 'N/A'}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </header>
@@ -357,11 +356,13 @@ export default function Discover() {
                                                     </p>
                                                 </div>
                                                 <div className="shrink-0 flex flex-col items-end gap-2">
-                                                    <span className={`px-2 py-1 text-[9px] font-black uppercase border rounded-lg ${opening.collegeScope?.type === 'ALL'
+                                                    <span className={`px-2 py-1 text-[9px] font-black uppercase border rounded-lg flex items-center gap-1 ${opening.visibility === 'public'
                                                         ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
                                                         : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
                                                         }`}>
-                                                        {opening.collegeScope?.type === 'ALL' ? 'All Colleges' : (opening.collegeScope?.collegeName || 'Selected')}
+                                                        {opening.visibility === 'public' && <>🌍 <span className="hidden sm:inline">Everyone</span></>}
+                                                        {opening.visibility === 'all-colleges' && <>🏫 <span className="hidden sm:inline">All Students</span></>}
+                                                        {opening.visibility === 'my-college' && <>🎓 <span className="hidden sm:inline">College Only</span></>}
                                                     </span>
                                                     <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-800/80 rounded-lg border border-white/5">
                                                         <span className="size-2 bg-emerald-500 rounded-full animate-pulse"></span>

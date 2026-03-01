@@ -554,33 +554,68 @@ export const editMessage = async (teamId, hackathonId, messageId, newMessage) =>
 // --- 9. Discover: Team Openings & Applications ---
 
 export const createTeamOpening = async (teamId, userId, data) => {
-    const member = await getTeamMemberRecord(teamId, userId);
-    if (!member || member.role !== 'owner') {
-        throw new Error("Only team leads can create openings.");
+    const idToken = await auth.currentUser.getIdToken(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'}/api/team-openings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                teamId,
+                description: data.description,
+                requiredRoles: data.requiredRoles,
+                visibility: data.visibility,
+                slotsOpen: data.slotsOpen
+            }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to create opening');
+        }
+
+        return await response.json();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
     }
+};
 
-    const teamSnap = await getDoc(doc(db, "teams", teamId));
-    if (!teamSnap.exists()) throw new Error("Team not found.");
+export const getTeamOpenings = async () => {
+    if (!auth.currentUser) {
+        console.warn("getTeamOpenings called without authenticated user.");
+        return [];
+    }
+    const idToken = await auth.currentUser.getIdToken(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const payload = {
-        teamId,
-        teamName: teamSnap.data().name || 'Unnamed Team',
-        createdBy: userId,
-        description: data.description || '',
-        requiredRoles: data.requiredRoles || [],
-        collegeScope: data.collegeScope || { type: "ALL" },
-        slotsOpen: Number.isFinite(data.slotsOpen) ? data.slotsOpen : 1,
-        status: data.status || "OPEN",
-        createdAt: serverTimestamp()
-    };
+    try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'}/api/team-openings`, {
+            headers: {
+                'Authorization': `Bearer ${idToken}`
+            },
+            signal: controller.signal
+        });
 
-    const ref = await addDoc(collection(db, "teamOpenings"), payload);
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to fetch openings');
+        }
 
-    await logActivity(teamId, userId, 'create_team_opening', {
-        teamName: payload.teamName
-    });
-
-    return { id: ref.id, ...payload };
+        return await response.json();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
 };
 
 export const updateTeamOpeningStatus = async (openingId, status) => {
@@ -611,20 +646,20 @@ export const deleteTeamOpening = async (openingId, userId) => {
     await deleteDoc(ref);
 };
 
-export const listenToTeamOpenings = (callback) => {
-    const q = query(
-        collection(db, "teamOpenings"),
-        orderBy("createdAt", "desc")
-    );
-    return onSnapshot(q, (snapshot) => {
-        const openings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        callback(openings);
-    }, (error) => {
-        console.error("Error listening to team openings:", error);
-        if (error.code === 'failed-precondition') {
-            console.warn("This query likely requires a Firestore index. Check the link in the full error object.");
+export const listenToTeamOpenings = (callback, errorCallback) => {
+    const poll = async () => {
+        try {
+            if (!auth.currentUser) return; // Wait for auth
+            const data = await getTeamOpenings();
+            callback(data);
+        } catch (error) {
+            console.error("Error polling openings:", error);
+            if (errorCallback) errorCallback(error);
         }
-    });
+    };
+    poll();
+    const interval = setInterval(poll, 30000); // Poll every 30s as fallback
+    return () => clearInterval(interval);
 };
 
 export const listenToTeamOpeningsByLead = (userId, callback) => {

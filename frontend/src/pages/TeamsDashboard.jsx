@@ -42,6 +42,7 @@ export default function TeamsDashboard() {
         description: '',
         requiredRoles: [],
         collegeScopeType: 'ALL',
+        visibility: 'public',
         collegeName: '',
         slotsOpen: 1
     });
@@ -179,9 +180,7 @@ export default function TeamsDashboard() {
             const newOpening = await createTeamOpening(openingForm.teamId, currentUserId, {
                 description: openingForm.description,
                 requiredRoles: openingForm.requiredRoles,
-                collegeScope: openingForm.collegeScopeType === 'ALL'
-                    ? { type: 'ALL' }
-                    : { type: 'COLLEGE_ONLY', collegeName: openingForm.collegeName },
+                visibility: userData?.profession === 'Student' ? openingForm.visibility : 'public',
                 slotsOpen: Number(openingForm.slotsOpen || 1),
                 status: 'OPEN'
             });
@@ -192,7 +191,7 @@ export default function TeamsDashboard() {
                 teamId: openingForm.teamId,
                 description: '',
                 requiredRoles: [],
-                collegeScopeType: 'ALL',
+                visibility: 'public',
                 collegeName: '',
                 slotsOpen: 1
             });
@@ -666,30 +665,32 @@ export default function TeamsDashboard() {
                                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">College Scope</label>
-                                    <select
-                                        value={openingForm.collegeScopeType}
-                                        onChange={(e) => setOpeningForm(prev => ({ ...prev, collegeScopeType: e.target.value }))}
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
-                                    >
-                                        <option value="ALL">All Colleges</option>
-                                        <option value="COLLEGE_ONLY">Specific College</option>
-                                    </select>
-                                </div>
+                                {userData?.profession === 'Student' ? (
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5 text-emerald-500">Who can join this team?</label>
+                                        <select
+                                            value={openingForm.visibility}
+                                            onChange={(e) => setOpeningForm(prev => ({ ...prev, visibility: e.target.value }))}
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
+                                        >
+                                            <option value="my-college">Only my college ({userData.college || 'Domain Only'})</option>
+                                            <option value="all-colleges">Students from any college</option>
+                                            <option value="public">Everyone (Public)</option>
+                                        </select>
+                                        <p className="mt-1.5 text-[10px] text-slate-500 font-bold italic">
+                                            {openingForm.visibility === 'my-college' && "Visible only to verified students from your institution."}
+                                            {openingForm.visibility === 'all-colleges' && "Visible to students globally, hidden from professionals."}
+                                            {openingForm.visibility === 'public' && "Visible to all Collabix users."}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl border border-dashed border-white/10">
+                                            🚀 Professional opening – Automatically set to public visibility.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
-                            {openingForm.collegeScopeType === 'COLLEGE_ONLY' && (
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">College Name</label>
-                                    <input
-                                        value={openingForm.collegeName}
-                                        onChange={(e) => setOpeningForm(prev => ({ ...prev, collegeName: e.target.value }))}
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
-                                        placeholder="e.g., Stanford University"
-                                        required
-                                    />
-                                </div>
-                            )}
                             <div className="pt-4 flex gap-3">
                                 <button
                                     type="button"
