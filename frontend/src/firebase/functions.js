@@ -467,6 +467,11 @@ export const getTasks = async (teamId, hackathonId) => {
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+export const deleteTask = async (teamId, hackathonId, taskId) => {
+    const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`, taskId);
+    await deleteDoc(ref);
+};
+
 // --- 7. Submission Links Functions ---
 
 export const addLink = async (teamId, hackathonId, label, url, type = "link", icon = "link", color = "bg-slate-500") => {

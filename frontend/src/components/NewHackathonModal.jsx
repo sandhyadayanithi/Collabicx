@@ -123,13 +123,14 @@ export default function NewHackathonModal(props) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Theme / Domain <span className="font-normal text-slate-400">(Optional)</span></label>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Project Idea / Theme <span className="font-normal text-slate-400">(Optional)</span></label>
+                  <p className="text-xs text-slate-500 mb-2">Add your project idea to get AI-powered task suggestions later in your workspace.</p>
                   <input
                     name="theme"
                     value={formData.theme}
                     onChange={handleChange}
                     className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white"
-                    placeholder="e.g. AI, Sustainability, Fintech"
+                    placeholder="e.g. An AI-powered task manager for hackathons"
                   />
                 </div>
               </div>

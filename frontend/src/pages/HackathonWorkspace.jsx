@@ -13,11 +13,14 @@ import {
     addLink as firebaseAddLink,
     deleteLink,
     getHackathonDetails,
-    editMessage
+    editMessage,
+    updateHackathon,
+    deleteTask as firebaseDeleteTask
 } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { generateTasksFromIdea } from '../services/gemini';
 
 
 export default function HackathonWorkspace() {
@@ -285,12 +288,60 @@ export default function HackathonWorkspace() {
     // -- State: Task Modal --
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [newTaskCategory, setNewTaskCategory] = useState("General");
+    const [isGeneratingTasks, setIsGeneratingTasks] = useState(false);
+    const [isIdeaPromptOpen, setIsIdeaPromptOpen] = useState(false);
+    const [projectIdeaInput, setProjectIdeaInput] = useState("");
+
+    const handleGenerateTasks = async (ideaToUse) => {
+        setIsIdeaPromptOpen(false);
+        if (!ideaToUse || !teamId || !hackathonId) return;
+
+        setIsGeneratingTasks(true);
+        try {
+            // Check if we need to update the hackathon idea
+            if (ideaToUse !== hackathon?.theme) {
+                await updateHackathon(teamId, hackathonId, { theme: ideaToUse });
+                // Optimistically update local state
+                setHackathon(prev => ({...prev, theme: ideaToUse}));
+            }
+            
+            const newTasks = await generateTasksFromIdea(ideaToUse);
+            for (const task of newTasks) {
+                await firebaseAddTask(teamId, hackathonId, task.title, task.category || "General");
+            }
+        } catch (error) {
+            console.error("Failed to generate tasks:", error);
+            alert("Failed to generate tasks using AI. Please ensure your Gemini API key is configured correctly.");
+        } finally {
+            setIsGeneratingTasks(false);
+            setProjectIdeaInput("");
+        }
+    };
+
+    const handleAITaskButtonClick = () => {
+        if (hackathon?.theme) {
+            handleGenerateTasks(hackathon.theme);
+        } else {
+            setIsIdeaPromptOpen(true);
+        }
+    };
 
     const toggleTask = async (id) => {
         try {
             await toggleTaskComplete(teamId, hackathonId, id);
         } catch (error) {
             console.error("Error toggling task:", error);
+        }
+    };
+
+    const handleDeleteTask = async (id, e) => {
+        e.stopPropagation(); // prevent toggling the task
+        if (window.confirm("Are you sure you want to delete this task?")) {
+            try {
+                await firebaseDeleteTask(teamId, hackathonId, id);
+            } catch (error) {
+                console.error("Error deleting task:", error);
+            }
         }
     };
 
@@ -612,6 +663,14 @@ export default function HackathonWorkspace() {
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Sprint Tasks</h3>
                                 <div className="flex items-center gap-2">
+                                    <button onClick={(e) => { e.stopPropagation(); handleAITaskButtonClick(); }} disabled={isGeneratingTasks} className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 flex items-center gap-1 text-sm font-bold mr-2 disabled:opacity-50">
+                                        {isGeneratingTasks ? (
+                                            <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                                        ) : (
+                                            <span className="material-symbols-outlined text-sm">auto_awesome</span> 
+                                        )}
+                                        {isGeneratingTasks ? 'Generating...' : 'AI Suggest Tasks'}
+                                    </button>
                                     <button onClick={(e) => { e.stopPropagation(); addTask(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
                                         <span className="material-symbols-outlined text-sm">add</span> Add
                                     </button>
@@ -647,13 +706,20 @@ export default function HackathonWorkspace() {
                                                 type="checkbox"
                                                 checked={task.completed}
                                                 onChange={() => toggleTask(task.id)}
-                                                className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer"
+                                                className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer shrink-0"
                                             />
-                                            <div className="flex-1">
-                                                <p className={`text-sm text-text-primary font-black ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`text-sm text-text-primary font-black truncate ${task.completed ? 'line-through text-slate-500' : ''}`}>
                                                     {task.title}
                                                 </p>
                                             </div>
+                                            <button
+                                                onClick={(e) => handleDeleteTask(task.id, e)}
+                                                className="hidden group-hover:flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors"
+                                                title="Delete Task"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">delete</span>
+                                            </button>
                                         </div>
                                     ))}
                                     {tasks.length === 0 && (
@@ -831,6 +897,58 @@ export default function HackathonWorkspace() {
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* AI Idea Prompt Modal */}
+            {
+                isIdeaPromptOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in zoom-in-95 duration-200">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+                                        <span className="material-symbols-outlined">auto_awesome</span>
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">AI Task Suggestions</h3>
+                                    </div>
+                                    <button onClick={() => setIsIdeaPromptOpen(false)} className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                                        <span className="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        To generate tasks, the AI needs to know what you are building. Please enter your project idea or theme below.
+                                    </p>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Project Idea</label>
+                                        <textarea
+                                            value={projectIdeaInput}
+                                            onChange={(e) => setProjectIdeaInput(e.target.value)}
+                                            placeholder="e.g., An AI planner that helps generate sprint tasks for hackathons..."
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all text-sm font-medium text-slate-900 dark:text-white min-h-[100px] resize-none"
+                                            autoFocus
+                                        />
+                                    </div>
+                                    <div className="pt-4 flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsIdeaPromptOpen(false)}
+                                            className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => handleGenerateTasks(projectIdeaInput)}
+                                            disabled={!projectIdeaInput.trim()}
+                                            className="flex-1 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Generate Tasks
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
