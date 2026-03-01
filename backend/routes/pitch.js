@@ -27,14 +27,14 @@ router.use(verifyToken);
 router.post('/analyze', async (req, res) => {
   console.log("POST /api/pitch/analyze - Start", { userId: req.user?.uid, body: req.body });
   try {
-    const { targetId, pitchContent } = req.body;
+    const { targetId, pitchContent, hackathonIdea } = req.body;
     const userId = req.user.uid;
 
     if (!pitchContent || !pitchContent.trim()) {
       return res.status(400).json({ error: 'Pitch content is required' });
     }
 
-    const result = await analyzePitch(userId, targetId || 'general', pitchContent);
+    const result = await analyzePitch(userId, targetId || 'general', pitchContent, hackathonIdea || null);
     res.status(200).json(result);
   } catch (error) {
     console.error("Error in /api/pitch/analyze:", error);

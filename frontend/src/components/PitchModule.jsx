@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { auth } from '../firebase/config';
+import { auth, db } from '../firebase/config';
+import { doc, updateDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Bold, List, Play, Square, Loader, AlertTriangle, CheckCircle, ChevronRight, Check } from 'lucide-react';
 
-export default function PitchModule({ userId = "user123", targetId = "target123", credits = 10 }) {
+export default function PitchModule({ userId = "user123", targetId = "target123", credits = 10, hackathonIdea = null, selectedTeamId = null, selectedHackathonId = null, onIdeaSaved }) {
     // Editor State
     const [pitchContent, setPitchContent] = useState("");
     const editorRef = useRef(null);
@@ -13,6 +14,10 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState(null);
 
+    // Add Idea Popup State
+    const [showAddIdeaPopup, setShowAddIdeaPopup] = useState(false);
+    const [ideaInputValue, setIdeaInputValue] = useState('');
+    const [isSavingIdea, setIsSavingIdea] = useState(false);
     // Voice Recording State
     const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
@@ -197,9 +202,16 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
         return `${m}:${s}`;
     };
 
-    const analyzePitch = async () => {
+    const analyzePitch = async (ideaOverride) => {
         if (!pitchContent.trim()) {
             alert("Please enter a pitch first.");
+            return;
+        }
+
+        // If a hackathon is selected but has no idea, show the popup first
+        const effectiveIdea = ideaOverride !== undefined ? ideaOverride : hackathonIdea;
+        if (selectedHackathonId && !effectiveIdea) {
+            setShowAddIdeaPopup(true);
             return;
         }
 
@@ -222,7 +234,8 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                 },
                 body: JSON.stringify({
                     targetId,
-                    pitchContent
+                    pitchContent,
+                    hackathonIdea: effectiveIdea || null
                 })
             });
 
@@ -247,6 +260,32 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
         } finally {
             setIsAnalyzing(false);
         }
+    };
+
+    const handleSaveIdeaAndAnalyze = async () => {
+        if (!ideaInputValue.trim()) return;
+        setIsSavingIdea(true);
+        try {
+            // Save idea to Firestore if a hackathon is selected
+            if (selectedTeamId && selectedHackathonId) {
+                const hackRef = doc(db, `teams/${selectedTeamId}/hackathons`, selectedHackathonId);
+                await updateDoc(hackRef, { theme: ideaInputValue.trim() });
+                onIdeaSaved?.(ideaInputValue.trim());
+            }
+        } catch (e) {
+            console.error('Failed to save idea:', e);
+        } finally {
+            setIsSavingIdea(false);
+            setShowAddIdeaPopup(false);
+            // Proceed with the saved idea
+            analyzePitch(ideaInputValue.trim());
+            setIdeaInputValue('');
+        }
+    };
+
+    const handleSkipIdea = () => {
+        setShowAddIdeaPopup(false);
+        analyzePitch(null);
     };
 
     // SVGCircle Progress Bar Component
@@ -527,12 +566,78 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                                     onClick={stopRecording}
                                     className="h-14 px-12 bg-white text-slate-950 hover:bg-emerald-400 transition-all rounded-full font-black text-lg flex items-center gap-3 shadow-[0_20px_40px_rgba(0,0,0,0.3)] active:scale-95 group/stop"
                                 >
-                                    <Square className="size-6 fill-slate-950 group-hover:scale-90 transition-transform" />
-                                    Finish & Sync
+                                    <Square className="size-6 fill-slate-950 group-hover/item:scale-90 transition-transform" />
+                                    Finish &amp; Sync
                                 </button>
                             </div>
                         </motion.div>
                     </div>
+                )}
+            </AnimatePresence>
+
+            {/* Add Idea Popup Modal */}
+            <AnimatePresence>
+                {showAddIdeaPopup && (
+                    <motion.div
+                        className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowAddIdeaPopup(false)} />
+
+                        <motion.div
+                            className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
+                            style={{ background: 'rgba(10, 22, 18, 0.95)', border: '1px solid rgba(255,255,255,0.08)' }}
+                            initial={{ scale: 0.92, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.92, opacity: 0, y: 20 }}
+                            transition={{ duration: 0.2, ease: 'easeOut' }}
+                        >
+                            {/* Glow accent */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-60" />
+
+                            <div className="p-7">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="material-symbols-outlined text-emerald-400 text-[22px]">lightbulb</span>
+                                    <h3 className="text-white font-black text-lg">Add Project Idea</h3>
+                                </div>
+                                <p className="text-slate-400 text-sm mb-5 leading-relaxed">
+                                    The selected project has no idea yet. Adding one lets the AI evaluate your pitch against your actual project goal.
+                                </p>
+
+                                <textarea
+                                    value={ideaInputValue}
+                                    onChange={e => setIdeaInputValue(e.target.value)}
+                                    placeholder="e.g., An AI-powered app that helps students find hackathon teammates based on their skills..."
+                                    autoFocus
+                                    rows={4}
+                                    className="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-white/10 text-slate-200 text-sm placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all mb-5"
+                                />
+
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={handleSkipIdea}
+                                        className="flex-1 py-2.5 rounded-xl bg-slate-800/60 border border-white/5 text-slate-400 hover:text-white text-sm font-bold transition-all"
+                                    >
+                                        Skip, analyze anyway
+                                    </button>
+                                    <button
+                                        onClick={handleSaveIdeaAndAnalyze}
+                                        disabled={!ideaInputValue.trim() || isSavingIdea}
+                                        className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-black shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                                    >
+                                        {isSavingIdea ? (
+                                            <><span className="material-symbols-outlined text-[16px] animate-spin">progress_activity</span> Saving...</>
+                                        ) : (
+                                            <><span className="material-symbols-outlined text-[16px]">check</span> Save &amp; Analyze</>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>

@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
 import PitchModule from '../components/PitchModule';
 import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { logout } from '../firebase/functions';
+import { logout, getUserTeams, getHackathons, getHackathonDetails } from '../firebase/functions';
 
 export default function PitchPractice() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Team & Hackathon selection
+  const [teams, setTeams] = useState([]);
+  const [selectedTeamId, setSelectedTeamId] = useState('');
+  const [hackathons, setHackathons] = useState([]);
+  const [selectedHackathonId, setSelectedHackathonId] = useState('');
+  const [hackathonIdea, setHackathonIdea] = useState(null);
+  const [teamsLoading, setTeamsLoading] = useState(false);
+  const [hackathonsLoading, setHackathonsLoading] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -25,11 +33,47 @@ export default function PitchPractice() {
           navigate('/profile-setup');
           return;
         }
+        // Fetch user's teams
+        setTeamsLoading(true);
+        try {
+          const userTeams = await getUserTeams(user.uid);
+          setTeams(userTeams);
+        } catch (e) {
+          console.error('Failed to load teams:', e);
+        } finally {
+          setTeamsLoading(false);
+        }
       }
       setLoading(false);
     });
     return () => unsub();
   }, [navigate]);
+
+  // Fetch hackathons when team changes
+  useEffect(() => {
+    if (!selectedTeamId) {
+      setHackathons([]);
+      setSelectedHackathonId('');
+      setHackathonIdea(null);
+      return;
+    }
+    setHackathonsLoading(true);
+    getHackathons(selectedTeamId)
+      .then(data => { setHackathons(data); })
+      .catch(e => console.error('Failed to load hackathons:', e))
+      .finally(() => setHackathonsLoading(false));
+  }, [selectedTeamId]);
+
+  // Fetch hackathon idea (theme) when hackathon changes
+  useEffect(() => {
+    if (!selectedTeamId || !selectedHackathonId) {
+      setHackathonIdea(null);
+      return;
+    }
+    getHackathonDetails(selectedTeamId, selectedHackathonId).then(data => {
+      setHackathonIdea(data?.theme || null);
+    });
+  }, [selectedTeamId, selectedHackathonId]);
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -103,7 +147,7 @@ export default function PitchPractice() {
       <div className="flex-1 flex flex-col overflow-hidden relative z-10">
         <main className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10">
           <div className="max-w-6xl mx-auto">
-            <header className="mb-10 text-center md:text-left">
+            <header className="mb-8 text-center md:text-left">
               <h1 className="text-4xl font-black text-white mb-3 tracking-tight drop-shadow-sm">
                 Pitch <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Practice</span>
               </h1>
@@ -112,9 +156,68 @@ export default function PitchPractice() {
               </p>
             </header>
 
+            {/* Team & Hackathon Context Selectors */}
+            <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <div className="flex items-center gap-2 text-slate-400 text-sm font-bold shrink-0">
+                <span className="material-symbols-outlined text-[18px] text-emerald-500">target</span>
+                Practice context
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 flex-1">
+                {/* Team selector */}
+                <div className="relative flex-1">
+                  <select
+                    value={selectedTeamId}
+                    onChange={e => { setSelectedTeamId(e.target.value); setSelectedHackathonId(''); }}
+                    disabled={teamsLoading}
+                    className="w-full appearance-none bg-slate-900/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 font-medium focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <option value="">
+                      {teamsLoading ? 'Loading teams...' : 'Select a team (optional)'}
+                    </option>
+                    {teams.map(t => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-500 pointer-events-none">expand_more</span>
+                </div>
+
+                {/* Hackathon selector */}
+                {selectedTeamId && (
+                  <div className="relative flex-1">
+                    <select
+                      value={selectedHackathonId}
+                      onChange={e => setSelectedHackathonId(e.target.value)}
+                      disabled={hackathonsLoading}
+                      className="w-full appearance-none bg-slate-900/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-200 font-medium focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      <option value="">
+                        {hackathonsLoading ? 'Loading...' : hackathons.length > 0 ? 'Select a project' : 'No projects found'}
+                      </option>
+                      {hackathons.map(h => (
+                        <option key={h.id} value={h.id}>{h.name}</option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-500 pointer-events-none">expand_more</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Idea badge */}
+              {selectedHackathonId && (
+                <div className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border ${hackathonIdea ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-slate-800/80 border-white/5 text-slate-500'}`}>
+                  <span className="material-symbols-outlined text-[13px]">{hackathonIdea ? 'check_circle' : 'radio_button_unchecked'}</span>
+                  {hackathonIdea ? 'Idea set' : 'No idea set'}
+                </div>
+              )}
+            </div>
+
             <PitchModule
               userId={userData?.id}
               credits={userData?.credits || 0}
+              hackathonIdea={hackathonIdea}
+              selectedTeamId={selectedTeamId}
+              selectedHackathonId={selectedHackathonId}
+              onIdeaSaved={(idea) => setHackathonIdea(idea)}
             />
           </div>
         </main>

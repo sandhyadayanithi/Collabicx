@@ -26,7 +26,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'dummy_key');
  * @param {string} targetId - The target or project ID
  * @param {string} pitchContent - The raw text of the pitch
  */
-async function analyzePitch(userId, targetId, pitchContent) {
+async function analyzePitch(userId, targetId, pitchContent, hackathonIdea = null) {
     const creditCost = 1;
 
     try {
@@ -52,8 +52,14 @@ async function analyzePitch(userId, targetId, pitchContent) {
     try {
         // 3. Call Gemini
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const ideaContext = hackathonIdea
+            ? `\nProject / Hackathon Idea Context (the pitch should align with this idea):\n"${hackathonIdea}"\n`
+            : '';
+
         const prompt = `
-You are an expert pitch coach and startup mentor. Analyze the following elevator pitch and provide a detailed review. 
+You are an expert pitch coach and startup mentor. Analyze the following elevator pitch and provide a detailed review.
+${ideaContext}
+Evaluate how well the pitch communicates the idea, its value proposition, clarity, confidence, and structure. If a project idea is provided, also assess how well the pitch aligns with that idea.
 You MUST return the ONLY output as a valid JSON object. Do not include any conversational text, no markdown wrappers, no backticks. Only the raw JSON object.
 
 The requirements for the JSON schema are:

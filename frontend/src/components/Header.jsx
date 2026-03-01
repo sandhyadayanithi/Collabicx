@@ -73,10 +73,17 @@ export default function Header({ title = "Team Dashboard", backPath = "/teams", 
                                 }}
                             >
                                 {ideaContent ? (
-                                    <div className="p-4">
-                                        <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                                    <div className="p-4 relative group/idea">
+                                        <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-medium pr-7">
                                             {ideaContent}
                                         </p>
+                                        <button
+                                            onClick={() => { setShowPopup(false); onAddIdea?.(); }}
+                                            title="Edit idea"
+                                            className="absolute top-3 right-3 size-6 flex items-center justify-center rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-white/10 transition-all opacity-0 group-hover/idea:opacity-100"
+                                        >
+                                            <span className="material-symbols-outlined text-[14px]">edit</span>
+                                        </button>
                                     </div>
                                 ) : (
                                     <div className="p-4 flex items-center justify-center">
