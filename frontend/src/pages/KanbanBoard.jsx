@@ -14,11 +14,23 @@ export default function KanbanBoard() {
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [newTaskCategory, setNewTaskCategory] = useState("General");
-    const [newTaskAssignee, setNewTaskAssignee] = useState(""); 
+    const [newTaskAssignee, setNewTaskAssignee] = useState("");
     const [initialStatusForNewTask, setInitialStatusForNewTask] = useState("todo");
-    
+
     // Team Members State
     const [teamMembers, setTeamMembers] = useState([]);
+
+    // Drag Over State
+    const [dragOverCol, setDragOverCol] = useState(null);
+
+    // Helper for tag colors
+    const getTagStyles = (category) => {
+        const cat = (category || 'general').toLowerCase();
+        if (cat === 'backend') return { backgroundColor: '#2563eb', color: 'white' };
+        if (cat === 'design') return { backgroundColor: '#10b981', color: 'white' };
+        if (cat === 'frontend') return { backgroundColor: '#f59e0b', color: 'white' };
+        return { backgroundColor: '#64748b', color: 'white' };
+    };
 
     // Fetch hackathon details
     useEffect(() => {
@@ -65,6 +77,7 @@ export default function KanbanBoard() {
 
     const handleDrop = async (e, newStatus) => {
         e.preventDefault();
+        setDragOverCol(null);
         const taskId = e.dataTransfer.getData("taskId");
         if (!taskId || !teamId || !hackathonId) return;
 
@@ -75,8 +88,15 @@ export default function KanbanBoard() {
         }
     };
 
-    const handleDragOver = (e) => {
+    const handleDragOver = (e, colId) => {
         e.preventDefault();
+        if (dragOverCol !== colId) {
+            setDragOverCol(colId);
+        }
+    };
+
+    const handleDragLeave = (e) => {
+        setDragOverCol(null);
     };
 
     const handleDeleteTask = async (id, e) => {
@@ -133,7 +153,7 @@ export default function KanbanBoard() {
                 // Add the task, passing assignee information
                 const { addTask } = await import('../firebase/functions');
                 await addTask(teamId, hackathonId, newTaskTitle, newTaskCategory, assigneeId, assigneeUsername);
-                
+
                 // Fetch the newly added task to update its status
                 // Alternatively we just update the addTask function to handle status, but for now this is safe
                 // Wait a tiny bit for listener to catch it, or just rely on backend changes
@@ -179,50 +199,64 @@ export default function KanbanBoard() {
                         <h2 className="text-2xl font-black text-text-primary">Sprint Tasks Board</h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Drag and drop tasks to move them across stages.</p>
                     </div>
-                        <button 
-                            onClick={() => navigate(`/workspace/${teamId}/${hackathonId}`)}
-                            className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm flex items-center gap-2"
-                        >
-                            <span className="material-symbols-outlined text-sm">arrow_back</span>
-                            Back to Workspace
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => navigate(`/workspace/${teamId}/${hackathonId}`)}
+                        className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm flex items-center gap-2"
+                    >
+                        <span className="material-symbols-outlined text-sm">arrow_back</span>
+                        Back to Workspace
+                    </button>
+                </div>
 
                 <div className="flex flex-1 gap-6 overflow-hidden">
                     {/* To Do Column */}
-                    <div 
-                        className="flex-1 bg-slate-100 dark:bg-slate-800/30 rounded-3xl p-5 flex flex-col border border-slate-200 dark:border-slate-800/60 shadow-inner"
+                    <div
+                        className="flex-1 rounded-[16px] p-5 flex flex-col transition-shadow"
+                        style={{
+                            background: 'rgba(10, 20, 30, 0.75)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            boxShadow: dragOverCol === 'todo' ? 'inset 0 0 0 2px rgba(59,130,246,0.4), 0 10px 40px rgba(0,0,0,0.35)' : '0 10px 40px rgba(0,0,0,0.35)'
+                        }}
                         onDrop={(e) => handleDrop(e, 'todo')}
-                        onDragOver={handleDragOver}
+                        onDragOver={(e) => handleDragOver(e, 'todo')}
+                        onDragLeave={handleDragLeave}
                     >
                         <div className="flex items-center justify-between mb-5 px-1">
-                            <h4 className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 text-lg">
-                                <div className="w-2.5 h-2.5 rounded-full bg-slate-400"></div>
+                            <h4 className="font-[600] flex items-center gap-2 text-lg" style={{ color: '#e6edf3' }}>
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#94a3b8' }}></div>
                                 To Do
                             </h4>
-                            <span className="text-xs font-bold text-slate-600 bg-slate-200/80 dark:bg-slate-700 px-2.5 py-1 rounded-full">
+                            <span className="text-[12px] font-bold text-white px-[10px] py-[4px] rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
                                 {kanbanTasks.todo.length}
                             </span>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1">
                             {kanbanTasks.todo.map(task => (
-                                <div 
-                                    key={task.id} 
+                                <div
+                                    key={task.id}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, task.id)}
-                                    className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-grab active:cursor-grabbing hover:border-black/20 dark:hover:border-white/20 transition-all group relative hover:-translate-y-0.5"
+                                    className="p-4 cursor-grab active:cursor-grabbing transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px]"
+                                    style={{
+                                        background: '#1f2a38',
+                                        border: '1px solid rgba(255,255,255,0.06)',
+                                        borderRadius: '12px',
+                                        boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
+                                    }}
                                 >
-                                    <p className="text-[15px] text-slate-800 dark:text-slate-100 font-medium mb-3 leading-snug">{task.title}</p>
+                                    <p className="text-[15px] font-medium mb-3 leading-snug" style={{ color: '#e6edf3' }}>{task.title}</p>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] uppercase tracking-wide font-black text-slate-500 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-md">
+                                        <span className="text-[12px] font-semibold px-[10px] py-[4px] rounded-full" style={getTagStyles(task.category)}>
                                             {task.category || 'General'}
                                         </span>
                                         <div className="flex z-10 items-center justify-end">
-                                            <div className="flex bg-slate-100 dark:bg-slate-700 rounded-lg hover:border-primary/50 border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
-                                                <select 
+                                            <div className="flex bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
+                                                <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    className="bg-transparent text-[10px] font-bold outline-none text-slate-500 dark:text-slate-400 p-1 rounded-md max-w-[85px] cursor-pointer"
+                                                    className="bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] cursor-pointer"
                                                 >
                                                     <option value="">Unassigned</option>
                                                     {teamMembers.map(member => (
@@ -234,7 +268,7 @@ export default function KanbanBoard() {
                                             </div>
                                             <button
                                                 onClick={(e) => handleDeleteTask(task.id, e)}
-                                                className="opacity-0 group-hover:opacity-100 size-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-all ml-1"
+                                                className="opacity-0 group-hover:opacity-100 size-7 flex items-center justify-center rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all ml-1"
                                                 title="Delete Task"
                                             >
                                                 <span className="material-symbols-outlined text-sm">delete</span>
@@ -244,11 +278,18 @@ export default function KanbanBoard() {
                                 </div>
                             ))}
                             {kanbanTasks.todo.length === 0 && (
-                                <div 
-                                    className="h-full flex items-center justify-center pb-10 cursor-pointer group"
+                                <div
+                                    className="flex items-center justify-center cursor-pointer group py-8"
                                     onClick={() => handleAddTaskClick('todo')}
                                 >
-                                    <p className="text-slate-400 text-sm font-medium text-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 w-full max-w-[80%] mx-auto group-hover:bg-slate-200/50 dark:group-hover:bg-slate-700/50 transition-colors">
+                                    <p className="text-sm font-medium text-center w-full mx-auto transition-colors group-hover:bg-[rgba(255,255,255,0.06)]"
+                                        style={{
+                                            border: '2px dashed rgba(255,255,255,0.15)',
+                                            borderRadius: '12px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            color: '#94a3b8',
+                                            padding: '24px'
+                                        }}>
                                         Click to add a task, or drop one here
                                     </p>
                                 </div>
@@ -257,39 +298,53 @@ export default function KanbanBoard() {
                     </div>
 
                     {/* In Progress Column */}
-                    <div 
-                        className="flex-1 bg-blue-50/60 dark:bg-blue-900/10 rounded-3xl p-5 flex flex-col border border-blue-100 dark:border-blue-900/30 shadow-inner"
+                    <div
+                        className="flex-1 rounded-[16px] p-5 flex flex-col transition-shadow"
+                        style={{
+                            background: 'rgba(4, 50, 96, 0.75)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            boxShadow: dragOverCol === 'inProgress' ? 'inset 0 0 0 2px rgba(59,130,246,0.4), 0 10px 40px rgba(0,0,0,0.35)' : '0 10px 40px rgba(0,0,0,0.35)'
+                        }}
                         onDrop={(e) => handleDrop(e, 'inProgress')}
-                        onDragOver={handleDragOver}
+                        onDragOver={(e) => handleDragOver(e, 'inProgress')}
+                        onDragLeave={handleDragLeave}
                     >
                         <div className="flex items-center justify-between mb-5 px-1">
-                            <h4 className="font-bold text-blue-700 dark:text-blue-400 flex items-center gap-2 text-lg">
-                                <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                            <h4 className="font-[600] flex items-center gap-2 text-lg" style={{ color: '#e6edf3' }}>
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#3b82f6' }}></div>
                                 In Progress
                             </h4>
-                            <span className="text-xs font-bold text-blue-600 bg-blue-100/80 dark:bg-blue-900/40 px-2.5 py-1 rounded-full">
+                            <span className="text-[12px] font-bold text-white px-[10px] py-[4px] rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
                                 {kanbanTasks.inProgress.length}
                             </span>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1">
                             {kanbanTasks.inProgress.map(task => (
-                                <div 
-                                    key={task.id} 
+                                <div
+                                    key={task.id}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, task.id)}
-                                    className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-md border-l-4 border-l-blue-500 border-y border-r border-slate-200 dark:border-slate-700 cursor-grab active:cursor-grabbing hover:shadow-lg transition-all group relative hover:-translate-y-0.5"
+                                    className="p-4 cursor-grab active:cursor-grabbing transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px]"
+                                    style={{
+                                        background: '#1f2a38',
+                                        border: '1px solid rgba(255,255,255,0.06)',
+                                        borderRadius: '12px',
+                                        boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
+                                    }}
                                 >
-                                    <p className="text-[15px] text-slate-800 dark:text-slate-100 font-medium mb-3 leading-snug">{task.title}</p>
+                                    <p className="text-[15px] font-medium mb-3 leading-snug" style={{ color: '#e6edf3' }}>{task.title}</p>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] uppercase tracking-wide font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-900/50 px-2.5 py-1 rounded-md">
+                                        <span className="text-[12px] font-semibold px-[10px] py-[4px] rounded-full" style={getTagStyles(task.category)}>
                                             {task.category || 'General'}
                                         </span>
                                         <div className="flex z-10 items-center justify-end">
-                                            <div className="flex bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
-                                                <select 
+                                            <div className="flex bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
+                                                <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    className="bg-transparent text-[10px] font-bold outline-none text-blue-600 dark:text-blue-400 p-1 rounded-md max-w-[85px] cursor-pointer"
+                                                    className="bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] cursor-pointer"
                                                 >
                                                     <option value="">Unassigned</option>
                                                     {teamMembers.map(member => (
@@ -301,7 +356,7 @@ export default function KanbanBoard() {
                                             </div>
                                             <button
                                                 onClick={(e) => handleDeleteTask(task.id, e)}
-                                                className="opacity-0 group-hover:opacity-100 size-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-all ml-1"
+                                                className="opacity-0 group-hover:opacity-100 size-7 flex items-center justify-center rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all ml-1"
                                                 title="Delete Task"
                                             >
                                                 <span className="material-symbols-outlined text-sm">delete</span>
@@ -311,11 +366,18 @@ export default function KanbanBoard() {
                                 </div>
                             ))}
                             {kanbanTasks.inProgress.length === 0 && (
-                                <div 
-                                    className="h-full flex items-center justify-center pb-10 cursor-pointer group"
-                                    onClick={() => handleAddTaskClick('inProgress')}    
+                                <div
+                                    className="flex items-center justify-center cursor-pointer group py-8"
+                                    onClick={() => handleAddTaskClick('inProgress')}
                                 >
-                                    <p className="text-blue-400/80 dark:text-blue-800 text-sm font-medium text-center border-2 border-dashed border-blue-300 dark:border-blue-900/50 rounded-2xl p-6 w-full max-w-[80%] mx-auto group-hover:bg-blue-100/50 dark:group-hover:bg-blue-900/40 transition-colors">
+                                    <p className="text-sm font-medium text-center w-full mx-auto transition-colors group-hover:bg-[rgba(255,255,255,0.06)]"
+                                        style={{
+                                            border: '2px dashed rgba(255,255,255,0.15)',
+                                            borderRadius: '12px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            color: '#94a3b8',
+                                            padding: '24px'
+                                        }}>
                                         Click to add a task, or drop one here
                                     </p>
                                 </div>
@@ -324,39 +386,53 @@ export default function KanbanBoard() {
                     </div>
 
                     {/* Done Column */}
-                    <div 
-                        className="flex-1 bg-green-50/60 dark:bg-green-900/10 rounded-3xl p-5 flex flex-col border border-green-100 dark:border-green-900/30 shadow-inner"
+                    <div
+                        className="flex-1 rounded-[16px] p-5 flex flex-col transition-shadow"
+                        style={{
+                            background: 'rgba(3, 85, 48, 0.75)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            boxShadow: dragOverCol === 'done' ? 'inset 0 0 0 2px rgba(59,130,246,0.4), 0 10px 40px rgba(0,0,0,0.35)' : '0 10px 40px rgba(0,0,0,0.35)'
+                        }}
                         onDrop={(e) => handleDrop(e, 'done')}
-                        onDragOver={handleDragOver}
+                        onDragOver={(e) => handleDragOver(e, 'done')}
+                        onDragLeave={handleDragLeave}
                     >
                         <div className="flex items-center justify-between mb-5 px-1">
-                            <h4 className="font-bold text-green-700 dark:text-green-400 flex items-center gap-2 text-lg">
-                                <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                            <h4 className="font-[600] flex items-center gap-2 text-lg" style={{ color: '#e6edf3' }}>
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#22c55e' }}></div>
                                 Done
                             </h4>
-                            <span className="text-xs font-bold text-green-600 bg-green-100/80 dark:bg-green-900/40 px-2.5 py-1 rounded-full">
+                            <span className="text-[12px] font-bold text-white px-[10px] py-[4px] rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
                                 {kanbanTasks.done.length}
                             </span>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1">
                             {kanbanTasks.done.map(task => (
-                                <div 
-                                    key={task.id} 
+                                <div
+                                    key={task.id}
                                     draggable
                                     onDragStart={(e) => handleDragStart(e, task.id)}
-                                    className="bg-white/70 dark:bg-slate-800/70 p-4 rounded-2xl shadow-sm border border-green-200 dark:border-green-900/50 cursor-grab active:cursor-grabbing hover:bg-white dark:hover:bg-slate-800 transition-all group relative opacity-80 hover:opacity-100 hover:-translate-y-0.5"
+                                    className="p-4 cursor-grab active:cursor-grabbing transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] opacity-70 hover:opacity-100"
+                                    style={{
+                                        background: '#1f2a38',
+                                        border: '1px solid rgba(255,255,255,0.06)',
+                                        borderRadius: '12px',
+                                        boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
+                                    }}
                                 >
-                                    <p className="text-[15px] text-slate-500 dark:text-slate-400 font-medium mb-3 leading-snug line-through">{task.title}</p>
+                                    <p className="text-[15px] font-medium mb-3 leading-snug line-through" style={{ color: '#94a3b8' }}>{task.title}</p>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] uppercase tracking-wide font-black text-green-700 bg-green-100 dark:bg-green-900/50 border border-green-200 dark:border-green-900/60 px-2.5 py-1 rounded-md">
+                                        <span className="text-[12px] font-semibold px-[10px] py-[4px] rounded-full" style={getTagStyles(task.category)}>
                                             {task.category || 'General'}
                                         </span>
                                         <div className="flex z-10 items-center justify-end">
-                                            <div className="flex bg-green-100 dark:bg-green-900/40 rounded-lg hover:border-green-300 dark:hover:border-green-600 border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
-                                                <select 
+                                            <div className="flex bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
+                                                <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    className="bg-transparent text-[10px] font-bold outline-none text-green-700 dark:text-green-400 p-1 rounded-md max-w-[85px] cursor-pointer"
+                                                    className="bg-transparent text-[10px] font-bold outline-none text-slate-400 p-1 rounded-md max-w-[85px] cursor-pointer"
                                                 >
                                                     <option value="">Unassigned</option>
                                                     {teamMembers.map(member => (
@@ -368,7 +444,7 @@ export default function KanbanBoard() {
                                             </div>
                                             <button
                                                 onClick={(e) => handleDeleteTask(task.id, e)}
-                                                className="opacity-0 group-hover:opacity-100 size-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-all ml-1"
+                                                className="opacity-0 group-hover:opacity-100 size-7 flex items-center justify-center rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all ml-1"
                                                 title="Delete Task"
                                             >
                                                 <span className="material-symbols-outlined text-sm">delete</span>
@@ -378,11 +454,18 @@ export default function KanbanBoard() {
                                 </div>
                             ))}
                             {kanbanTasks.done.length === 0 && (
-                                <div 
-                                    className="h-full flex items-center justify-center pb-10 cursor-pointer group"
-                                    onClick={() => handleAddTaskClick('done')}    
+                                <div
+                                    className="flex items-center justify-center cursor-pointer group py-8"
+                                    onClick={() => handleAddTaskClick('done')}
                                 >
-                                    <p className="text-green-400/80 dark:text-green-800 text-sm font-medium text-center border-2 border-dashed border-green-300 dark:border-green-900/50 rounded-2xl p-6 w-full max-w-[80%] mx-auto group-hover:bg-green-100/50 dark:group-hover:bg-green-900/40 transition-colors">
+                                    <p className="text-sm font-medium text-center w-full mx-auto transition-colors group-hover:bg-[rgba(255,255,255,0.06)]"
+                                        style={{
+                                            border: '2px dashed rgba(255,255,255,0.15)',
+                                            borderRadius: '12px',
+                                            background: 'rgba(255,255,255,0.03)',
+                                            color: '#94a3b8',
+                                            padding: '24px'
+                                        }}>
                                         Click to add a task, or drop one here
                                     </p>
                                 </div>

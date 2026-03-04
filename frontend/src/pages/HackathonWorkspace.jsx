@@ -106,7 +106,7 @@ export default function HackathonWorkspace() {
 
     // -- State: Team Members --
     const [teamMembers, setTeamMembers] = useState([]);
-    
+
     // Fetch team members
     useEffect(() => {
         if (teamId) {
@@ -402,7 +402,7 @@ export default function HackathonWorkspace() {
                         assigneeUsername = member.user?.username || member.user?.name || "User";
                     }
                 }
-                
+
                 await firebaseAddTask(teamId, hackathonId, newTaskTitle, newTaskCategory, assigneeId, assigneeUsername);
                 setIsTaskModalOpen(false);
                 setNewTaskTitle("");
@@ -768,8 +768,8 @@ export default function HackathonWorkspace() {
                                                 onChange={() => toggleTask(task.id)}
                                                 className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer shrink-0"
                                             />
-                                            <div className="flex-1 min-w-0 flex flex-col items-start">
-                                                <p className={`text-sm text-text-primary font-black truncate ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                                <p className={`text-sm text-text-primary font-black truncate w-full ${task.completed ? 'line-through text-slate-500' : ''}`}>
                                                     {task.title}
                                                 </p>
                                                 {task.assigneeUsername && (
