@@ -291,6 +291,8 @@ export default function HackathonWorkspace() {
     const [isGeneratingTasks, setIsGeneratingTasks] = useState(false);
     const [isIdeaPromptOpen, setIsIdeaPromptOpen] = useState(false);
     const [projectIdeaInput, setProjectIdeaInput] = useState("");
+    const [isEditIdeaModalOpen, setIsEditIdeaModalOpen] = useState(false);
+    const [editIdeaInput, setEditIdeaInput] = useState("");
 
     const handleGenerateTasks = async (ideaToUse) => {
         setIsIdeaPromptOpen(false);
@@ -322,7 +324,25 @@ export default function HackathonWorkspace() {
         if (hackathon?.theme) {
             handleGenerateTasks(hackathon.theme);
         } else {
+            setProjectIdeaInput("");
             setIsIdeaPromptOpen(true);
+        }
+    };
+
+    const openEditIdeaModal = () => {
+        setEditIdeaInput(hackathon?.theme || "");
+        setIsEditIdeaModalOpen(true);
+    };
+
+    const handleSaveIdea = async () => {
+        if (!teamId || !hackathonId) return;
+        try {
+            await updateHackathon(teamId, hackathonId, { theme: editIdeaInput });
+            setHackathon(prev => ({ ...prev, theme: editIdeaInput }));
+            setIsEditIdeaModalOpen(false);
+        } catch (error) {
+            console.error("Failed to update idea:", error);
+            alert("Failed to update project idea.");
         }
     };
 
@@ -486,7 +506,7 @@ export default function HackathonWorkspace() {
                 title={hackathon?.name || "Loading Workspace..."}
                 backPath={teamId ? `/dashboard/${teamId}` : "/dashboard"}
                 ideaContent={hackathon?.theme || null}
-                onAddIdea={() => setIsIdeaPromptOpen(true)}
+                onAddIdea={openEditIdeaModal}
             >
             </Header>
 
@@ -951,6 +971,57 @@ export default function HackathonWorkspace() {
                                             className="flex-1 py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             Generate Tasks
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Edit Project Idea Modal */}
+            {
+                isEditIdeaModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                        <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in zoom-in-95 duration-200">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-2 text-primary">
+                                        <span className="material-symbols-outlined">lightbulb</span>
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Edit Project Idea</h3>
+                                    </div>
+                                    <button onClick={() => setIsEditIdeaModalOpen(false)} className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                                        <span className="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        Update your project idea or theme below. This will not regenerate your tasks.
+                                    </p>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Project Idea</label>
+                                        <textarea
+                                            value={editIdeaInput}
+                                            onChange={(e) => setEditIdeaInput(e.target.value)}
+                                            placeholder="e.g., An AI planner that helps generate sprint tasks for hackathons..."
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white min-h-[150px] resize-none"
+                                            autoFocus
+                                        />
+                                    </div>
+                                    <div className="pt-4 flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsEditIdeaModalOpen(false)}
+                                            className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleSaveIdea}
+                                            className="flex-1 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+                                        >
+                                            Save Idea
                                         </button>
                                     </div>
                                 </div>
