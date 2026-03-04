@@ -51,14 +51,18 @@ export default function Header({ title = "Team Dashboard", backPath = "/teams", 
                 </Link>
                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 ml-2"></div>
 
-                {/* Hoverable title with idea popup */}
-                <div className="relative hidden md:block" onMouseEnter={handleMouseEnterTitle} onMouseLeave={handleMouseLeaveTitle}>
+                {/* Hoverable title with idea popup - only if supported */}
+                <div
+                    className="relative hidden md:block"
+                    onMouseEnter={(ideaContent || onAddIdea) ? handleMouseEnterTitle : undefined}
+                    onMouseLeave={(ideaContent || onAddIdea) ? handleMouseLeaveTitle : undefined}
+                >
                     <h1 className="text-black dark:text-white font-black text-lg cursor-default select-none">
                         {title}
                     </h1>
 
                     {/* Idea Popup */}
-                    {showPopup && (
+                    {(showPopup && (ideaContent || onAddIdea)) && (
                         <div
                             className="absolute left-0 top-full mt-2 w-80 z-[200] animate-in fade-in slide-in-from-top-1 duration-150"
                             onMouseEnter={handleMouseEnterTitle}
@@ -77,13 +81,15 @@ export default function Header({ title = "Team Dashboard", backPath = "/teams", 
                                         <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-medium pr-7">
                                             {ideaContent}
                                         </p>
-                                        <button
-                                            onClick={() => { setShowPopup(false); onAddIdea?.(); }}
-                                            title="Edit idea"
-                                            className="absolute top-3 right-3 size-6 flex items-center justify-center rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-white/10 transition-all opacity-0 group-hover/idea:opacity-100"
-                                        >
-                                            <span className="material-symbols-outlined text-[14px]">edit</span>
-                                        </button>
+                                        {onAddIdea && (
+                                            <button
+                                                onClick={() => { setShowPopup(false); onAddIdea(); }}
+                                                title="Edit idea"
+                                                className="absolute top-3 right-3 size-6 flex items-center justify-center rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-white/10 transition-all opacity-0 group-hover/idea:opacity-100"
+                                            >
+                                                <span className="material-symbols-outlined text-[14px]">edit</span>
+                                            </button>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="p-4 flex items-center justify-center">
