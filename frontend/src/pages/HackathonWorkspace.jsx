@@ -9,10 +9,12 @@ import {
     listenToTasks,
     listenToLinks,
     toggleTaskComplete,
+    updateTaskStatus,
     addTask as firebaseAddTask,
     addLink as firebaseAddLink,
     deleteLink,
     getHackathonDetails,
+    getTeamMembers,
     editMessage,
     updateHackathon,
     deleteTask as firebaseDeleteTask
@@ -101,6 +103,20 @@ export default function HackathonWorkspace() {
         });
         return () => unsubscribe();
     }, [teamId, hackathonId]);
+
+    // -- State: Team Members --
+    const [teamMembers, setTeamMembers] = useState([]);
+    
+    // Fetch team members
+    useEffect(() => {
+        if (teamId) {
+            getTeamMembers(teamId).then(members => {
+                setTeamMembers(members);
+            }).catch(err => {
+                console.error("Error fetching team members:", err);
+            });
+        }
+    }, [teamId]);
 
     // Scroll effect when messages change
 
@@ -288,6 +304,7 @@ export default function HackathonWorkspace() {
     // -- State: Task Modal --
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [newTaskCategory, setNewTaskCategory] = useState("General");
+    const [newTaskAssignee, setNewTaskAssignee] = useState("");
     const [isGeneratingTasks, setIsGeneratingTasks] = useState(false);
     const [isIdeaPromptOpen, setIsIdeaPromptOpen] = useState(false);
     const [projectIdeaInput, setProjectIdeaInput] = useState("");
@@ -348,6 +365,7 @@ export default function HackathonWorkspace() {
     const addTask = () => {
         setNewTaskTitle("");
         setNewTaskCategory("General");
+        setNewTaskAssignee("");
         setIsTaskModalOpen(true);
     };
 
@@ -355,7 +373,17 @@ export default function HackathonWorkspace() {
         e.preventDefault();
         if (newTaskTitle.trim() && teamId && hackathonId) {
             try {
-                await firebaseAddTask(teamId, hackathonId, newTaskTitle, newTaskCategory);
+                let assigneeId = null;
+                let assigneeUsername = null;
+                if (newTaskAssignee !== "") {
+                    assigneeId = newTaskAssignee;
+                    const member = teamMembers.find(m => m.user?.uid === assigneeId);
+                    if (member) {
+                        assigneeUsername = member.user?.username || member.user?.name || "User";
+                    }
+                }
+                
+                await firebaseAddTask(teamId, hackathonId, newTaskTitle, newTaskCategory, assigneeId, assigneeUsername);
                 setIsTaskModalOpen(false);
                 setNewTaskTitle("");
             } catch (error) {
@@ -364,8 +392,11 @@ export default function HackathonWorkspace() {
         }
     };
 
-    const completedCount = tasks.filter(t => t.completed).length;
+    const completedCount = tasks.filter(t => t.completed || t.status === "done").length;
     const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
+
+    // No longer required since drag handles have been moved to Kanban board
+
 
     // -- State: Expandable Sections --
     const [expandedSections, setExpandedSections] = useState({
@@ -668,13 +699,17 @@ export default function HackathonWorkspace() {
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Sprint Tasks</h3>
                                 <div className="flex items-center gap-2">
+                                    <button onClick={(e) => { e.stopPropagation(); navigate(`/workspace/${teamId}/${hackathonId}/board`); }} className="text-emerald-500 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300 flex items-center gap-1 text-sm font-bold mr-2">
+                                        <span className="material-symbols-outlined text-sm">view_kanban</span>
+                                        Kanban
+                                    </button>
                                     <button onClick={(e) => { e.stopPropagation(); handleAITaskButtonClick(); }} disabled={isGeneratingTasks} className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 flex items-center gap-1 text-sm font-bold mr-2 disabled:opacity-50">
                                         {isGeneratingTasks ? (
                                             <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
                                         ) : (
                                             <span className="material-symbols-outlined text-sm">auto_awesome</span>
                                         )}
-                                        {isGeneratingTasks ? 'Generating...' : 'AI Suggest Tasks'}
+                                        {isGeneratingTasks ? 'Generating...' : 'AI Tasks'}
                                     </button>
                                     <button onClick={(e) => { e.stopPropagation(); addTask(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
                                         <span className="material-symbols-outlined text-sm">add</span> Add
@@ -713,10 +748,18 @@ export default function HackathonWorkspace() {
                                                 onChange={() => toggleTask(task.id)}
                                                 className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer shrink-0"
                                             />
-                                            <div className="flex-1 min-w-0">
+                                            <div className="flex-1 min-w-0 flex flex-col items-start">
                                                 <p className={`text-sm text-text-primary font-black truncate ${task.completed ? 'line-through text-slate-500' : ''}`}>
                                                     {task.title}
                                                 </p>
+                                                {task.assigneeUsername && (
+                                                    <div className="mt-1 flex items-center gap-1 opacity-70">
+                                                        <span className="material-symbols-outlined text-[12px] text-slate-500">person</span>
+                                                        <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">
+                                                            {task.assigneeUsername}
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <button
                                                 onClick={(e) => handleDeleteTask(task.id, e)}
@@ -885,6 +928,21 @@ export default function HackathonWorkspace() {
                                                 </button>
                                             ))}
                                         </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Assign To</label>
+                                        <select
+                                            value={newTaskAssignee}
+                                            onChange={(e) => setNewTaskAssignee(e.target.value)}
+                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
+                                        >
+                                            <option value="">Unassigned</option>
+                                            {teamMembers.map(member => (
+                                                <option key={member.id} value={member.user?.uid}>
+                                                    {member.user?.username || member.user?.name || "User"}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="pt-4 flex gap-3">
                                         <button

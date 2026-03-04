@@ -422,11 +422,14 @@ export const getNotes = async (teamId, hackathonId) => {
 
 // --- 6. Tasks Functions ---
 
-export const addTask = async (teamId, hackathonId, title, category = "General") => {
+export const addTask = async (teamId, hackathonId, title, category = "General", assigneeId = null, assigneeUsername = null) => {
     await addDoc(collection(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`), {
         title,
         category,
         completed: false,
+        status: "todo", // ADDED: For Kanban tracking
+        assigneeId,     // Tracking Task Ownership
+        assigneeUsername, // Human readable tracking
         createdAt: serverTimestamp()
     });
 
@@ -448,13 +451,50 @@ export const listenToTasks = (teamId, hackathonId, callback) => {
     });
 };
 
+export const updateTaskAssignee = async (teamId, hackathonId, taskId, assigneeId, assigneeUsername) => {
+    const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`, taskId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+
+    await updateDoc(ref, {
+        assigneeId: assigneeId,
+        assigneeUsername: assigneeUsername
+    });
+};
+
 export const toggleTaskComplete = async (teamId, hackathonId, taskId) => {
     const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`, taskId);
     const snap = await getDoc(ref);
     const isCompleted = !snap.data().completed;
-    await updateDoc(ref, { completed: isCompleted });
+    
+    // Update both completed and status automatically
+    await updateDoc(ref, { 
+        completed: isCompleted,
+        status: isCompleted ? "done" : "todo"
+    });
 
     if (isCompleted) {
+        await logActivity(teamId, auth.currentUser?.uid, 'complete_task', {
+            title: snap.data().title,
+            hackathonId
+        });
+    }
+};
+
+export const updateTaskStatus = async (teamId, hackathonId, taskId, status) => {
+    const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`, taskId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+
+    // Keep completed property in sync for percentage calculations
+    const isCompleted = status === "done";
+    
+    await updateDoc(ref, { 
+        status: status,
+        completed: isCompleted 
+    });
+
+    if (isCompleted && !snap.data().completed) {
         await logActivity(teamId, auth.currentUser?.uid, 'complete_task', {
             title: snap.data().title,
             hackathonId
