@@ -118,6 +118,8 @@ export default function HackathonWorkspace() {
         }
     }, [teamId]);
 
+    const isCreator = teamMembers.some(m => m.userId === currentUser?.uid && m.role === 'owner');
+
     // Scroll effect when messages change
 
     useEffect(() => {
@@ -954,7 +956,9 @@ export default function HackathonWorkspace() {
                                         <select
                                             value={newTaskAssignee}
                                             onChange={(e) => setNewTaskAssignee(e.target.value)}
-                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white"
+                                            disabled={!isCreator}
+                                            title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
+                                            className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white ${!isCreator ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             <option value="">Unassigned</option>
                                             {teamMembers.map(member => (

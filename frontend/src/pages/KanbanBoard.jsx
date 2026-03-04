@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { listenToTasks, updateTaskStatus, deleteTask as firebaseDeleteTask, getHackathonDetails, getTeamMembers, updateTaskAssignee } from '../firebase/functions';
+import { auth } from '../firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function KanbanBoard() {
     const { teamId, hackathonId } = useParams();
@@ -9,6 +11,7 @@ export default function KanbanBoard() {
     const [tasks, setTasks] = useState([]);
     const [hackathon, setHackathon] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [currentUserUid, setCurrentUserUid] = useState(null);
 
     // Modal state
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -21,6 +24,17 @@ export default function KanbanBoard() {
     const [teamMembers, setTeamMembers] = useState([]);
 
     // Fetch hackathon details
+    useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setCurrentUserUid(user.uid);
+            } else {
+                setCurrentUserUid(null);
+            }
+        });
+        return () => unsubscribeAuth();
+    }, []);
+
     useEffect(() => {
         if (teamId && hackathonId) {
             setLoading(true);
@@ -91,6 +105,7 @@ export default function KanbanBoard() {
     };
 
     const handleAssigneeChange = async (taskId, memberId) => {
+        if (!isCreator) return;
         try {
             const member = teamMembers.find(m => m.user?.uid === memberId);
             const username = member ? (member.user?.username || member.user?.name || "User") : null;
@@ -99,6 +114,8 @@ export default function KanbanBoard() {
             console.error("Error updating assignee", error);
         }
     };
+
+    const isCreator = teamMembers.some(m => m.userId === currentUserUid && m.role === 'owner');
 
     // Group tasks for Kanban board
     const kanbanTasks = {
@@ -222,7 +239,9 @@ export default function KanbanBoard() {
                                                 <select 
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    className="bg-transparent text-[10px] font-bold outline-none text-slate-500 dark:text-slate-400 p-1 rounded-md max-w-[85px] cursor-pointer"
+                                                    disabled={!isCreator}
+                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
+                                                    className={`bg-transparent text-[10px] font-bold outline-none text-slate-500 dark:text-slate-400 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
                                                     <option value="">Unassigned</option>
                                                     {teamMembers.map(member => (
@@ -289,7 +308,9 @@ export default function KanbanBoard() {
                                                 <select 
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    className="bg-transparent text-[10px] font-bold outline-none text-blue-600 dark:text-blue-400 p-1 rounded-md max-w-[85px] cursor-pointer"
+                                                    disabled={!isCreator}
+                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
+                                                    className={`bg-transparent text-[10px] font-bold outline-none text-blue-600 dark:text-blue-400 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
                                                     <option value="">Unassigned</option>
                                                     {teamMembers.map(member => (
@@ -356,7 +377,9 @@ export default function KanbanBoard() {
                                                 <select 
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    className="bg-transparent text-[10px] font-bold outline-none text-green-700 dark:text-green-400 p-1 rounded-md max-w-[85px] cursor-pointer"
+                                                    disabled={!isCreator}
+                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
+                                                    className={`bg-transparent text-[10px] font-bold outline-none text-green-700 dark:text-green-400 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
                                                     <option value="">Unassigned</option>
                                                     {teamMembers.map(member => (
@@ -432,12 +455,14 @@ export default function KanbanBoard() {
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Assign To</label>
                                 <select
-                                    value={newTaskAssignee}
-                                    onChange={(e) => setNewTaskAssignee(e.target.value)}
-                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-text-primary"
-                                >
-                                    <option value="">Unassigned</option>
-                                    {teamMembers.map(member => (
+                                                    value={newTaskAssignee}
+                                                    onChange={(e) => setNewTaskAssignee(e.target.value)}
+                                                    disabled={!isCreator}
+                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
+                                                    className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-text-primary ${!isCreator ? "cursor-not-allowed opacity-50" : ""}`}
+                                                >
+                                                    <option value="">Unassigned</option>
+                                                    {teamMembers.map(member => (
                                         <option key={member.id} value={member.user?.uid}>
                                             {member.user?.username || member.user?.name || "User"}
                                         </option>
