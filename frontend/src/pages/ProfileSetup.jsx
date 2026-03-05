@@ -7,6 +7,8 @@ import {
     logout
 } from '../firebase/functions';
 import { auth, db } from '../firebase/config';
+import { BACKEND_URL } from '../config';
+
 
 // Import Avatars
 import avatar1 from '../assets/avatars/avatar1.png';
@@ -151,7 +153,7 @@ export default function ProfileSetup() {
             }
 
             const idToken = await currentUser.getIdToken(true); // Force refresh to get a fresh token
-            const response = await fetch('http://localhost:4000/api/auth/verify-role', {
+            const response = await fetch(`${BACKEND_URL}/api/auth/verify-role`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

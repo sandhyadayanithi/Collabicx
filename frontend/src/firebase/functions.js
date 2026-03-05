@@ -26,6 +26,8 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, googleProvider, githubProvider, storage } from "./config";
+import { BACKEND_URL } from "../config";
+
 
 // --- 0. Helper Functions ---
 export const checkUsernameAvailability = async (username) => {
@@ -466,9 +468,9 @@ export const toggleTaskComplete = async (teamId, hackathonId, taskId) => {
     const ref = doc(db, `teams/${teamId}/hackathons/${hackathonId}/tasks`, taskId);
     const snap = await getDoc(ref);
     const isCompleted = !snap.data().completed;
-    
+
     // Update both completed and status automatically
-    await updateDoc(ref, { 
+    await updateDoc(ref, {
         completed: isCompleted,
         status: isCompleted ? "done" : "todo"
     });
@@ -488,10 +490,10 @@ export const updateTaskStatus = async (teamId, hackathonId, taskId, status) => {
 
     // Keep completed property in sync for percentage calculations
     const isCompleted = status === "done";
-    
-    await updateDoc(ref, { 
+
+    await updateDoc(ref, {
         status: status,
-        completed: isCompleted 
+        completed: isCompleted
     });
 
     if (isCompleted && !snap.data().completed) {
@@ -599,7 +601,7 @@ export const createTeamOpening = async (teamId, userId, data) => {
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'}/api/team-openings`, {
+        const response = await fetch(`${BACKEND_URL}/api/team-openings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -638,7 +640,7 @@ export const getTeamOpenings = async () => {
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000'}/api/team-openings`, {
+        const response = await fetch(`${BACKEND_URL}/api/team-openings`, {
             headers: {
                 'Authorization': `Bearer ${idToken}`
             },
