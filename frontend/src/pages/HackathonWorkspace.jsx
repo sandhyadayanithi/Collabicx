@@ -117,7 +117,7 @@ export default function HackathonWorkspace() {
         }
     }, [teamId]);
 
-    const isCreator = teamMembers.some(m => m.userId === currentUser?.uid && m.role === 'owner');
+    const isTeamLead = teamMembers.some(m => m.userId === currentUser?.uid && m.role === 'owner');
 
     // Scroll effect when messages change
 
@@ -392,7 +392,7 @@ export default function HackathonWorkspace() {
                 let assigneeUsername = null;
                 if (newTaskAssignee !== "") {
                     assigneeId = newTaskAssignee;
-                    const member = teamMembers.find(m => m.user?.uid === assigneeId);
+                    const member = teamMembers.find(m => m.userId === assigneeId);
                     if (member) {
                         assigneeUsername = member.user?.username || member.user?.name || "User";
                     }
@@ -1006,13 +1006,13 @@ export default function HackathonWorkspace() {
                                         <select
                                             value={newTaskAssignee}
                                             onChange={(e) => setNewTaskAssignee(e.target.value)}
-                                            disabled={!isCreator}
-                                            title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
-                                            className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white ${!isCreator ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            disabled={!isTeamLead}
+                                            title={!isTeamLead ? "Only team leads can assign tasks" : "Assign Task"}
+                                            className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 dark:text-white ${!isTeamLead ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             <option value="">Unassigned</option>
                                             {teamMembers.map(member => (
-                                                <option key={member.id} value={member.user?.uid}>
+                                                <option key={member.id} value={member.userId}>
                                                     {member.user?.username || member.user?.name || "User"}
                                                 </option>
                                             ))}
