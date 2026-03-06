@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import { listenToTasks, updateTaskStatus, deleteTask as firebaseDeleteTask, getHackathonDetails, getTeamMembers, updateTaskAssignee } from '../firebase/functions';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
+import { getAvatarImage } from '../constants/avatars';
 
 export default function KanbanBoard() {
     const { teamId, hackathonId } = useParams();
@@ -136,11 +137,11 @@ export default function KanbanBoard() {
         try {
             const member = teamMembers.find(m => m.userId === memberId);
             const username = member ? (member.user?.username || member.user?.name || "User") : null;
-            
+
             // Optimistic UI update
-            setTasks(prevTasks => prevTasks.map(t => 
-                t.id === taskId 
-                    ? { ...t, assigneeId: memberId === "" ? null : memberId, assigneeUsername: memberId === "" ? null : username } 
+            setTasks(prevTasks => prevTasks.map(t =>
+                t.id === taskId
+                    ? { ...t, assigneeId: memberId === "" ? null : memberId, assigneeUsername: memberId === "" ? null : username }
                     : t
             ));
 

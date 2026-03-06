@@ -12,6 +12,7 @@ import cover2 from '../assets/hackathon-covers/cover2.png';
 import cover3 from '../assets/hackathon-covers/cover3.png';
 import cover4 from '../assets/hackathon-covers/cover4.png';
 import cover5 from '../assets/hackathon-covers/cover5.png';
+import { getAvatarImage } from '../constants/avatars';
 
 const hackathonImages = [cover1, cover2, cover3, cover4, cover5];
 
@@ -174,7 +175,7 @@ export default function Dashboard() {
                                             <span className="text-xs font-black">{teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}</span>
                                             <div className="flex -space-x-2">
                                                 {teamMembers.slice(0, 3).map((member, idx) => (
-                                                    <img key={idx} src={member.user?.avatar || 'https://i.pravatar.cc/150'} className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
+                                                    <img key={idx} src={getAvatarImage(member.user?.avatar)} className="size-6 rounded-full border-2 border-white dark:border-slate-900" />
                                                 ))}
                                                 {teamMembers.length > 3 && (
                                                     <div className="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[8px] font-bold text-slate-600 dark:text-slate-300">+{teamMembers.length - 3}</div>
@@ -188,7 +189,7 @@ export default function Dashboard() {
                                             <div className="space-y-1">
                                                 {teamMembers.length > 0 ? teamMembers.map((member) => (
                                                     <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
-                                                        <img src={member.user?.avatar || 'https://i.pravatar.cc/150'} className="size-8 rounded-full" />
+                                                        <img src={getAvatarImage(member.user?.avatar)} className="size-8 rounded-full" />
                                                         <div>
                                                             <p className="text-sm font-bold text-vibrant-primary">{member.user?.name || 'Unknown'}</p>
                                                             <p className="text-[10px] text-vibrant-secondary font-black">{member.role === 'owner' ? 'Team Lead' : 'Member'}</p>

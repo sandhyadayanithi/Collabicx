@@ -10,12 +10,7 @@ import { auth, db } from '../firebase/config';
 import { BACKEND_URL } from '../config';
 
 
-// Avatar paths (now served from /public/avatars/)
-const avatar1 = '/avatars/avatar1.png';
-const avatar2 = '/avatars/avatar2.png';
-const avatar3 = '/avatars/avatar3.png';
-const avatar4 = '/avatars/avatar4.png';
-const avatar5 = '/avatars/avatar5.png';
+import { PRESET_AVATARS, getAvatarImage } from '../constants/avatars';
 
 export default function ProfileSetup() {
     const navigate = useNavigate();
@@ -25,12 +20,12 @@ export default function ProfileSetup() {
     const [isUsernameAvailable, setIsUsernameAvailable] = useState(null); // null, true, false
     const [role, setRole] = useState('Developer');
     const [college, setCollege] = useState('');
-    const [selectedAvatar, setSelectedAvatar] = useState(avatar1);
+    const [selectedAvatar, setSelectedAvatar] = useState('avatar1');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [user, setUser] = useState(null);
 
-    const presetAvatars = [avatar1, avatar2, avatar3, avatar4, avatar5];
+    // presetAvatars logic replaced by central constant
 
     // Auth Check
     useEffect(() => {
@@ -210,18 +205,18 @@ export default function ProfileSetup() {
                         <div>
                             <label className="block text-[11px] font-black uppercase tracking-[0.1em] text-vibrant-secondary mb-6">Choose an Avatar</label>
                             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                                {presetAvatars.map((avatar, index) => (
+                                {PRESET_AVATARS.map((avatar) => (
                                     <div
-                                        key={index}
+                                        key={avatar.id}
                                         onClick={() => {
-                                            setSelectedAvatar(avatar);
+                                            setSelectedAvatar(avatar.id);
                                         }}
-                                        className={`size-[64px] rounded-full p-0.5 relative cursor-pointer active:scale-95 transition-all ${selectedAvatar === avatar ? 'ring-[3px] ring-blue-500 ring-offset-[4px] ring-offset-[#0b101a]' : 'border border-slate-800 hover:border-slate-600'}`}
+                                        className={`size-[64px] rounded-full p-0.5 relative cursor-pointer active:scale-95 transition-all ${selectedAvatar === avatar.id ? 'ring-[3px] ring-blue-500 ring-offset-[4px] ring-offset-[#0b101a]' : 'border border-slate-800 hover:border-slate-600'}`}
                                     >
                                         <div className="w-full h-full rounded-full bg-cover bg-center overflow-hidden">
-                                            <img src={avatar} alt={`Avatar ${index + 1}`} className="w-full h-full object-cover" />
+                                            <img src={avatar.img} alt={avatar.id} className="w-full h-full object-cover" />
                                         </div>
-                                        {selectedAvatar === avatar && (
+                                        {selectedAvatar === avatar.id && (
                                             <div className="absolute -right-1 -bottom-1 bg-blue-500 rounded-full p-1 border-2 border-[#0b101a]">
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />

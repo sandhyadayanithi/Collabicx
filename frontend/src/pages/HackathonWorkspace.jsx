@@ -22,6 +22,7 @@ import { auth, db } from '../firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { generateTasksFromIdea } from '../services/gemini';
+import { getAvatarImage } from '../constants/avatars';
 
 
 export default function HackathonWorkspace() {
@@ -615,8 +616,8 @@ export default function HackathonWorkspace() {
                                                 <div className={`flex items-center gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                                                     {!isMe && (
                                                         <div
-                                                            className="size-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center border border-slate-300 dark:border-slate-600"
-                                                            style={msg.userAvatar ? { backgroundImage: `url(${msg.userAvatar})` } : {}}
+                                                            className="size-6 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center shrink-0 border border-white/5"
+                                                            style={msg.userAvatar ? { backgroundImage: `url(${getAvatarImage(msg.userAvatar)})` } : {}}
                                                         >
                                                             {!msg.userAvatar && (
                                                                 <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 flex items-center justify-center h-full w-full">
@@ -797,7 +798,7 @@ export default function HackathonWorkspace() {
                                             return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-slate-500/10">To Do</span>;
                                         };
 
-                                        const assignee = teamMembers.find(m => m.user?.uid === task.assigneeId);
+                                        const assignee = teamMembers.find(m => m.userId === task.assigneeId);
 
                                         return (
                                             <div key={task.id} className="p-2.5 px-3.5 vibrant-badge rounded-[10px] group transition-all hover:bg-white/[0.04] hover:-translate-y-[1px] duration-150 flex flex-col gap-1.5 border border-transparent hover:border-white/5">
@@ -826,7 +827,7 @@ export default function HackathonWorkspace() {
                                                             <div className="flex items-center gap-1.5 bg-white/[0.03] px-1.5 py-0.5 rounded-lg border border-white/5" title={assignee.user?.username || assignee.user?.name}>
                                                                 <div
                                                                     className="size-4 rounded-full bg-cover bg-center border border-white/10"
-                                                                    style={{ backgroundImage: `url(${assignee.user?.avatar || 'https://www.gravatar.com/avatar?d=mp'})` }}
+                                                                    style={{ backgroundImage: `url(${getAvatarImage(assignee.user?.avatar)})` }}
                                                                 />
                                                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter max-w-[50px] truncate">
                                                                     {assignee.user?.username || assignee.user?.name}

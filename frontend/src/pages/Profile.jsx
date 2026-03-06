@@ -7,12 +7,7 @@ import Sidebar from '../components/Sidebar';
 import { logout, deleteUserAccount } from '../firebase/functions';
 import { useNavigate } from 'react-router-dom';
 
-// Avatar paths (now served from /public/avatars/)
-const avatar1 = '/avatars/avatar1.png';
-const avatar2 = '/avatars/avatar2.png';
-const avatar3 = '/avatars/avatar3.png';
-const avatar4 = '/avatars/avatar4.png';
-const avatar5 = '/avatars/avatar5.png';
+import { PRESET_AVATARS, getAvatarImage } from '../constants/avatars';
 
 export default function Profile() {
     const navigate = useNavigate();
@@ -30,7 +25,7 @@ export default function Profile() {
     const [showAvatarPicker, setShowAvatarPicker] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
 
-    const presetAvatars = [avatar1, avatar2, avatar3, avatar4, avatar5];
+    // presetAvatars logic replaced by central constant
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -50,7 +45,7 @@ export default function Profile() {
                     setCollege(data.college || '');
                     setVerifiedStudent(data.verifiedStudent || false);
                     setProfession(data.profession || '');
-                    setSelectedAvatar(data.avatar || avatar1);
+                    setSelectedAvatar(data.avatar || 'avatar1');
                 }
             } else {
                 navigate('/login');
@@ -131,7 +126,7 @@ export default function Profile() {
                         <div className="absolute -bottom-16 left-10 p-1.5 vibrant-card rounded-full border-none group">
                             <div
                                 className="size-32 rounded-full border-4 border-white dark:border-emerald-900 shadow-xl bg-slate-100 dark:bg-emerald-900/40 bg-cover bg-center relative overflow-hidden"
-                                style={{ backgroundImage: `url(${selectedAvatar})` }}
+                                style={{ backgroundImage: `url(${getAvatarImage(selectedAvatar)})` }}
                             >
                                 <button
                                     onClick={() => setShowAvatarPicker(true)}
@@ -275,15 +270,15 @@ export default function Profile() {
                         </div>
 
                         <div className="flex justify-center gap-4 py-4 overflow-x-auto pb-6">
-                            {presetAvatars.map((ava, idx) => (
+                            {PRESET_AVATARS.map((ava) => (
                                 <button
-                                    key={idx}
+                                    key={ava.id}
                                     onClick={() => {
-                                        setSelectedAvatar(ava);
+                                        setSelectedAvatar(ava.id);
                                         setShowAvatarPicker(false);
                                     }}
-                                    className={`size-16 rounded-full border-4 transition-all duration-300 flex-shrink-0 bg-cover bg-center ${selectedAvatar === ava ? 'border-primary scale-110 shadow-lg shadow-primary/30' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'}`}
-                                    style={{ backgroundImage: `url(${ava})` }}
+                                    className={`size-16 rounded-full border-4 transition-all duration-300 flex-shrink-0 bg-cover bg-center ${selectedAvatar === ava.id ? 'border-primary scale-110 shadow-lg shadow-primary/30' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'}`}
+                                    style={{ backgroundImage: `url(${ava.img})` }}
                                 ></button>
                             ))}
                         </div>
