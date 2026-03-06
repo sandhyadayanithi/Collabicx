@@ -6,7 +6,7 @@ import { Mic, MicOff, Bold, List, Play, Square, Loader, AlertTriangle, CheckCirc
 import { BACKEND_URL } from '../config';
 
 
-export default function PitchModule({ userId = "user123", targetId = "target123", credits = 10, hackathonIdea = null, selectedTeamId = null, selectedHackathonId = null, onIdeaSaved }) {
+export default function PitchModule({ userId, targetId = null, credits = 10, hackathonIdea = null, selectedTeamId = null, selectedHackathonId = null, onIdeaSaved }) {
     // Editor State
     const [pitchContent, setPitchContent] = useState("");
     const editorRef = useRef(null);
@@ -23,7 +23,15 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
             if (!user) return;
 
             const effectiveTarget = selectedHackathonId || selectedTeamId || targetId;
-            if (!effectiveTarget) return;
+            if (!effectiveTarget) {
+                // Clear state when no context is selected
+                setPitchContent("");
+                setAnalysisResult(null);
+                if (editorRef.current) {
+                    editorRef.current.innerHTML = "";
+                }
+                return;
+            }
 
             setIsLoadingLastPitch(true);
             try {
