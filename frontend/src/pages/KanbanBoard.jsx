@@ -136,6 +136,14 @@ export default function KanbanBoard() {
         try {
             const member = teamMembers.find(m => m.user?.uid === memberId);
             const username = member ? (member.user?.username || member.user?.name || "User") : null;
+            
+            // Optimistic UI update
+            setTasks(prevTasks => prevTasks.map(t => 
+                t.id === taskId 
+                    ? { ...t, assigneeId: memberId === "" ? null : memberId, assigneeUsername: memberId === "" ? null : username } 
+                    : t
+            ));
+
             await updateTaskAssignee(teamId, hackathonId, taskId, memberId === "" ? null : memberId, memberId === "" ? null : username);
         } catch (error) {
             console.error("Error updating assignee", error);
