@@ -1,6 +1,6 @@
 import express from 'express';
 import admin from '../firebase.js';
-import { analyzePitch } from '../services/pitchAnalysisService.js';
+import { analyzePitch, getLastPitch } from '../services/pitchAnalysisService.js';
 
 const router = express.Router();
 
@@ -42,6 +42,25 @@ router.post('/analyze', async (req, res) => {
       return res.status(402).json({ error: 'Insufficient credits for analysis' });
     }
     res.status(500).json({ error: 'Internal server error while analyzing pitch' });
+  }
+});
+
+// Get Last Pitch
+router.get('/last', async (req, res) => {
+  console.log("GET /api/pitch/last - Start", { userId: req.user?.uid, query: req.query });
+  try {
+    const { targetId } = req.query;
+    const userId = req.user.uid;
+
+    const result = await getLastPitch(userId, targetId || 'general');
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(200).json(null); // Return null 200 explicitly when no pitch found
+    }
+  } catch (error) {
+    console.error("Error in /api/pitch/last:", error);
+    res.status(500).json({ error: 'Internal server error while fetching last pitch' });
   }
 });
 

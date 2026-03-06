@@ -6,7 +6,7 @@ import { Mic, MicOff, Bold, List, Play, Square, Loader, AlertTriangle, CheckCirc
 import { BACKEND_URL } from '../config';
 
 
-export default function PitchModule({ userId = "user123", targetId = "target123", credits = 10, hackathonIdea = null, selectedTeamId = null, selectedHackathonId = null, onIdeaSaved }) {
+export default function PitchModule({ userId, targetId = null, credits = 10, hackathonIdea = null, selectedTeamId = null, selectedHackathonId = null, onIdeaSaved }) {
     // Editor State
     const [pitchContent, setPitchContent] = useState("");
     const editorRef = useRef(null);
@@ -15,6 +15,71 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
     // Analysis State
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState(null);
+    const [isLoadingLastPitch, setIsLoadingLastPitch] = useState(false);
+
+    // Fetch previous pitch data when target context changes
+    useEffect(() => {
+        const fetchLastPitch = async (user) => {
+            if (!user) return;
+
+            const effectiveTarget = selectedHackathonId || selectedTeamId || targetId;
+            if (!effectiveTarget) {
+                // Clear state when no context is selected
+                setPitchContent("");
+                setAnalysisResult(null);
+                if (editorRef.current) {
+                    editorRef.current.innerHTML = "";
+                }
+                return;
+            }
+
+            setIsLoadingLastPitch(true);
+            try {
+                const idToken = await user.getIdToken();
+                const response = await fetch(`${BACKEND_URL}/api/pitch/last?targetId=${effectiveTarget}`, {
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data) {
+                        setPitchContent(data.pitchContent || "");
+                        if (editorRef.current) {
+                            editorRef.current.innerHTML = data.pitchContent || "";
+                        }
+
+                        // Set analysis if it exists
+                        if (data.overallScore !== undefined) {
+                            setAnalysisResult(data);
+                        } else {
+                            setAnalysisResult(null);
+                        }
+                    } else {
+                        // Reset if no pitch found
+                        setPitchContent("");
+                        setAnalysisResult(null);
+                        if (editorRef.current) {
+                            editorRef.current.innerHTML = "";
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch last pitch", err);
+            } finally {
+                setIsLoadingLastPitch(false);
+            }
+        };
+
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            if (user) {
+                fetchLastPitch(user);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [selectedHackathonId, selectedTeamId, targetId]);
 
     // Add Idea Popup State
     const [showAddIdeaPopup, setShowAddIdeaPopup] = useState(false);
@@ -347,11 +412,17 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
         <div className="max-w-7xl mx-auto h-full flex flex-col gap-8">
             <div className="flex flex-col lg:flex-row gap-8 flex-1 min-h-[600px]">
 
-                {/* LEFT COLUMN: Drafting Zone (Dark Glass Card) */}
-                <div className="w-full lg:w-3/5 flex flex-col glass-card rounded-3xl border border-white/5 shadow-2xl overflow-hidden bg-slate-900/40 backdrop-blur-xl group">
+                {/* LEFT COLUMN: Drafting Zone (Dynamic Sizing) */}
+                <div className={`flex flex-col glass-card rounded-3xl border border-white/5 shadow-2xl overflow-hidden bg-slate-900/40 backdrop-blur-xl group relative transition-all duration-500 ease-in-out ${analysisResult ? 'w-full lg:w-1/3' : 'w-full lg:w-3/5 mx-auto'}`}>
 
-                    <div className="bg-slate-900/60 border-b border-white/5 px-6 py-4 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                    {isLoadingLastPitch && (
+                        <div className="absolute inset-0 z-20 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center">
+                            <Loader className="size-8 text-emerald-500 animate-spin" />
+                        </div>
+                    )}
+
+                    <div className="bg-slate-900/60 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-1">
                             <button
                                 onClick={() => executeCommand('bold')}
                                 className="p-2 text-slate-400 hover:bg-emerald-500/10 hover:text-emerald-400 rounded-xl transition-all active:scale-90"
@@ -392,17 +463,18 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                         }}
                     />
 
-                    <div className="p-6 bg-slate-900/20 border-t border-white/5 flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                            <div className="vibrant-badge px-3 py-1 rounded-full text-[10px] font-black uppercase text-emerald-500 border border-emerald-500/20">
+                    <div className="p-4 bg-slate-900/20 border-t border-white/5 flex flex-col justify-between items-stretch gap-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-black uppercase text-slate-500 tracking-wider">Draft Editor</span>
+                            <div className="vibrant-badge px-2 py-0.5 rounded-full text-[10px] font-black uppercase text-emerald-500 border border-emerald-500/20">
                                 {pitchContent.split(/\s+/).filter(Boolean).length} Words
                             </div>
-
                         </div>
+
                         <button
                             onClick={() => analyzePitch()}
-                            disabled={isAnalyzing || !pitchContent.trim()}
-                            className="h-12 px-8 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white text-sm font-black rounded-full shadow-lg shadow-emerald-900/20 flex items-center gap-2 transition-all active:scale-95 hover:shadow-emerald-500/20 group/btn"
+                            disabled={isAnalyzing || !pitchContent.trim() || isLoadingLastPitch}
+                            className="h-12 w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white text-sm font-black rounded-xl shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2 transition-all active:scale-95 hover:shadow-emerald-500/20 group/btn"
                         >
                             {isAnalyzing ? (
                                 <><Loader className="size-5 animate-spin" /> Analyzing...</>
@@ -416,18 +488,24 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                     </div>
                 </div>
 
-                {/* RIGHT COLUMN: AI Feedback (Dark Glass Card) */}
-                <div className="w-full lg:w-2/5 flex flex-col gap-6">
+                {/* RIGHT COLUMN: AI Feedback (Central Dominant Card) */}
+                <div className={`flex flex-col gap-6 relative transition-all duration-500 ease-in-out ${analysisResult ? 'w-full lg:w-2/3' : 'w-full lg:w-2/5 mx-auto'}`}>
+                    {isLoadingLastPitch && (
+                        <div className="absolute inset-0 z-20 bg-slate-950/50 backdrop-blur-sm shadow-2xl rounded-3xl flex items-center justify-center">
+                            <Loader className="size-10 text-emerald-500 animate-spin" />
+                        </div>
+                    )}
+
                     <div className="glass-card rounded-3xl border border-white/5 shadow-2xl flex-1 overflow-hidden bg-slate-900/40 backdrop-blur-xl flex flex-col">
                         {!analysisResult && !isAnalyzing ? (
                             <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
                                 <div className="relative mb-8">
                                     <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] rounded-full animate-pulse"></div>
                                     <div className="relative z-10 size-24 bg-slate-800/80 rounded-3xl border border-white/10 flex items-center justify-center shadow-2xl">
-                                        <Mic className="size-12 text-emerald-400" />
+                                        <span className="material-symbols-outlined text-emerald-400 text-5xl">psychology</span>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Ready for analysis?</h3>
+                                <h3 className="text-3xl font-black text-white mb-3 tracking-tight">Ready for analysis?</h3>
                                 <p className="text-slate-400 font-medium leading-relaxed max-w-[280px]">
                                     Draft your pitch on the left, then click analyze to get <span className="text-emerald-400">Gemini AI</span> powered feedback.
                                 </p>
@@ -655,6 +733,6 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 }
