@@ -97,7 +97,7 @@ export default function KanbanBoard() {
 
         // Verify authorization for drop
         const task = tasks.find(t => t.id === taskId);
-        if (task && !isCreator && task.assigneeId !== currentUserUid) {
+        if (task && !isTeamLead && task.assigneeId !== currentUserUid) {
             console.warn("Unauthorized drop attempt: You can only move your own tasks.");
             return;
         }
@@ -132,9 +132,9 @@ export default function KanbanBoard() {
     };
 
     const handleAssigneeChange = async (taskId, memberId) => {
-        if (!isCreator) return;
+        if (!isTeamLead) return;
         try {
-            const member = teamMembers.find(m => m.user?.uid === memberId);
+            const member = teamMembers.find(m => m.userId === memberId);
             const username = member ? (member.user?.username || member.user?.name || "User") : null;
             await updateTaskAssignee(teamId, hackathonId, taskId, memberId === "" ? null : memberId, memberId === "" ? null : username);
         } catch (error) {
@@ -142,7 +142,7 @@ export default function KanbanBoard() {
         }
     };
 
-    const isCreator = teamMembers.some(m => m.userId === currentUserUid && m.role === 'owner');
+    const isTeamLead = teamMembers.some(m => m.userId === currentUserUid && m.role === 'owner');
 
     // Group tasks for Kanban board
     const kanbanTasks = {
@@ -168,7 +168,7 @@ export default function KanbanBoard() {
                 let assigneeUsername = null;
                 if (newTaskAssignee !== "") {
                     assigneeId = newTaskAssignee;
-                    const member = teamMembers.find(m => m.user?.uid === assigneeId);
+                    const member = teamMembers.find(m => m.userId === assigneeId);
                     if (member) {
                         assigneeUsername = member.user?.username || member.user?.name || "User";
                     }
@@ -212,7 +212,7 @@ export default function KanbanBoard() {
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col font-display">
             {/* Header linking back to the Workspace */}
             <Header
-                title={`${hackathon?.name || "Workspace"} - Kanban Board`}
+                title={`${hackathon?.name || "Workspace"} - Tasks Board`}
                 backPath={`/workspace/${teamId}/${hackathonId}`}
                 ideaContent={null}
             />
@@ -260,9 +260,9 @@ export default function KanbanBoard() {
                             {kanbanTasks.todo.map(task => (
                                 <div
                                     key={task.id}
-                                    draggable={isCreator || task.assigneeId === currentUserUid}
-                                    onDragStart={(e) => (isCreator || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
-                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] ${isCreator || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
+                                    draggable={isTeamLead || task.assigneeId === currentUserUid}
+                                    onDragStart={(e) => (isTeamLead || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
+                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] ${isTeamLead || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
                                     style={{
                                         background: '#1f2a38',
                                         border: '1px solid rgba(255,255,255,0.06)',
@@ -280,13 +280,13 @@ export default function KanbanBoard() {
                                                 <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    disabled={!isCreator}
-                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
-                                                    className={`bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
+                                                    disabled={!isTeamLead}
+                                                    title={!isTeamLead ? "Only team leads can assign tasks" : "Assign Task"}
+                                                    className={`bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] ${!isTeamLead ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
                                                     <option value="" className="bg-[#1f2a38] text-white">Unassigned</option>
                                                     {teamMembers.map(member => (
-                                                        <option key={member.id} value={member.user?.uid} className="bg-[#1f2a38] text-white">
+                                                        <option key={member.id} value={member.userId} className="bg-[#1f2a38] text-white">
                                                             {member.user?.username || member.user?.name || "User"}
                                                         </option>
                                                     ))}
@@ -350,9 +350,9 @@ export default function KanbanBoard() {
                             {kanbanTasks.inProgress.map(task => (
                                 <div
                                     key={task.id}
-                                    draggable={isCreator || task.assigneeId === currentUserUid}
-                                    onDragStart={(e) => (isCreator || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
-                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] ${isCreator || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
+                                    draggable={isTeamLead || task.assigneeId === currentUserUid}
+                                    onDragStart={(e) => (isTeamLead || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
+                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] ${isTeamLead || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
                                     style={{
                                         background: '#1f2a38',
                                         border: '1px solid rgba(255,255,255,0.06)',
@@ -370,13 +370,13 @@ export default function KanbanBoard() {
                                                 <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    disabled={!isCreator}
-                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
-                                                    className={`bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
+                                                    disabled={!isTeamLead}
+                                                    title={!isTeamLead ? "Only team leads can assign tasks" : "Assign Task"}
+                                                    className={`bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] ${!isTeamLead ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
                                                     <option value="" className="bg-[#1f2a38] text-white">Unassigned</option>
                                                     {teamMembers.map(member => (
-                                                        <option key={member.id} value={member.user?.uid} className="bg-[#1f2a38] text-white">
+                                                        <option key={member.id} value={member.userId} className="bg-[#1f2a38] text-white">
                                                             {member.user?.username || member.user?.name || "User"}
                                                         </option>
                                                     ))}
@@ -440,9 +440,9 @@ export default function KanbanBoard() {
                             {kanbanTasks.done.map(task => (
                                 <div
                                     key={task.id}
-                                    draggable={isCreator || task.assigneeId === currentUserUid}
-                                    onDragStart={(e) => (isCreator || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
-                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] opacity-70 hover:opacity-100 ${isCreator || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
+                                    draggable={isTeamLead || task.assigneeId === currentUserUid}
+                                    onDragStart={(e) => (isTeamLead || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
+                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] opacity-70 hover:opacity-100 ${isTeamLead || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
                                     style={{
                                         background: '#1f2a38',
                                         border: '1px solid rgba(255,255,255,0.06)',
@@ -460,13 +460,13 @@ export default function KanbanBoard() {
                                                 <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
-                                                    disabled={!isCreator}
-                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
-                                                    className={`bg-transparent text-[10px] font-bold outline-none text-slate-400 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
+                                                    disabled={!isTeamLead}
+                                                    title={!isTeamLead ? "Only team leads can assign tasks" : "Assign Task"}
+                                                    className={`bg-transparent text-[10px] font-bold outline-none text-slate-400 p-1 rounded-md max-w-[85px] ${!isTeamLead ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
                                                     <option value="" className="bg-[#1f2a38] text-white">Unassigned</option>
                                                     {teamMembers.map(member => (
-                                                        <option key={member.id} value={member.user?.uid} className="bg-[#1f2a38] text-white">
+                                                        <option key={member.id} value={member.userId} className="bg-[#1f2a38] text-white">
                                                             {member.user?.username || member.user?.name || "User"}
                                                         </option>
                                                     ))}
@@ -545,15 +545,15 @@ export default function KanbanBoard() {
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Assign To</label>
                                 <select
-                                                    value={newTaskAssignee}
-                                                    onChange={(e) => setNewTaskAssignee(e.target.value)}
-                                                    disabled={!isCreator}
-                                                    title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
-                                                    className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-text-primary ${!isCreator ? "cursor-not-allowed opacity-50" : ""}`}
-                                                >
-                                                    <option value="">Unassigned</option>
-                                                    {teamMembers.map(member => (
-                                        <option key={member.id} value={member.user?.uid}>
+                                    value={newTaskAssignee}
+                                    onChange={(e) => setNewTaskAssignee(e.target.value)}
+                                    disabled={!isTeamLead}
+                                    title={!isTeamLead ? "Only team leads can assign tasks" : "Assign Task"}
+                                    className={`w-full px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-text-primary ${!isTeamLead ? "cursor-not-allowed opacity-50" : ""}`}
+                                >
+                                    <option value="">Unassigned</option>
+                                    {teamMembers.map(member => (
+                                        <option key={member.id} value={member.userId}>
                                             {member.user?.username || member.user?.name || "User"}
                                         </option>
                                     ))}
