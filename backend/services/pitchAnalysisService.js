@@ -17,6 +17,7 @@ const mockCreditSystem = {
     }
 };
 
+const USE_MOCK_GEMINI = true; // Toggle this to false to use the real Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'dummy_key');
 
 /**
@@ -51,12 +52,32 @@ async function analyzePitch(userId, targetId, pitchContent, hackathonIdea = null
 
     try {
         // 3. Call Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const ideaContext = hackathonIdea
-            ? `\nProject / Hackathon Idea Context (the pitch should align with this idea):\n"${hackathonIdea}"\n`
-            : '';
+        let cleanedText;
 
-        const prompt = `
+        if (USE_MOCK_GEMINI) {
+            console.log("Using Mock Gemini Mode");
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            cleanedText = JSON.stringify({
+                score: 85,
+                clarityScore: 90,
+                confidenceScore: 80,
+                structureScore: 85,
+                best_part: "Strong opening hook and clear value proposition.",
+                strengths: ["Confident tone", "Good structure", "Clear problem definition"],
+                improvements: ["Could use more concrete metrics", "Call to action could be stronger"],
+                feedback: "[MOCK MODE] This is a standard mock feedback to save your API quota. To get real feedback, set USE_MOCK_GEMINI to false in backend/services/pitchAnalysisService.js.",
+                worse_part: "Lacked specific market size data."
+            });
+        } else {
+            console.log("Calling REAL Gemini AI...");
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const ideaContext = hackathonIdea
+                ? `\nProject / Hackathon Idea Context (the pitch should align with this idea):\n"${hackathonIdea}"\n`
+                : '';
+
+            const prompt = `
 You are an expert pitch coach and startup mentor. Analyze the following elevator pitch and provide a detailed review.
 ${ideaContext}
 Evaluate how well the pitch communicates the idea, its value proposition, clarity, confidence, and structure. If a project idea is provided, also assess how well the pitch aligns with that idea.
@@ -79,27 +100,27 @@ Here is the pitch text to analyze:
 "${pitchContent}"
 `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const textResult = response.text();
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const textResult = response.text();
 
-        // 4. Robust extraction of JSON from response
-        const rawText = textResult;
+            // 4. Robust extraction of JSON from response
+            const rawText = textResult;
+            cleanedText = rawText;
+            const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
 
-        let cleanedText = rawText;
-        const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-
-        if (jsonMatch && jsonMatch[1]) {
-            // Extracted from markdown block
-            cleanedText = jsonMatch[1].trim();
-        } else {
-            // Attempt to find the first '{' and last '}' manually if no valid markdown block exists
-            const startIndex = rawText.indexOf('{');
-            const endIndex = rawText.lastIndexOf('}');
-            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-                cleanedText = rawText.substring(startIndex, endIndex + 1).trim();
+            if (jsonMatch && jsonMatch[1]) {
+                // Extracted from markdown block
+                cleanedText = jsonMatch[1].trim();
             } else {
-                cleanedText = rawText.trim();
+                // Attempt to find the first '{' and last '}' manually if no valid markdown block exists
+                const startIndex = rawText.indexOf('{');
+                const endIndex = rawText.lastIndexOf('}');
+                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+                    cleanedText = rawText.substring(startIndex, endIndex + 1).trim();
+                } else {
+                    cleanedText = rawText.trim();
+                }
             }
         }
 
@@ -109,7 +130,7 @@ Here is the pitch text to analyze:
             analysisData = JSON.parse(cleanedText);
         } catch (parseError) {
             console.error("Failed to parse JSON. Cleaned text string:", cleanedText);
-            throw new Error("Failed to parse Gemini response as JSON. Raw output: " + textResult);
+            throw new Error("Failed to parse Gemini response as JSON. Raw output: " + cleanedText);
         }
 
         // 6. Clamp scores using Math.min and Math.max to ensure they are 0-100
@@ -157,7 +178,32 @@ Here is the pitch text to analyze:
     }
 }
 
+/**
+ * Fetches the user's last saved pitch for a specific target.
+ * 
+ * @param {string} userId - The ID of the user
+ * @param {string} targetId - The target or project ID
+ * @returns {Object|null} The pitch data or null if not found
+ */
+async function getLastPitch(userId, targetId) {
+    const db = admin.firestore();
+    const docId = `${userId}_${targetId}`;
+
+    try {
+        const pitchRef = db.collection('user_pitches').doc(docId);
+        const docSnap = await pitchRef.get();
+        if (docSnap.exists) {
+            return docSnap.data();
+        }
+        return null;
+    } catch (error) {
+        console.error("Failed to fetch last pitch from Firestore:", error);
+        throw error;
+    }
+}
+
 export {
-    analyzePitch
+    analyzePitch,
+    getLastPitch
 };
 
