@@ -253,9 +253,9 @@ export default function KanbanBoard() {
                             {kanbanTasks.todo.map(task => (
                                 <div
                                     key={task.id}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, task.id)}
-                                    className="p-4 cursor-grab active:cursor-grabbing transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px]"
+                                    draggable={isCreator || task.assigneeId === currentUserUid}
+                                    onDragStart={(e) => (isCreator || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
+                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] ${isCreator || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
                                     style={{
                                         background: '#1f2a38',
                                         border: '1px solid rgba(255,255,255,0.06)',
@@ -343,9 +343,9 @@ export default function KanbanBoard() {
                             {kanbanTasks.inProgress.map(task => (
                                 <div
                                     key={task.id}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, task.id)}
-                                    className="p-4 cursor-grab active:cursor-grabbing transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px]"
+                                    draggable={isCreator || task.assigneeId === currentUserUid}
+                                    onDragStart={(e) => (isCreator || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
+                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] ${isCreator || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
                                     style={{
                                         background: '#1f2a38',
                                         border: '1px solid rgba(255,255,255,0.06)',
@@ -433,9 +433,9 @@ export default function KanbanBoard() {
                             {kanbanTasks.done.map(task => (
                                 <div
                                     key={task.id}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, task.id)}
-                                    className="p-4 cursor-grab active:cursor-grabbing transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] opacity-70 hover:opacity-100"
+                                    draggable={isCreator || task.assigneeId === currentUserUid}
+                                    onDragStart={(e) => (isCreator || task.assigneeId === currentUserUid) && handleDragStart(e, task.id)}
+                                    className={`p-4 transition-all duration-200 group relative hover:bg-[#273447] hover:-translate-y-[2px] opacity-70 hover:opacity-100 ${isCreator || task.assigneeId === currentUserUid ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
                                     style={{
                                         background: '#1f2a38',
                                         border: '1px solid rgba(255,255,255,0.06)',
