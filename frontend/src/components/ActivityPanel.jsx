@@ -3,6 +3,8 @@ import { io } from 'socket.io-client';
 import { listenToActivities } from '../firebase/functions';
 import { db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
+import { SOCKET_URL } from '../config';
+
 
 const maskSensitive = (value) => {
   if (!value || typeof value !== 'string') return value;
@@ -196,7 +198,7 @@ export default function ActivityPanel({ teamIds = [] }) {
 
   useEffect(() => {
     if (!teamIds.length) return;
-    const socketUrl = import.meta.env.VITE_ACTIVITY_SOCKET_URL || 'http://localhost:4000';
+    const socketUrl = SOCKET_URL;
     const socket = io(socketUrl, { transports: ['websocket'] });
 
     socket.emit('activity:subscribe', { teamIds });

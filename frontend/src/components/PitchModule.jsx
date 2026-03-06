@@ -3,6 +3,8 @@ import { auth, db } from '../firebase/config';
 import { doc, updateDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Bold, List, Play, Square, Loader, AlertTriangle, CheckCircle, ChevronRight, Check } from 'lucide-react';
+import { BACKEND_URL } from '../config';
+
 
 export default function PitchModule({ userId = "user123", targetId = "target123", credits = 10, hackathonIdea = null, selectedTeamId = null, selectedHackathonId = null, onIdeaSaved }) {
     // Editor State
@@ -224,9 +226,7 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
             }
 
             const idToken = await user.getIdToken();
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
-
-            const response = await fetch(`${backendUrl}/api/pitch/analyze`, {
+            const response = await fetch(`${BACKEND_URL}/api/pitch/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

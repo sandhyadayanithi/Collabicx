@@ -8,7 +8,6 @@ import {
     listenToMessages,
     listenToTasks,
     listenToLinks,
-    toggleTaskComplete,
     updateTaskStatus,
     addTask as firebaseAddTask,
     addLink as firebaseAddLink,
@@ -292,6 +291,7 @@ export default function HackathonWorkspace() {
 
     // -- State: Sprint Tasks --
     const [tasks, setTasks] = useState([]);
+    const [statusFilter, setStatusFilter] = useState("all");
     const [newTaskTitle, setNewTaskTitle] = useState("");
 
     // Tasks Listener
@@ -365,13 +365,6 @@ export default function HackathonWorkspace() {
         }
     };
 
-    const toggleTask = async (id) => {
-        try {
-            await toggleTaskComplete(teamId, hackathonId, id);
-        } catch (error) {
-            console.error("Error toggling task:", error);
-        }
-    };
 
     const handleDeleteTask = async (id, e) => {
         e.stopPropagation(); // prevent toggling the task
@@ -717,86 +710,143 @@ export default function HackathonWorkspace() {
 
                     {/* Sprint Tasks & Submission Assets combined */}
                     <section className="flex-1 min-w-[320px] h-full rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col vibrant-card shrink-0">
-                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" onClick={() => toggleSection('sprintTasks')}>
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Sprint Tasks</h3>
-                                <div className="flex items-center gap-2">
-                                    <button onClick={(e) => { e.stopPropagation(); navigate(`/workspace/${teamId}/${hackathonId}/board`); }} className="text-emerald-500 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300 flex items-center gap-1 text-sm font-bold mr-2">
-                                        <span className="material-symbols-outlined text-sm">view_kanban</span>
-                                        Kanban
+                        <div className="p-4 py-4 border-b border-slate-200 dark:border-slate-800 transition-colors">
+                            <div className="flex flex-col gap-5">
+                                {/* Row 1: Title + Primary Action */}
+                                <div className="flex items-center justify-between">
+                                    <h3 className="font-bold text-sm uppercase tracking-wider text-text-secondary dark:text-emerald-400">Sprint Tasks</h3>
+                                    <button
+                                        onClick={() => addTask()}
+                                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white px-3.5 py-1.5 rounded-lg text-xs font-black shadow-lg shadow-emerald-500/20 transition-all active:scale-95 flex items-center gap-1.5"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">add</span>
+                                        ADD TASK
                                     </button>
-                                    <button onClick={(e) => { e.stopPropagation(); handleAITaskButtonClick(); }} disabled={isGeneratingTasks} className="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300 flex items-center gap-1 text-sm font-bold mr-2 disabled:opacity-50">
-                                        {isGeneratingTasks ? (
-                                            <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-                                        ) : (
-                                            <span className="material-symbols-outlined text-sm">auto_awesome</span>
-                                        )}
-                                        {isGeneratingTasks ? 'Generating...' : 'AI Tasks'}
-                                    </button>
-                                    <button onClick={(e) => { e.stopPropagation(); addTask(); }} className="text-primary hover:text-blue-400 flex items-center gap-1 text-sm font-bold">
-                                        <span className="material-symbols-outlined text-sm">add</span> Add
-                                    </button>
-                                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${expandedSections.sprintTasks ? 'rotate-180' : ''}`}>
-                                        expand_more
-                                    </span>
                                 </div>
-                            </div>
-                            <div className="vibrant-badge p-4 rounded-xl">
-                                <div className="flex justify-between items-end mb-2">
-                                    <div>
-                                        <p className="text-2xl font-black text-text-primary">{progress}%</p>
+
+                                {/* Row 2: Status Filter + Navigation Toggles */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2.5">
+                                        <span className="text-[12px] font-bold text-slate-400 uppercase">Status:</span>
+                                        <select
+                                            id="statusFilter"
+                                            value={statusFilter}
+                                            onChange={(e) => { e.stopPropagation(); setStatusFilter(e.target.value); }}
+                                            className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-[11px] font-bold text-slate-200 outline-none focus:border-emerald-500/50 transition-all hover:bg-white/15 cursor-pointer"
+                                        >
+                                            <option value="all" className="bg-slate-900">All</option>
+                                            <option value="todo" className="bg-slate-900">To Do</option>
+                                            <option value="inprogress" className="bg-slate-900">In Progress</option>
+                                            <option value="done" className="bg-slate-900">Done</option>
+                                        </select>
                                     </div>
-                                    <div className="text-right">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${progress >= 50 ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
+
+                                    <div className="flex items-center bg-white/5 p-1 rounded-lg border border-white/10 gap-1">
+                                        <button
+                                            onClick={() => navigate(`/workspace/${teamId}/${hackathonId}/board`)}
+                                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] font-black transition-all hover:bg-white/10 text-emerald-400"
+                                        >
+                                            <span className="material-symbols-outlined text-[14px]">view_kanban</span>
+                                            BOARD
+                                        </button>
+                                        <div className="w-[1px] h-3 bg-white/10 mx-0.5" />
+                                        <button
+                                            onClick={() => handleAITaskButtonClick()}
+                                            disabled={isGeneratingTasks}
+                                            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] font-black transition-all ${isGeneratingTasks ? 'opacity-50 text-slate-500' : 'hover:bg-white/10 text-slate-400 hover:text-purple-400'}`}
+                                        >
+                                            <span className="material-symbols-outlined text-[14px]">{isGeneratingTasks ? 'progress_activity' : 'auto_awesome'}</span>
+                                            AI TASKS
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Progress Bar Mini */}
+                                <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <div className="flex justify-between items-center mb-2 px-0.5">
+                                        <div className="flex items-baseline gap-2">
+                                            <p className="text-[20px] font-bold text-text-primary leading-none">{progress}%</p>
+                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Complete</span>
+                                        </div>
+                                        <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${progress >= 50 ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
                                             {progress >= 50 ? 'On Track' : 'In Progress'}
                                         </span>
                                     </div>
-                                </div>
-                                <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
-                                    <div className="bg-primary h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                                    <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                                        <div className="bg-primary h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                             {/* Task List */}
-                            {expandedSections.sprintTasks && (
-                                <div className="space-y-2 mb-8">
-                                    {tasks.map(task => (
-                                        <div key={task.id} className={`flex items-center gap-3 p-3 vibrant-badge rounded-lg group transition-all ${task.completed ? 'opacity-60' : ''}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={task.completed}
-                                                onChange={() => toggleTask(task.id)}
-                                                className="rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary bg-transparent size-4 cursor-pointer shrink-0"
-                                            />
-                                            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                                <p className={`text-sm text-text-primary font-black truncate w-full ${task.completed ? 'line-through text-slate-500' : ''}`}>
-                                                    {task.title}
-                                                </p>
-                                                {task.assigneeUsername && (
-                                                    <div className="mt-1 flex items-center gap-1 opacity-70">
-                                                        <span className="material-symbols-outlined text-[12px] text-slate-500">person</span>
-                                                        <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">
-                                                            {task.assigneeUsername}
+                            <div className="space-y-2 mb-8">
+                                {tasks
+                                    .filter(task => {
+                                        if (statusFilter === "all") return true;
+                                        const status = (task.status || (task.completed ? "done" : "todo")).toLowerCase();
+                                        if (statusFilter === "inprogress" && (status === "inprogress" || status === "in progress")) return true;
+                                        return status === statusFilter;
+                                    })
+                                    .map(task => {
+                                        const status = (task.status || (task.completed ? "done" : "todo")).toLowerCase();
+                                        const getStatusBadge = (s) => {
+                                            if (s === 'done') return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/10">Done</span>;
+                                            if (s === 'inprogress' || s === 'in progress') return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/10">In Progress</span>;
+                                            return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-slate-500/10">To Do</span>;
+                                        };
+
+                                        const assignee = teamMembers.find(m => m.user?.uid === task.assigneeId);
+
+                                        return (
+                                            <div key={task.id} className="p-2.5 px-3.5 vibrant-badge rounded-[10px] group transition-all hover:bg-white/[0.04] hover:-translate-y-[1px] duration-150 flex flex-col gap-1.5 border border-transparent hover:border-white/5">
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <p className="text-[14px] text-text-primary font-bold leading-tight truncate">
+                                                        {task.title}
+                                                    </p>
+                                                    <button
+                                                        onClick={(e) => handleDeleteTask(task.id, e)}
+                                                        className="opacity-0 group-hover:opacity-100 size-6 shrink-0 flex items-center justify-center rounded-md hover:bg-red-500/10 text-slate-500 hover:text-red-500 transition-all"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[14px]">delete</span>
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex items-center justify-between mt-0.5">
+                                                    <div className="flex items-center gap-1.5">
+                                                        {getStatusBadge(status)}
+                                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800/50 text-slate-500 border border-white/5 uppercase tracking-tight">
+                                                            {task.category || 'General'}
                                                         </span>
                                                     </div>
-                                                )}
+
+                                                    <div className="flex items-center">
+                                                        {assignee ? (
+                                                            <div className="flex items-center gap-1.5 bg-white/[0.03] px-1.5 py-0.5 rounded-lg border border-white/5" title={assignee.user?.username || assignee.user?.name}>
+                                                                <div
+                                                                    className="size-4 rounded-full bg-cover bg-center border border-white/10"
+                                                                    style={{ backgroundImage: `url(${assignee.user?.avatar || 'https://www.gravatar.com/avatar?d=mp'})` }}
+                                                                />
+                                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter max-w-[50px] truncate">
+                                                                    {assignee.user?.username || assignee.user?.name}
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-1 opacity-30">
+                                                                <span className="material-symbols-outlined text-[10px] text-slate-500">person</span>
+                                                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Unassigned</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <button
-                                                onClick={(e) => handleDeleteTask(task.id, e)}
-                                                className="hidden group-hover:flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors"
-                                                title="Delete Task"
-                                            >
-                                                <span className="material-symbols-outlined text-sm">delete</span>
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {tasks.length === 0 && (
-                                        <p className="text-center text-slate-400 text-sm py-8 italic">No tasks.</p>
-                                    )}
-                                </div>
-                            )}
+                                        );
+                                    })}
+                                {tasks.length === 0 && (
+                                    <p className="text-center text-slate-500 text-[11px] font-bold py-10 uppercase tracking-widest opacity-30">No tasks found</p>
+                                )}
+                            </div>
 
                             {/* Submission Assets Header & List */}
                             <div className="border-t border-slate-200 dark:border-slate-700 pt-6">

@@ -269,7 +269,7 @@ export default function KanbanBoard() {
                                             {task.category || 'General'}
                                         </span>
                                         <div className="flex z-10 items-center justify-end">
-                                            <div className="flex bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex bg-[rgba(255,255,255,0.05)] rounded-full border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.1)] transition-colors px-[6px]" onClick={(e) => e.stopPropagation()}>
                                                 <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
@@ -277,9 +277,9 @@ export default function KanbanBoard() {
                                                     title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
                                                     className={`bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
-                                                    <option value="">Unassigned</option>
+                                                    <option value="" className="bg-[#1f2a38] text-white">Unassigned</option>
                                                     {teamMembers.map(member => (
-                                                        <option key={member.id} value={member.user?.uid}>
+                                                        <option key={member.id} value={member.user?.uid} className="bg-[#1f2a38] text-white">
                                                             {member.user?.username || member.user?.name || "User"}
                                                         </option>
                                                     ))}
@@ -359,7 +359,7 @@ export default function KanbanBoard() {
                                             {task.category || 'General'}
                                         </span>
                                         <div className="flex z-10 items-center justify-end">
-                                            <div className="flex bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex bg-[rgba(255,255,255,0.05)] rounded-full border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.1)] transition-colors px-[6px]" onClick={(e) => e.stopPropagation()}>
                                                 <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
@@ -367,9 +367,9 @@ export default function KanbanBoard() {
                                                     title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
                                                     className={`bg-transparent text-[10px] font-bold outline-none text-slate-300 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
-                                                    <option value="">Unassigned</option>
+                                                    <option value="" className="bg-[#1f2a38] text-white">Unassigned</option>
                                                     {teamMembers.map(member => (
-                                                        <option key={member.id} value={member.user?.uid}>
+                                                        <option key={member.id} value={member.user?.uid} className="bg-[#1f2a38] text-white">
                                                             {member.user?.username || member.user?.name || "User"}
                                                         </option>
                                                     ))}
@@ -449,7 +449,7 @@ export default function KanbanBoard() {
                                             {task.category || 'General'}
                                         </span>
                                         <div className="flex z-10 items-center justify-end">
-                                            <div className="flex bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-transparent transition-colors px-1" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex bg-[rgba(255,255,255,0.05)] rounded-full border border-[rgba(255,255,255,0.08)] hover:bg-[rgba(255,255,255,0.1)] transition-colors px-[6px]" onClick={(e) => e.stopPropagation()}>
                                                 <select
                                                     value={task.assigneeId || ""}
                                                     onChange={(e) => handleAssigneeChange(task.id, e.target.value)}
@@ -457,9 +457,9 @@ export default function KanbanBoard() {
                                                     title={!isCreator ? "Only team creators can assign tasks" : "Assign Task"}
                                                     className={`bg-transparent text-[10px] font-bold outline-none text-slate-400 p-1 rounded-md max-w-[85px] ${!isCreator ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                                 >
-                                                    <option value="">Unassigned</option>
+                                                    <option value="" className="bg-[#1f2a38] text-white">Unassigned</option>
                                                     {teamMembers.map(member => (
-                                                        <option key={member.id} value={member.user?.uid}>
+                                                        <option key={member.id} value={member.user?.uid} className="bg-[#1f2a38] text-white">
                                                             {member.user?.username || member.user?.name || "User"}
                                                         </option>
                                                     ))}
