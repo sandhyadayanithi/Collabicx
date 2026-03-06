@@ -10,12 +10,12 @@ import { auth, db } from '../firebase/config';
 import { BACKEND_URL } from '../config';
 
 
-// Import Avatars
-import avatar1 from '../assets/avatars/avatar1.png';
-import avatar2 from '../assets/avatars/avatar2.png';
-import avatar3 from '../assets/avatars/avatar3.png';
-import avatar4 from '../assets/avatars/avatar4.png';
-import avatar5 from '../assets/avatars/avatar5.png';
+// Avatar paths (now served from /public/avatars/)
+const avatar1 = '/avatars/avatar1.png';
+const avatar2 = '/avatars/avatar2.png';
+const avatar3 = '/avatars/avatar3.png';
+const avatar4 = '/avatars/avatar4.png';
+const avatar5 = '/avatars/avatar5.png';
 
 export default function ProfileSetup() {
     const navigate = useNavigate();
