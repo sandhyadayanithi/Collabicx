@@ -17,7 +17,7 @@ const mockCreditSystem = {
     }
 };
 
-const USE_MOCK_GEMINI = true; // Toggle this to false to use the real Gemini API
+const USE_MOCK_GEMINI = false; // Toggle this to false to use the real Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'dummy_key');
 
 /**
