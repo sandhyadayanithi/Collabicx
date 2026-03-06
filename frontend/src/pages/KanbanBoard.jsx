@@ -95,6 +95,13 @@ export default function KanbanBoard() {
         const taskId = e.dataTransfer.getData("taskId");
         if (!taskId || !teamId || !hackathonId) return;
 
+        // Verify authorization for drop
+        const task = tasks.find(t => t.id === taskId);
+        if (task && !isCreator && task.assigneeId !== currentUserUid) {
+            console.warn("Unauthorized drop attempt: You can only move your own tasks.");
+            return;
+        }
+
         try {
             await updateTaskStatus(teamId, hackathonId, taskId, newStatus);
         } catch (error) {
