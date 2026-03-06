@@ -164,13 +164,28 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
         if (textToAppend) {
             // Manage cursor jump manually for programmatic inserts
             isTypingRef.current = false;
-            const spaceSeparator = pitchContent.length > 0 ? " " : "";
-            const newContent = pitchContent + spaceSeparator + textToAppend;
+
+            // Ensures correct space separation
+            const needsSpace = pitchContent.length > 0 && !pitchContent.endsWith(" ") && !pitchContent.endsWith("&nbsp;");
+            const spaceSeparator = needsSpace ? "&nbsp;" : "";
+
+            const newContent = pitchContent + spaceSeparator + textToAppend + "&nbsp;";
             setPitchContent(newContent);
 
             // Update DOM manually to sync the state without losing caret on next keystroke
             if (editorRef.current) {
                 editorRef.current.innerHTML = newContent;
+                // Move caret to end
+                try {
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(editorRef.current);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } catch (e) {
+                    console.error("Caret repositioning failed", e);
+                }
             }
         }
     };
@@ -233,7 +248,7 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
                     'Authorization': `Bearer ${idToken}`
                 },
                 body: JSON.stringify({
-                    targetId,
+                    targetId: selectedHackathonId || selectedTeamId || targetId,
                     pitchContent,
                     hackathonIdea: effectiveIdea || null
                 })
@@ -385,7 +400,7 @@ export default function PitchModule({ userId = "user123", targetId = "target123"
 
                         </div>
                         <button
-                            onClick={analyzePitch}
+                            onClick={() => analyzePitch()}
                             disabled={isAnalyzing || !pitchContent.trim()}
                             className="h-12 px-8 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white text-sm font-black rounded-full shadow-lg shadow-emerald-900/20 flex items-center gap-2 transition-all active:scale-95 hover:shadow-emerald-500/20 group/btn"
                         >

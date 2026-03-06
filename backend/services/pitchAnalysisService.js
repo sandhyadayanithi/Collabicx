@@ -51,7 +51,7 @@ async function analyzePitch(userId, targetId, pitchContent, hackathonIdea = null
 
     try {
         // 3. Call Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const ideaContext = hackathonIdea
             ? `\nProject / Hackathon Idea Context (the pitch should align with this idea):\n"${hackathonIdea}"\n`
             : '';
@@ -83,15 +83,33 @@ Here is the pitch text to analyze:
         const response = await result.response;
         const textResult = response.text();
 
-        // 4. Clean up response (RegEx for stripping markdown like ```json...```)
-        const cleanedText = textResult.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+        // 4. Robust extraction of JSON from response
+        const rawText = textResult;
+
+        let cleanedText = rawText;
+        const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+
+        if (jsonMatch && jsonMatch[1]) {
+            // Extracted from markdown block
+            cleanedText = jsonMatch[1].trim();
+        } else {
+            // Attempt to find the first '{' and last '}' manually if no valid markdown block exists
+            const startIndex = rawText.indexOf('{');
+            const endIndex = rawText.lastIndexOf('}');
+            if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+                cleanedText = rawText.substring(startIndex, endIndex + 1).trim();
+            } else {
+                cleanedText = rawText.trim();
+            }
+        }
 
         // 5. Parse JSON
         let analysisData;
         try {
             analysisData = JSON.parse(cleanedText);
         } catch (parseError) {
-            throw new Error("Failed to parse Gemini response as JSON. Raw output: " + cleanedText);
+            console.error("Failed to parse JSON. Cleaned text string:", cleanedText);
+            throw new Error("Failed to parse Gemini response as JSON. Raw output: " + textResult);
         }
 
         // 6. Clamp scores using Math.min and Math.max to ensure they are 0-100
